@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contratos DC - Dashboard</title>
+
+<style>
+:root{
+  --orange:#D88D53;
+  --orange-light:#F0B06E;
+  --orange-soft:#F5C98E;
+  --cream:#FFF8EF;
+  --bg:#F3EFE9;
+  --white:#FFFFFF;
+  --text:#2C3B4D;
+  --muted:#7A8490;
+  --border:#E8DED3;
+  --green:#6FA879;
+  --red:#C96B67;
+  --yellow:#D7A84D;
+  --blue:#6F91B5;
+  --shadow:0 15px 40px rgba(70,52,36,.12);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%,#fff8ef 0,transparent 35%),
+    radial-gradient(circle at 90% 90%,#f4d8bb 0,transparent 35%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* CONTENEDOR PRINCIPAL */
+
+.stage{
+  min-height:100vh;
+  padding:18px;
+  display:flex;
+}
+
+.win{
+  width:100%;
+  min-height:calc(100vh - 36px);
+  display:flex;
+  overflow:hidden;
+  border-radius:28px;
+  background:rgba(255,255,255,.72);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+
+/* SIDEBAR */
+
+.side{
+  width:235px;
+  flex-shrink:0;
+  background:#D88D53;
+  color:white;
+  padding:24px 14px;
+  display:flex;
+  flex-direction:column;
+}
+
+.sb-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:0 8px 28px;
+}
+
+.sb-head h2{
+  font-size:18px;
+  font-weight:700;
+}
+
+.sb-head span{
+  display:block;
+  margin-top:3px;
+  font-size:11px;
+  opacity:.8;
+}
+
+.more{
+  border:0;
+  background:rgba(255,255,255,.15);
+  color:white;
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  cursor:pointer;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:white;
+  text-align:left;
+  padding:11px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.nav button:hover,
+.nav button.active{
+  background:rgba(255,255,255,.18);
+}
+
+.nav .icon{
+  width:20px;
+  text-align:center;
+}
+
+.me{
+  margin-top:auto;
+  padding:14px 8px 4px;
+  border-top:1px solid rgba(255,255,255,.2);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.av{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:rgba(255,255,255,.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:12px;
+}
+
+.me b{
+  display:block;
+  font-size:12px;
+}
+
+.me small{
+  font-size:10px;
+  opacity:.75;
+}
+
+/* CONTENIDO */
+
+.main{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.bar{
+  height:66px;
+  padding:0 26px;
+  display:flex;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.72);
+}
+
+.crumb{
+  font-size:13px;
+  font-weight:600;
+}
+
+.sp{
+  flex:1;
+}
+
+.role{
+  display:flex;
+  background:#F4E9DD;
+  padding:3px;
+  border-radius:9px;
+  margin-right:16px;
+}
+
+.role button{
+  border:0;
+  background:transparent;
+  padding:7px 12px;
+  border-radius:7px;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:11px;
+}
+
+.role button.active{
+  background:white;
+  color:var(--text);
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+.tool{
+  width:34px;
+  height:34px;
+  border-radius:9px;
+  border:1px solid var(--border);
+  background:white;
+  cursor:pointer;
+}
+
+/* CONTENIDO */
+
+.content{
+  padding:26px;
+  overflow:auto;
+}
+
+.view{
+  display:none;
+}
+
+.view.active{
+  display:block;
+}
+
+.titline{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:22px;
+}
+
+.titline h1{
+  font-size:24px;
+  margin-bottom:4px;
+}
+
+.titline p{
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* FILTROS */
+
+.filters{
+  display:flex;
+  gap:9px;
+  margin-bottom:22px;
+  flex-wrap:wrap;
+}
+
+.filter{
+  border:1px solid var(--border);
+  background:white;
+  color:var(--text);
+  padding:8px 13px;
+  border-radius:9px;
+  font-size:11px;
+}
+
+/* KPI */
+
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.kpi{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:17px;
+  box-shadow:0 5px 15px rgba(60,45,30,.05);
+}
+
+.kpi-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.kpi-label{
+  font-size:11px;
+  color:var(--muted);
+}
+
+.kpi-icon{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:#FFF0DD;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.kpi strong{
+  display:block;
+  margin-top:7px;
+  font-size:25px;
+}
+
+.kpi small{
+  color:var(--muted);
+  font-size:10px;
+}
+
+/* GRID */
+
+.grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-bottom:18px;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin-bottom:18px;
+}
+
+/* CARDS */
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.card-head{
+  padding:14px 17px;
+  background:linear-gradient(180deg,#F5C98E,#F0B06E);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.card-head h3{
+  font-size:12px;
+}
+
+.card-head span{
+  font-size:10px;
+  color:#6D5845;
+}
+
+.card-body{
+  padding:17px;
+}
+
+/* BARRAS */
+
+.bar-item{
+  margin-bottom:14px;
+}
+
+.bar-info{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:5px;
+  font-size:11px;
+}
+
+.bar-track{
+  height:8px;
+  background:#F0E9E1;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.bar-fill{
+  height:100%;
+  background:var(--orange);
+  border-radius:20px;
+}
+
+/* DISTRIBUCIONES */
+
+.stats-row{
+  display:flex;
+  gap:10px;
+}
+
+.stat-box{
+  flex:1;
+  background:#FAF6F1;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:11px;
+}
+
+.stat-box strong{
+  display:block;
+  font-size:18px;
+}
+
+.stat-box span{
+  font-size:10px;
+  color:var(--muted);
+}
+
+/* TABLA */
+
+.table-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+
+.table-head{
+  padding:14px 17px;
+  background:linear-gradient(180deg,#F5C98E,#F0B06E);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.table-head h3{
+  font-size:12px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th{
+  text-align:left;
+  font-size:10px;
+  color:var(--muted);
+  font-weight:600;
+  padding:11px 14px;
+  background:#FCFAF7;
+}
+
+td{
+  padding:12px 14px;
+  font-size:11px;
+  border-top:1px solid #F0EAE3;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:20px;
+  font-size:9px;
+  font-weight:600;
+}
+
+.green{
+  background:#E6F2E8;
+  color:#527D5B;
+}
+
+.red{
+  background:#F8E5E4;
+  color:#A4514D;
+}
+
+.yellow{
+  background:#F8EFD9;
+  color:#947326;
+}
+
+.blue{
+  background:#E5EDF6;
+  color:#52718E;
+}
+
+.gray{
+  background:#ECECEC;
+  color:#666;
+}
+
+/* ALERTAS */
+
+.alert{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:11px 13px;
+  border-radius:10px;
+  background:#FAF7F3;
+  margin-bottom:9px;
+  border:1px solid var(--border);
+}
+
+.alert-icon{
+  width:29px;
+  height:29px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#F8EFD9;
+}
+
+.alert strong{
+  font-size:11px;
+  display:block;
+}
+
+.alert span{
+  font-size:10px;
+  color:var(--muted);
+}
+
+/* FALLOS */
+
+.fallo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid #F0EAE3;
+}
+
+.fallo:last-child{
+  border-bottom:0;
+}
+
+.fallo-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+
+.fallo-info{
+  flex:1;
+}
+
+.fallo-info strong{
+  font-size:11px;
+  display:block;
+}
+
+.fallo-info span{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.fallo-value{
+  font-size:12px;
+  font-weight:600;
+}
+
+/* OPERATIVA */
+
+.operational-grid{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:18px;
+}
+
+.list{
+  display:flex;
+  flex-direction:column;
+}
+
+.list-row{
+  padding:12px 0;
+  border-bottom:1px solid #F0EAE3;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.list-row:last-child{
+  border-bottom:0;
+}
+
+.list-main{
+  flex:1;
+}
+
+.list-main strong{
+  font-size:11px;
+  display:block;
+}
+
+.list-main span{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.date{
+  font-size:10px;
+  color:var(--muted);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+  .kpis{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid-2,
+  .grid-3,
+  .operational-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:700px){
+  .side{
+    width:70px;
+    padding:20px 8px;
+  }
+
+  .sb-head h2,
+  .sb-head span,
+  .nav button span,
+  .me div:not(.av){
+    display:none;
+  }
+
+  .sb-head{
+    justify-content:center;
+  }
+
+  .nav button{
+    justify-content:center;
+  }
+
+  .kpis{
+    grid-template-columns:1fr;
+  }
+
+  .content{
+    padding:18px;
+  }
+
+  .bar{
+    padding:0 15px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="stage">
+
+<div class="win">
+
+<!-- SIDEBAR -->
+<aside class="side">
+
+  <div class="sb-head">
+    <div>
+      <h2>Contratos DC</h2>
+      <span>Dirección de Contratación</span>
+    </div>
+
+    <button class="more">···</button>
+  </div>
+
+  <nav class="nav">
+
+    <button class="active" onclick="mostrarVista('ejecutiva',this)">
+      <span class="icon">▦</span>
+      <span>Vista ejecutiva</span>
+    </button>
+
+    <button onclick="mostrarVista('operativa',this)">
+      <span class="icon">☷</span>
+      <span>Vista operativa</span>
+    </button>
+
+    <button>
+      <span class="icon">▤</span>
+      <span>Procesos</span>
+    </button>
+
+    <button>
+      <span class="icon">◉</span>
+      <span>Abogados</span>
+    </button>
+
+    <button>
+      <span class="icon">⚠</span>
+      <span>Calidad</span>
+    </button>
+
+  </nav>
+
+  <div class="me">
+    <div class="av">SF</div>
+
+    <div>
+      <b>Santiago Forero</b>
+      <small>Administrador</small>
+    </div>
+  </div>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+  <header class="bar">
+
+    <span class="crumb" id="crumb">
+      Dashboard · Vista ejecutiva
+    </span>
+
+    <div class="sp"></div>
+
+    <div class="role">
+
+      <button id="btnEjecutiva"
+              class="active"
+              onclick="mostrarVista('ejecutiva')">
+        Ejecutiva
+      </button>
+
+      <button id="btnOperativa"
+              onclick="mostrarVista('operativa')">
+        Operativa
+      </button>
+
+    </div>
+
+    <button class="tool">☼</button>
+
+  </header>
+
+
+  <div class="content">
+
+
+  <!-- ================================================= -->
+  <!-- VISTA EJECUTIVA -->
+  <!-- ================================================= -->
+
+  <section id="ejecutiva" class="view active">
+
+    <div class="titline">
+
+      <div>
+        <h1>Vista ejecutiva</h1>
+        <p>Resumen general del estado de los procesos de contratación.</p>
+      </div>
+
+    </div>
+
+
+    <!-- FILTROS -->
+
+    <div class="filters">
+
+      <button class="filter">Año: 2026 ▾</button>
+      <button class="filter">Área: Todas ▾</button>
+      <button class="filter">Tipo de proceso: Todos ▾</button>
+      <button class="filter">Etapa: Todas ▾</button>
+
+    </div>
+
+
+    <!-- KPIs -->
+
+    <div class="kpis">
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Procesos activos</span>
+          <div class="kpi-icon">●</div>
+        </div>
+
+        <strong>248</strong>
+        <small>Procesos actualmente activos</small>
+      </div>
+
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Procesos terminados</span>
+          <div class="kpi-icon">✓</div>
+        </div>
+
+        <strong>126</strong>
+        <small>Procesos finalizados</small>
+      </div>
+
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Desvinculados</span>
+          <div class="kpi-icon">↗</div>
+        </div>
+
+        <strong>17</strong>
+        <small>Procesos desvinculados</small>
+      </div>
+
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Medida cautelar</span>
+          <div class="kpi-icon">!</div>
+        </div>
+
+        <strong>23</strong>
+        <small>Procesos con medida cautelar</small>
+      </div>
+
+    </div>
+
+
+    <!-- PROCESOS POR TIPO / ETAPA -->
+
+    <div class="grid-2">
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Procesos por tipo</h3>
+          <span>Total: 391</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Contratación directa</span>
+              <b>142</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:78%"></div>
+            </div>
+          </div>
+
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Selección abreviada</span>
+              <b>96</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:55%"></div>
+            </div>
+          </div>
+
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Licitación pública</span>
+              <b>81</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:45%"></div>
+            </div>
+          </div>
+
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Mínima cuantía</span>
+              <b>72</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:38%"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Procesos por etapa</h3>
+          <span>Estado actual</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="stats-row">
+
+            <div class="stat-box">
+              <strong>84</strong>
+              <span>Revisión</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>71</strong>
+              <span>Evaluación</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>53</strong>
+              <span>Adjudicación</span>
+            </div>
+
+          </div>
+
+          <br>
+
+          <div class="stats-row">
+
+            <div class="stat-box">
+              <strong>27</strong>
+              <span>Legalización</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>13</strong>
+              <span>Cierre</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>--</strong>
+              <span>Otros</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- CALIDAD / ÁREA -->
+
+    <div class="grid-2">
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Calidad de los procesos</h3>
+          <span>Distribución</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="stats-row">
+
+            <div class="stat-box">
+              <strong>276</strong>
+              <span>Óptimos</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>84</strong>
+              <span>Con observaciones</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>31</strong>
+              <span>Deficientes</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Área generadora</h3>
+          <span>Procesos</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Dirección de Contratación</span>
+              <b>152</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:82%"></div>
+            </div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Planeación</span>
+              <b>103</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:58%"></div>
+            </div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-info">
+              <span>Administrativa</span>
+              <b>81</b>
+            </div>
+
+            <div class="bar-track">
+              <div class="bar-fill" style="width:45%"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ABOGADOS -->
+
+    <div class="table-card">
+
+      <div class="table-head">
+
+        <h3>Carga de procesos por abogado</h3>
+
+        <span>Distribución actual</span>
+
+      </div>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Abogado</th>
+            <th>Activos</th>
+            <th>Terminados</th>
+            <th>Observaciones</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>Laura Martínez</td>
+            <td>42</td>
+            <td>21</td>
+            <td><span class="badge yellow">4</span></td>
+            <td><b>67</b></td>
+          </tr>
+
+          <tr>
+            <td>Carlos Rodríguez</td>
+            <td>38</td>
+            <td>25</td>
+            <td><span class="badge green">2</span></td>
+            <td><b>65</b></td>
+          </tr>
+
+          <tr>
+            <td>Andrea Gómez</td>
+            <td>35</td>
+            <td>19</td>
+            <td><span class="badge red">7</span></td>
+            <td><b>61</b></td>
+          </tr>
+
+          <tr>
+            <td>Juan Pérez</td>
+            <td>31</td>
+            <td>24</td>
+            <td><span class="badge green">1</span></td>
+            <td><b>56</b></td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- PRETENSIONES / FALLOS -->
+
+    <div class="grid-2">
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Valor de pretensiones</h3>
+          <span>Distribución por rangos</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="stats-row">
+
+            <div class="stat-box">
+              <strong>118</strong>
+              <span>Hasta $50 M</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>74</strong>
+              <span>$50 M - $200 M</span>
+            </div>
+
+            <div class="stat-box">
+              <strong>36</strong>
+              <span>Más de $200 M</span>
+            </div>
+
+          </div>
+
+          <div style="margin-top:15px;font-size:11px;color:#777;">
+            Valor agregado:
+            <b style="color:#2C3B4D;">$4.820.000.000</b>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Resultado de fallos</h3>
+          <span>Procesos judiciales</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="fallo">
+            <div class="fallo-dot" style="background:#6FA879"></div>
+
+            <div class="fallo-info">
+              <strong>Favorables</strong>
+              <span>Resultado favorable</span>
+            </div>
+
+            <div class="fallo-value">42</div>
+          </div>
+
+
+          <div class="fallo">
+            <div class="fallo-dot" style="background:#C96B67"></div>
+
+            <div class="fallo-info">
+              <strong>Desfavorables</strong>
+              <span>Resultado desfavorable</span>
+            </div>
+
+            <div class="fallo-value">18</div>
+          </div>
+
+
+          <div class="fallo">
+            <div class="fallo-dot" style="background:#D7A84D"></div>
+
+            <div class="fallo-info">
+              <strong>Mixtos</strong>
+              <span>Resultado mixto</span>
+            </div>
+
+            <div class="fallo-value">9</div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- PERMANENCIA -->
+
+    <div class="card">
+
+      <div class="card-head">
+        <h3>Procesos con larga permanencia sin actuación</h3>
+        <span>Requieren revisión</span>
+      </div>
+
+      <div class="card-body">
+
+        <div class="alert">
+          <div class="alert-icon">!</div>
+
+          <div>
+            <strong>SDM-CPS-1042-2026</strong>
+            <span>48 días sin actuación · Abogado: Laura Martínez</span>
+          </div>
+
+          <span class="badge red">48 días</span>
+        </div>
+
+
+        <div class="alert">
+          <div class="alert-icon">!</div>
+
+          <div>
+            <strong>SDM-CPS-3105-2026</strong>
+            <span>39 días sin actualización · Abogado: Carlos Rodríguez</span>
+          </div>
+
+          <span class="badge yellow">39 días</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================================================= -->
+  <!-- VISTA OPERATIVA -->
+  <!-- ================================================= -->
+
+  <section id="operativa" class="view">
+
+    <div class="titline">
+
+      <div>
+        <h1>Vista operativa</h1>
+        <p>Seguimiento de registros, actuaciones, calidad e incidencias.</p>
+      </div>
+
+    </div>
+
+
+    <!-- KPIs OPERATIVOS -->
+
+    <div class="kpis">
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Sin actualización</span>
+          <div class="kpi-icon">!</div>
+        </div>
+
+        <strong>18</strong>
+        <small>Procesos pendientes de actualización</small>
+      </div>
+
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Errores de calidad</span>
+          <div class="kpi-icon">×</div>
+        </div>
+
+        <strong>11</strong>
+        <small>Registros con inconsistencias</small>
+      </div>
+
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Campos incompletos</span>
+          <div class="kpi-icon">□</div>
+        </div>
+
+        <strong>27</strong>
+        <small>Registros pendientes</small>
+      </div>
+
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Incidencias</span>
+          <div class="kpi-icon">⚠</div>
+        </div>
+
+        <strong>9</strong>
+        <small>Incidencias de calidad abiertas</small>
+      </div>
+
+    </div>
+
+
+    <div class="operational-grid">
+
+      <!-- SIN ACTUALIZACIÓN -->
+
+      <div class="table-card">
+
+        <div class="table-head">
+          <h3>Procesos sin actualización reciente</h3>
+          <span>Últimos 30 días</span>
+        </div>
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Radicado</th>
+              <th>Abogado</th>
+              <th>Última actuación</th>
+              <th>Días</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>SDM-CPS-1042-2026</td>
+              <td>Laura Martínez</td>
+              <td>12/08/2026</td>
+              <td><span class="badge red">48</span></td>
+            </tr>
+
+            <tr>
+              <td>SDM-CPS-3105-2026</td>
+              <td>Carlos Rodríguez</td>
+              <td>21/08/2026</td>
+              <td><span class="badge yellow">39</span></td>
+            </tr>
+
+            <tr>
+              <td>SDM-CPS-164-2026</td>
+              <td>Andrea Gómez</td>
+              <td>27/08/2026</td>
+              <td><span class="badge yellow">33</span></td>
+            </tr>
+
+            <tr>
+              <td>SDM-CPS-3612-2026</td>
+              <td>Juan Pérez</td>
+              <td>02/09/2026</td>
+              <td><span class="badge blue">27</span></td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- ERRORES -->
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Errores y campos incompletos</h3>
+          <span>Pendientes</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="alert">
+
+            <div class="alert-icon">×</div>
+
+            <div>
+              <strong>Fecha de terminación</strong>
+              <span>5 registros sin información</span>
+            </div>
+
+            <span class="badge red">5</span>
+
+          </div>
+
+
+          <div class="alert">
+
+            <div class="alert-icon">×</div>
+
+            <div>
+              <strong>Abogado asignado</strong>
+              <span>4 registros sin asignación</span>
+            </div>
+
+            <span class="badge yellow">4</span>
+
+          </div>
+
+
+          <div class="alert">
+
+            <div class="alert-icon">×</div>
+
+            <div>
+              <strong>Área generadora</strong>
+              <span>3 registros incompletos</span>
+            </div>
+
+            <span class="badge yellow">3</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ABOGADO + ESTADO -->
+
+    <div class="table-card">
+
+      <div class="table-head">
+
+        <h3>Procesos por abogado y estado</h3>
+
+        <span>Seguimiento operativo</span>
+
+      </div>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Abogado</th>
+            <th>En revisión</th>
+            <th>En trámite</th>
+            <th>Terminados</th>
+            <th>Con incidencia</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>Laura Martínez</td>
+            <td>12</td>
+            <td>21</td>
+            <td>21</td>
+            <td><span class="badge red">4</span></td>
+            <td><b>58</b></td>
+          </tr>
+
+          <tr>
+            <td>Carlos Rodríguez</td>
+            <td>9</td>
+            <td>18</td>
+            <td>25</td>
+            <td><span class="badge yellow">2</span></td>
+            <td><b>52</b></td>
+          </tr>
+
+          <tr>
+            <td>Andrea Gómez</td>
+            <td>15</td>
+            <td>20</td>
+            <td>19</td>
+            <td><span class="badge red">7</span></td>
+            <td><b>54</b></td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- ÚLTIMAS ACTUACIONES -->
+
+    <div class="grid-2">
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Últimas actuaciones registradas</h3>
+          <span>Actividad reciente</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="list">
+
+            <div class="list-row">
+
+              <div class="list-main">
+                <strong>SDM-CPS-3612-2026</strong>
+                <span>Reasignado a abogado</span>
+              </div>
+
+              <span class="date">Hoy 08:42</span>
+
+            </div>
+
+
+            <div class="list-row">
+
+              <div class="list-main">
+                <strong>SDM-CPS-164-2026</strong>
+                <span>CDP expedido · N.° 77</span>
+              </div>
+
+              <span class="date">Ayer</span>
+
+            </div>
+
+
+            <div class="list-row">
+
+              <div class="list-main">
+                <strong>SDM-CPS-3105-2026</strong>
+                <span>Devuelto por el área</span>
+              </div>
+
+              <span class="date">Ayer</span>
+
+            </div>
+
+
+            <div class="list-row">
+
+              <div class="list-main">
+                <strong>SDM-CPS-1042-2026</strong>
+                <span>Revisora aprobó el proceso</span>
+              </div>
+
+              <span class="date">12 sep</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- TERMINADOS SIN FECHA -->
+
+      <div class="card">
+
+        <div class="card-head">
+          <h3>Terminados sin fecha de terminación</h3>
+          <span>Revisión requerida</span>
+        </div>
+
+        <div class="card-body">
+
+          <div class="alert">
+
+            <div class="alert-icon">!</div>
+
+            <div>
+              <strong>SDM-CPS-2501-2026</strong>
+              <span>Estado: Terminado · Fecha faltante</span>
+            </div>
+
+            <span class="badge red">Pendiente</span>
+
+          </div>
+
+
+          <div class="alert">
+
+            <div class="alert-icon">!</div>
+
+            <div>
+              <strong>SDM-CPS-2754-2026</strong>
+              <span>Estado: Terminado · Fecha faltante</span>
+            </div>
+
+            <span class="badge red">Pendiente</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- INCIDENCIAS -->
+
+    <div class="table-card">
+
+      <div class="table-head">
+
+        <h3>Radicados y expedientes con incidencias de calidad</h3>
+
+        <span>9 pendientes</span>
+
+      </div>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Radicado</th>
+            <th>Incidencia</th>
+            <th>Responsable</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>SDM-CPS-1042-2026</td>
+            <td>Campo obligatorio incompleto</td>
+            <td>Laura Martínez</td>
+            <td>18/09/2026</td>
+            <td><span class="badge red">Pendiente</span></td>
+          </tr>
+
+          <tr>
+            <td>SDM-CPS-3105-2026</td>
+            <td>Fecha inconsistente</td>
+            <td>Carlos Rodríguez</td>
+            <td>17/09/2026</td>
+            <td><span class="badge yellow">En revisión</span></td>
+          </tr>
+
+          <tr>
+            <td>SDM-CPS-164-2026</td>
+            <td>Abogado sin asignar</td>
+            <td>Administración</td>
+            <td>16/09/2026</td>
+            <td><span class="badge red">Pendiente</span></td>
+          </tr>
+
+          <tr>
+            <td>SDM-CPS-3612-2026</td>
+            <td>Área generadora faltante</td>
+            <td>Juan Pérez</td>
+            <td>15/09/2026</td>
+            <td><span class="badge blue">En revisión</span></td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+  </div>
+
+</main>
+
+</div>
+</div>
+
+
+<script>
+
+function mostrarVista(vista, boton){
+
+  document.querySelectorAll(".view").forEach(function(v){
+    v.classList.remove("active");
+  });
+
+  document.getElementById(vista).classList.add("active");
+
+
+  document.querySelectorAll(".nav button").forEach(function(btn){
+    btn.classList.remove("active");
+  });
+
+  if(boton){
+    boton.classList.add("active");
+  }
+
+
+  document.querySelector("#btnEjecutiva").classList.remove("active");
+  document.querySelector("#btnOperativa").classList.remove("active");
+
+
+  if(vista === "ejecutiva"){
+
+    document.querySelector("#btnEjecutiva").classList.add("active");
+
+    document.querySelector("#crumb").textContent =
+      "Dashboard · Vista ejecutiva";
+
+  }else{
+
+    document.querySelector("#btnOperativa").classList.add("active");
+
+    document.querySelector("#crumb").textContent =
+      "Dashboard · Vista operativa";
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
