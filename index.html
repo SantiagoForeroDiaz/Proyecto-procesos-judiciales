@@ -161,6 +161,186 @@
       margin-bottom: 20px
     }
 
+    .dashboard-charts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px
+    }
+
+    .chart-panel {
+      min-width: 0
+    }
+
+    .chart-panel.wide {
+      grid-column: 1 / -1
+    }
+
+    .chart-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px
+    }
+
+    .status-chart {
+      display: grid;
+      grid-template-columns: minmax(130px, 180px) 1fr;
+      align-items: center;
+      gap: 20px;
+      min-height: 190px
+    }
+
+    .donut-wrap {
+      display: grid;
+      place-items: center;
+      position: relative;
+      width: 170px;
+      aspect-ratio: 1
+    }
+
+    .donut-wrap svg {
+      display: block;
+      width: 100%;
+      height: 100%
+    }
+
+    .donut-center {
+      position: absolute;
+      display: grid;
+      text-align: center;
+      line-height: 1.2
+    }
+
+    .donut-center strong {
+      font-size: 25px
+    }
+
+    .donut-center span {
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    .chart-legend {
+      display: grid;
+      gap: 10px
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 10px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-size: 12px
+    }
+
+    .legend-swatch {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px
+    }
+
+    .legend-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .legend-value {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums
+    }
+
+    .month-chart {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+      min-height: 190px;
+      padding-top: 16px
+    }
+
+    .month-column {
+      display: grid;
+      grid-template-rows: 20px 1fr 20px;
+      gap: 7px;
+      min-width: 0;
+      height: 170px;
+      text-align: center
+    }
+
+    .month-value,
+    .month-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums
+    }
+
+    .month-track {
+      display: flex;
+      align-items: end;
+      overflow: hidden;
+      background: #f0f3f5;
+      border-radius: 4px;
+      min-height: 0
+    }
+
+    .month-bar {
+      width: 100%;
+      height: var(--bar-height);
+      min-height: 0;
+      background: #287a59;
+      border-radius: 4px 4px 0 0
+    }
+
+    .rank-chart {
+      display: grid;
+      gap: 13px;
+      padding: 5px 0
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: minmax(100px, 190px) 1fr 32px;
+      align-items: center;
+      gap: 12px
+    }
+
+    .rank-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px
+    }
+
+    .rank-track {
+      height: 9px;
+      overflow: hidden;
+      background: #f0f3f5;
+      border-radius: 5px
+    }
+
+    .rank-bar {
+      height: 100%;
+      background: #315d82;
+      border-radius: inherit
+    }
+
+    .rank-count {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      font-variant-numeric: tabular-nums
+    }
+
+    .chart-empty {
+      display: grid;
+      place-items: center;
+      min-height: 165px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center
+    }
+
     .stat,
     .panel {
       background: var(--panel);
@@ -417,6 +597,14 @@
       .stats {
         grid-template-columns: repeat(2, 1fr)
       }
+
+      .dashboard-charts {
+        grid-template-columns: 1fr
+      }
+
+      .chart-panel.wide {
+        grid-column: auto
+      }
     }
 
     @media(max-width:560px) {
@@ -451,6 +639,21 @@
 
       .steps {
         gap: 5px
+      }
+
+      .status-chart {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 14px
+      }
+
+      .chart-legend {
+        width: 100%
+      }
+
+      .rank-row {
+        grid-template-columns: minmax(82px, 125px) 1fr 28px;
+        gap: 8px
       }
     }
 
@@ -546,6 +749,35 @@
           <div class="stat"><small>Activos</small><strong id="statActive">0</strong></div>
           <div class="stat"><small>Terminados</small><strong id="statClosed">0</strong></div>
           <div class="stat"><small>Con datos por revisar</small><strong id="statIssues">0</strong></div>
+        </div>
+        <div class="dashboard-charts">
+          <section class="panel chart-panel" aria-labelledby="stateChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="stateChartTitle">Procesos por estado</h2>
+                <div class="chart-subtitle">Distribución de la carga actual</div>
+              </div>
+            </div>
+            <div id="stateChart" class="status-chart"></div>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="activityChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="activityChartTitle">Actuaciones por mes</h2>
+                <div class="chart-subtitle">Últimos seis meses</div>
+              </div>
+            </div>
+            <div id="activityChart"></div>
+          </section>
+          <section class="panel chart-panel wide" aria-labelledby="typeChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="typeChartTitle">Procesos por tipo</h2>
+                <div class="chart-subtitle">Tipos más frecuentes en los registros</div>
+              </div>
+            </div>
+            <div id="typeChart"></div>
+          </section>
         </div>
         <div class="panel">
           <div class="panel-head">
@@ -727,7 +959,55 @@
     function table(list) { return list.length ? `<div class="table-wrap"><table><thead><tr><th>Identificación</th><th>Partes</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>` : '<div class="empty">No hay procesos registrados.</div>' }
     function renderProcesses() { let q = (document.getElementById('search')?.value || '').toLowerCase(); let st = document.getElementById('filterState')?.value || ''; let list = records.filter(r => (!st || r.state === st) && fields.some(k => String(r[k] || '').toLowerCase().includes(q))); document.getElementById('processTable').innerHTML = table(list) }
     function renderActions() { const query = (document.getElementById('actionsSearch')?.value || '').trim().toLowerCase(); const entries = records.flatMap(record => (record.actions || []).map(action => ({ record, action }))).filter(({ record, action }) => [record.shortNo, record.radicado, record.claimant, action.date, action.description].some(value => String(value || '').toLowerCase().includes(query))).sort((a, b) => b.action.date.localeCompare(a.action.date) || String(b.action.createdAt || '').localeCompare(String(a.action.createdAt || ''))); document.getElementById('allActionsTable').innerHTML = entries.length ? `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Actuación</th><th>Demandante</th><th></th></tr></thead><tbody>${entries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(action.description)}</td><td>${escapeHtml(record.claimant || '—')}</td><td><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No hay actuaciones registradas.</div>' }
-    function renderAll() { document.getElementById('statTotal').textContent = records.length; document.getElementById('statActive').textContent = records.filter(r => r.state === 'Activo').length; document.getElementById('statClosed').textContent = records.filter(r => r.state === 'Terminado').length; document.getElementById('statIssues').textContent = records.filter(issues).length; document.getElementById('recentTable').innerHTML = table(records.slice(0, 5)); if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses(); if (!document.getElementById('actions').classList.contains('hidden')) renderActions(); if (!document.getElementById('quality').classList.contains('hidden')) renderQuality() }
+    function renderAll() { document.getElementById('statTotal').textContent = records.length; document.getElementById('statActive').textContent = records.filter(r => r.state === 'Activo').length; document.getElementById('statClosed').textContent = records.filter(r => r.state === 'Terminado').length; document.getElementById('statIssues').textContent = records.filter(issues).length; document.getElementById('recentTable').innerHTML = table(records.slice(0, 5)); renderCharts(); if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses(); if (!document.getElementById('actions').classList.contains('hidden')) renderActions(); if (!document.getElementById('quality').classList.contains('hidden')) renderQuality() }
+    function renderCharts() {
+      const statusColors = { Activo: '#287a59', Terminado: '#7a8792', Desvinculado: '#315d82', 'Sin estado': '#d88d53' };
+      const statusCounts = records.reduce((counts, record) => { const status = record.state || 'Sin estado'; counts.set(status, (counts.get(status) || 0) + 1); return counts }, new Map());
+      const statuses = [...statusCounts.entries()].sort((a, b) => (Object.keys(statusColors).indexOf(a[0]) + 1 || 99) - (Object.keys(statusColors).indexOf(b[0]) + 1 || 99));
+      const circumference = 2 * Math.PI * 52;
+      let offset = 0;
+      const segments = statuses.map(([status, count]) => {
+        const length = records.length ? count / records.length * circumference : 0;
+        const color = statusColors[status] || '#a6afb7';
+        const segment = `<circle cx="60" cy="60" r="52" fill="none" stroke="${color}" stroke-width="16" stroke-dasharray="${length} ${circumference}" stroke-dashoffset="${-offset}"/>`;
+        offset += length;
+        return segment;
+      }).join('');
+      document.getElementById('stateChart').innerHTML = records.length
+        ? `<div class="donut-wrap"><svg viewBox="0 0 120 120" role="img" aria-label="Distribución de ${records.length} procesos por estado"><circle cx="60" cy="60" r="52" fill="none" stroke="#edf1f4" stroke-width="16"/><g transform="rotate(-90 60 60)">${segments}</g></svg><div class="donut-center"><strong>${records.length}</strong><span>procesos</span></div></div><div class="chart-legend">${statuses.map(([status, count]) => `<div class="legend-row"><span class="legend-swatch" style="background:${statusColors[status] || '#a6afb7'}"></span><span class="legend-name">${escapeHtml(status)}</span><span class="legend-value">${count} · ${Math.round(count / records.length * 100)}%</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">Registra procesos para ver su distribución por estado.</div>';
+
+      const today = new Date();
+      const months = Array.from({ length: 6 }, (_, index) => {
+        const date = new Date(today.getFullYear(), today.getMonth() - 5 + index, 1);
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const label = new Intl.DateTimeFormat('es-CO', { month: 'short' }).format(date).replace('.', '');
+        return { key, label, count: 0 };
+      });
+      const monthLookup = new Map(months.map(month => [month.key, month]));
+      records.forEach(record => (record.actions || []).forEach(action => {
+        const month = monthLookup.get(String(action.date || '').slice(0, 7));
+        if (month) month.count++;
+      }));
+      const maxMonthlyCount = Math.max(1, ...months.map(month => month.count));
+      const actionCount = months.reduce((sum, month) => sum + month.count, 0);
+      document.getElementById('activityChart').innerHTML = actionCount
+        ? `<div class="month-chart" role="img" aria-label="Actuaciones registradas por mes en los últimos seis meses">${months.map(month => `<div class="month-column"><span class="month-value">${month.count}</span><div class="month-track"><div class="month-bar" style="--bar-height:${month.count ? Math.max(4, month.count / maxMonthlyCount * 100) : 0}%"></div></div><span class="month-label">${escapeHtml(month.label)}</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">No hay actuaciones en los últimos seis meses.</div>';
+
+      const typeCounts = records.reduce((counts, record) => {
+        const type = String(record.type || '').trim() || 'Sin clasificar';
+        counts.set(type, (counts.get(type) || 0) + 1);
+        return counts;
+      }, new Map());
+      const sortedTypes = [...typeCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+      const visibleTypes = sortedTypes.slice(0, 5);
+      if (sortedTypes.length > 5) visibleTypes.push(['Otros', sortedTypes.slice(5).reduce((sum, entry) => sum + entry[1], 0)]);
+      const maxTypeCount = Math.max(1, ...visibleTypes.map(([, count]) => count));
+      document.getElementById('typeChart').innerHTML = visibleTypes.length
+        ? `<div class="rank-chart" role="img" aria-label="Procesos agrupados por tipo">${visibleTypes.map(([type, count]) => `<div class="rank-row"><span class="rank-name" title="${escapeHtml(type)}">${escapeHtml(type)}</span><div class="rank-track"><div class="rank-bar" style="width:${count / maxTypeCount * 100}%"></div></div><span class="rank-count">${count}</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">Registra procesos para comparar sus tipos.</div>';
+    }
     function issues(r) { return !r.currentRadicado || !r.lawyer || (r.state === 'Terminado' && !r.endDate) || !r.area }
     function renderQuality() { let list = records.filter(issues); document.getElementById('qualityTable').innerHTML = list.length ? `<div class="table-wrap"><table><thead><tr><th>No. corto</th><th>Radicado</th><th>Observaciones de calidad</th><th></th></tr></thead><tbody>${list.map(r => { let m = []; if (!r.currentRadicado) m.push('Falta radicado actual'); if (!r.lawyer) m.push('Sin responsable'); if (!r.area) m.push('Sin área'); if (r.state === 'Terminado' && !r.endDate) m.push('Terminado sin fecha'); return `<tr><td>${escapeHtml(r.shortNo)}</td><td>${escapeHtml(r.radicado)}</td><td>${m.join(' · ')}</td><td><button class="secondary small" onclick="editProcess('${r.id}')">Completar</button></td></tr>` }).join('')}</tbody></table></div>` : '<div class="empty">No se detectan pendientes en los campos básicos revisados.</div>' }
     async function deleteProcess(id) { if (!confirm('¿Eliminar este registro y sus actuaciones de este navegador?')) return; records = records.filter(r => r.id !== id); try { await persist() } catch (error) { alert(error.message) } }
