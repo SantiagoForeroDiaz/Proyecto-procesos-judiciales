@@ -1,1718 +1,1042 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contratos DC - Dashboard</title>
-
-<style>
-:root{
-  --orange:#D88D53;
-  --orange-light:#F0B06E;
-  --orange-soft:#F5C98E;
-  --cream:#FFF8EF;
-  --bg:#F3EFE9;
-  --white:#FFFFFF;
-  --text:#2C3B4D;
-  --muted:#7A8490;
-  --border:#E8DED3;
-  --green:#6FA879;
-  --red:#C96B67;
-  --yellow:#D7A84D;
-  --blue:#6F91B5;
-  --shadow:0 15px 40px rgba(70,52,36,.12);
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-body{
-  font-family:"Segoe UI",Arial,sans-serif;
-  background:
-    radial-gradient(circle at 10% 10%,#fff8ef 0,transparent 35%),
-    radial-gradient(circle at 90% 90%,#f4d8bb 0,transparent 35%),
-    var(--bg);
-  color:var(--text);
-  min-height:100vh;
-}
-
-/* CONTENEDOR PRINCIPAL */
-
-.stage{
-  min-height:100vh;
-  padding:18px;
-  display:flex;
-}
-
-.win{
-  width:100%;
-  min-height:calc(100vh - 36px);
-  display:flex;
-  overflow:hidden;
-  border-radius:28px;
-  background:rgba(255,255,255,.72);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-}
-
-/* SIDEBAR */
-
-.side{
-  width:235px;
-  flex-shrink:0;
-  background:#D88D53;
-  color:white;
-  padding:24px 14px;
-  display:flex;
-  flex-direction:column;
-}
-
-.sb-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  padding:0 8px 28px;
-}
-
-.sb-head h2{
-  font-size:18px;
-  font-weight:700;
-}
-
-.sb-head span{
-  display:block;
-  margin-top:3px;
-  font-size:11px;
-  opacity:.8;
-}
-
-.more{
-  border:0;
-  background:rgba(255,255,255,.15);
-  color:white;
-  width:30px;
-  height:30px;
-  border-radius:9px;
-  cursor:pointer;
-}
-
-.nav{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.nav button{
-  width:100%;
-  border:0;
-  background:transparent;
-  color:white;
-  text-align:left;
-  padding:11px 12px;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:13px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.nav button:hover,
-.nav button.active{
-  background:rgba(255,255,255,.18);
-}
-
-.nav .icon{
-  width:20px;
-  text-align:center;
-}
-
-.me{
-  margin-top:auto;
-  padding:14px 8px 4px;
-  border-top:1px solid rgba(255,255,255,.2);
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.av{
-  width:35px;
-  height:35px;
-  border-radius:50%;
-  background:rgba(255,255,255,.25);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  font-size:12px;
-}
-
-.me b{
-  display:block;
-  font-size:12px;
-}
-
-.me small{
-  font-size:10px;
-  opacity:.75;
-}
-
-/* CONTENIDO */
-
-.main{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-}
-
-.bar{
-  height:66px;
-  padding:0 26px;
-  display:flex;
-  align-items:center;
-  border-bottom:1px solid var(--border);
-  background:rgba(255,255,255,.72);
-}
-
-.crumb{
-  font-size:13px;
-  font-weight:600;
-}
-
-.sp{
-  flex:1;
-}
-
-.role{
-  display:flex;
-  background:#F4E9DD;
-  padding:3px;
-  border-radius:9px;
-  margin-right:16px;
-}
-
-.role button{
-  border:0;
-  background:transparent;
-  padding:7px 12px;
-  border-radius:7px;
-  color:var(--muted);
-  cursor:pointer;
-  font-size:11px;
-}
-
-.role button.active{
-  background:white;
-  color:var(--text);
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
-}
-
-.tool{
-  width:34px;
-  height:34px;
-  border-radius:9px;
-  border:1px solid var(--border);
-  background:white;
-  cursor:pointer;
-}
-
-/* CONTENIDO */
-
-.content{
-  padding:26px;
-  overflow:auto;
-}
-
-.view{
-  display:none;
-}
-
-.view.active{
-  display:block;
-}
-
-.titline{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  margin-bottom:22px;
-}
-
-.titline h1{
-  font-size:24px;
-  margin-bottom:4px;
-}
-
-.titline p{
-  font-size:12px;
-  color:var(--muted);
-}
-
-/* FILTROS */
-
-.filters{
-  display:flex;
-  gap:9px;
-  margin-bottom:22px;
-  flex-wrap:wrap;
-}
-
-.filter{
-  border:1px solid var(--border);
-  background:white;
-  color:var(--text);
-  padding:8px 13px;
-  border-radius:9px;
-  font-size:11px;
-}
-
-/* KPI */
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:20px;
-}
-
-.kpi{
-  background:white;
-  border:1px solid var(--border);
-  border-radius:15px;
-  padding:17px;
-  box-shadow:0 5px 15px rgba(60,45,30,.05);
-}
-
-.kpi-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.kpi-label{
-  font-size:11px;
-  color:var(--muted);
-}
-
-.kpi-icon{
-  width:28px;
-  height:28px;
-  border-radius:8px;
-  background:#FFF0DD;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.kpi strong{
-  display:block;
-  margin-top:7px;
-  font-size:25px;
-}
-
-.kpi small{
-  color:var(--muted);
-  font-size:10px;
-}
-
-/* GRID */
-
-.grid-2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-  margin-bottom:18px;
-}
-
-.grid-3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-  margin-bottom:18px;
-}
-
-/* CARDS */
-
-.card{
-  background:white;
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-}
-
-.card-head{
-  padding:14px 17px;
-  background:linear-gradient(180deg,#F5C98E,#F0B06E);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.card-head h3{
-  font-size:12px;
-}
-
-.card-head span{
-  font-size:10px;
-  color:#6D5845;
-}
-
-.card-body{
-  padding:17px;
-}
-
-/* BARRAS */
-
-.bar-item{
-  margin-bottom:14px;
-}
-
-.bar-info{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:5px;
-  font-size:11px;
-}
-
-.bar-track{
-  height:8px;
-  background:#F0E9E1;
-  border-radius:20px;
-  overflow:hidden;
-}
-
-.bar-fill{
-  height:100%;
-  background:var(--orange);
-  border-radius:20px;
-}
-
-/* DISTRIBUCIONES */
-
-.stats-row{
-  display:flex;
-  gap:10px;
-}
-
-.stat-box{
-  flex:1;
-  background:#FAF6F1;
-  border:1px solid var(--border);
-  border-radius:11px;
-  padding:11px;
-}
-
-.stat-box strong{
-  display:block;
-  font-size:18px;
-}
-
-.stat-box span{
-  font-size:10px;
-  color:var(--muted);
-}
-
-/* TABLA */
-
-.table-card{
-  background:white;
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  margin-bottom:18px;
-}
-
-.table-head{
-  padding:14px 17px;
-  background:linear-gradient(180deg,#F5C98E,#F0B06E);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.table-head h3{
-  font-size:12px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-th{
-  text-align:left;
-  font-size:10px;
-  color:var(--muted);
-  font-weight:600;
-  padding:11px 14px;
-  background:#FCFAF7;
-}
-
-td{
-  padding:12px 14px;
-  font-size:11px;
-  border-top:1px solid #F0EAE3;
-}
-
-.badge{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:20px;
-  font-size:9px;
-  font-weight:600;
-}
-
-.green{
-  background:#E6F2E8;
-  color:#527D5B;
-}
-
-.red{
-  background:#F8E5E4;
-  color:#A4514D;
-}
-
-.yellow{
-  background:#F8EFD9;
-  color:#947326;
-}
-
-.blue{
-  background:#E5EDF6;
-  color:#52718E;
-}
-
-.gray{
-  background:#ECECEC;
-  color:#666;
-}
-
-/* ALERTAS */
-
-.alert{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:11px 13px;
-  border-radius:10px;
-  background:#FAF7F3;
-  margin-bottom:9px;
-  border:1px solid var(--border);
-}
-
-.alert-icon{
-  width:29px;
-  height:29px;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#F8EFD9;
-}
-
-.alert strong{
-  font-size:11px;
-  display:block;
-}
-
-.alert span{
-  font-size:10px;
-  color:var(--muted);
-}
-
-/* FALLOS */
-
-.fallo{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:10px 0;
-  border-bottom:1px solid #F0EAE3;
-}
-
-.fallo:last-child{
-  border-bottom:0;
-}
-
-.fallo-dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-}
-
-.fallo-info{
-  flex:1;
-}
-
-.fallo-info strong{
-  font-size:11px;
-  display:block;
-}
-
-.fallo-info span{
-  font-size:10px;
-  color:var(--muted);
-}
-
-.fallo-value{
-  font-size:12px;
-  font-weight:600;
-}
-
-/* OPERATIVA */
-
-.operational-grid{
-  display:grid;
-  grid-template-columns:1.3fr 1fr;
-  gap:18px;
-}
-
-.list{
-  display:flex;
-  flex-direction:column;
-}
-
-.list-row{
-  padding:12px 0;
-  border-bottom:1px solid #F0EAE3;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.list-row:last-child{
-  border-bottom:0;
-}
-
-.list-main{
-  flex:1;
-}
-
-.list-main strong{
-  font-size:11px;
-  display:block;
-}
-
-.list-main span{
-  font-size:10px;
-  color:var(--muted);
-}
-
-.date{
-  font-size:10px;
-  color:var(--muted);
-}
-
-/* RESPONSIVE */
-
-@media(max-width:1000px){
-  .kpis{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .grid-2,
-  .grid-3,
-  .operational-grid{
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:700px){
-  .side{
-    width:70px;
-    padding:20px 8px;
-  }
-
-  .sb-head h2,
-  .sb-head span,
-  .nav button span,
-  .me div:not(.av){
-    display:none;
-  }
-
-  .sb-head{
-    justify-content:center;
-  }
-
-  .nav button{
-    justify-content:center;
-  }
-
-  .kpis{
-    grid-template-columns:1fr;
-  }
-
-  .content{
-    padding:18px;
-  }
-
-  .bar{
-    padding:0 15px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de procesos judiciales</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #fff;
+      --text: #202b36;
+      --muted: #697785;
+      --line: #e2e7eb;
+      --accent: #d88d53;
+      --accent2: #b96d34;
+      --soft: #fff3e8;
+      --danger: #b54747;
+      --green: #287a59;
+      --blue: #315d82;
+      --shadow: 0 8px 28px rgba(26, 39, 51, .06)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 Inter, Segoe UI, Arial, sans-serif
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600
+    }
+
+    button:hover {
+      background: var(--accent2)
+    }
+
+    button.secondary {
+      background: #edf1f4;
+      color: #344454
+    }
+
+    button.danger {
+      background: #fff0f0;
+      color: var(--danger)
+    }
+
+    button.small {
+      padding: 6px 10px;
+      font-size: 12px
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 245px 1fr;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      background: #202b36;
+      color: #eaf0f4;
+      padding: 24px 16px
+    }
+
+    .brand {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 10px 28px
+    }
+
+    .brand span {
+      display: block;
+      color: #aab8c4;
+      font-size: 11px;
+      font-weight: 400;
+      margin-top: 4px
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px
+    }
+
+    .nav button {
+      background: transparent;
+      color: #d6e0e7;
+      text-align: left;
+      font-weight: 500
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      background: #344554;
+      color: white
+    }
+
+    .side-note {
+      margin: 30px 10px;
+      color: #aab8c4;
+      font-size: 12px
+    }
+
+    .main {
+      min-width: 0;
+      padding: 26px clamp(16px, 3vw, 42px)
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px
+    }
+
+    .eyebrow {
+      color: var(--accent2);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .top h1 {
+      font-size: 25px;
+      margin: 2px 0
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px
+    }
+
+    .dashboard-charts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px
+    }
+
+    .chart-panel {
+      min-width: 0
+    }
+
+    .chart-panel.wide {
+      grid-column: 1 / -1
+    }
+
+    .chart-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px
+    }
+
+    .status-chart {
+      display: grid;
+      grid-template-columns: minmax(130px, 180px) 1fr;
+      align-items: center;
+      gap: 20px;
+      min-height: 190px
+    }
+
+    .donut-wrap {
+      display: grid;
+      place-items: center;
+      position: relative;
+      width: 170px;
+      aspect-ratio: 1
+    }
+
+    .donut-wrap svg {
+      display: block;
+      width: 100%;
+      height: 100%
+    }
+
+    .donut-center {
+      position: absolute;
+      display: grid;
+      text-align: center;
+      line-height: 1.2
+    }
+
+    .donut-center strong {
+      font-size: 25px
+    }
+
+    .donut-center span {
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    .chart-legend {
+      display: grid;
+      gap: 10px
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 10px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-size: 12px
+    }
+
+    .legend-swatch {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px
+    }
+
+    .legend-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .legend-value {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums
+    }
+
+    .month-chart {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+      min-height: 190px;
+      padding-top: 16px
+    }
+
+    .month-column {
+      display: grid;
+      grid-template-rows: 20px 1fr 20px;
+      gap: 7px;
+      min-width: 0;
+      height: 170px;
+      text-align: center
+    }
+
+    .month-value,
+    .month-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums
+    }
+
+    .month-track {
+      display: flex;
+      align-items: end;
+      overflow: hidden;
+      background: #f0f3f5;
+      border-radius: 4px;
+      min-height: 0
+    }
+
+    .month-bar {
+      width: 100%;
+      height: var(--bar-height);
+      min-height: 0;
+      background: #287a59;
+      border-radius: 4px 4px 0 0
+    }
+
+    .rank-chart {
+      display: grid;
+      gap: 13px;
+      padding: 5px 0
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: minmax(100px, 190px) 1fr 32px;
+      align-items: center;
+      gap: 12px
+    }
+
+    .rank-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px
+    }
+
+    .rank-track {
+      height: 9px;
+      overflow: hidden;
+      background: #f0f3f5;
+      border-radius: 5px
+    }
+
+    .rank-bar {
+      height: 100%;
+      background: #315d82;
+      border-radius: inherit
+    }
+
+    .rank-count {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      font-variant-numeric: tabular-nums
+    }
+
+    .chart-empty {
+      display: grid;
+      place-items: center;
+      min-height: 165px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center
+    }
+
+    .stat,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      box-shadow: var(--shadow)
+    }
+
+    .stat {
+      padding: 16px
+    }
+
+    .stat small {
+      color: var(--muted)
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-top: 5px
+    }
+
+    .panel {
+      padding: 20px;
+      margin-bottom: 18px
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      margin: 0
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .toolbar input {
+      min-width: 210px
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px
+    }
+
+    .field {
+      display: grid;
+      gap: 5px
+    }
+
+    .field.full {
+      grid-column: 1/-1
+    }
+
+    label {
+      font-size: 12px;
+      color: #536272;
+      font-weight: 650
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d7dee4;
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text);
+      outline: none
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px #d88d5320
+    }
+
+    textarea {
+      min-height: 84px;
+      resize: vertical
+    }
+
+    .steps {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 20px;
+      overflow: auto
+    }
+
+    .step {
+      white-space: nowrap;
+      background: #edf1f4;
+      color: #657382;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 650
+    }
+
+    .step.active {
+      background: var(--soft);
+      color: var(--accent2);
+      outline: 1px solid #edc7a5
+    }
+
+    .step.done {
+      background: #e8f4ee;
+      color: var(--green)
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 18px
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .table-wrap {
+      overflow: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle
+    }
+
+    th {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    td {
+      font-size: 13px
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: #edf1f4;
+      color: #4f6170;
+      font-size: 11px
+    }
+
+    .pill.active {
+      background: #e8f4ee;
+      color: var(--green)
+    }
+
+    .pill.closed {
+      background: #f1f0f0;
+      color: #68727b
+    }
+
+    .empty {
+      text-align: center;
+      padding: 35px;
+      color: var(--muted)
+    }
+
+    .record-title {
+      font-weight: 700
+    }
+
+    .record-sub {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .notice {
+      padding: 11px 13px;
+      border-radius: 8px;
+      background: #fff7eb;
+      color: #855b2f;
+      font-size: 12px;
+      margin-bottom: 14px
+    }
+
+    .actions-list {
+      display: grid;
+      gap: 10px
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 150px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      padding: 12px;
+      border-radius: 9px
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 15px
+    }
+
+    @media(max-width:850px) {
+      .app {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar {
+        padding: 12px
+      }
+
+      .brand {
+        margin: 5px 8px 12px
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, 1fr)
+      }
+
+      .nav button {
+        text-align: center;
+        padding: 8px
+      }
+
+      .side-note {
+        display: none
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .dashboard-charts {
+        grid-template-columns: 1fr
+      }
+
+      .chart-panel.wide {
+        grid-column: auto
+      }
+    }
+
+    @media(max-width:560px) {
+      .main {
+        padding: 16px
+      }
+
+      .top {
+        align-items: flex-start;
+        flex-direction: column
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr
+      }
+
+      .field.full {
+        grid-column: auto
+      }
+
+      .stats {
+        gap: 8px
+      }
+
+      .stat {
+        padding: 12px
+      }
+
+      .action-row {
+        grid-template-columns: 1fr
+      }
+
+      .steps {
+        gap: 5px
+      }
+
+      .status-chart {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 14px
+      }
+
+      .chart-legend {
+        width: 100%
+      }
+
+      .rank-row {
+        grid-template-columns: minmax(82px, 125px) 1fr 28px;
+        gap: 8px
+      }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      background: #17212bb8;
+      padding: 20px;
+      display: none;
+      place-items: center
+    }
+
+    .modal.open {
+      display: grid
+    }
+
+    .modal-card {
+      width: min(760px, 100%);
+      max-height: min(85vh, 760px);
+      overflow: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 18px 60px #10182055
+    }
+
+    .action-list {
+      display: grid;
+      gap: 8px;
+      margin: 16px 0
+    }
+
+    .action-item {
+      border-left: 3px solid var(--accent);
+      padding: 10px 12px;
+      background: #f7f8f9
+    }
+
+    .action-item strong {
+      display: block;
+      margin-bottom: 3px
+    }
+
+    .action-form {
+      display: grid;
+      grid-template-columns: 150px minmax(170px, 1fr) 170px auto;
+      gap: 8px;
+      align-items: end
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    @media(max-width:560px) {
+      .action-form {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-<div class="stage">
-
-<div class="win">
-
-<!-- SIDEBAR -->
-<aside class="side">
-
-  <div class="sb-head">
-    <div>
-      <h2>Contratos DC</h2>
-      <span>Dirección de Contratación</span>
-    </div>
-
-    <button class="more">···</button>
-  </div>
-
-  <nav class="nav">
-
-    <button class="active" onclick="mostrarVista('ejecutiva',this)">
-      <span class="icon">▦</span>
-      <span>Vista ejecutiva</span>
-    </button>
-
-    <button onclick="mostrarVista('operativa',this)">
-      <span class="icon">☷</span>
-      <span>Vista operativa</span>
-    </button>
-
-    <button>
-      <span class="icon">▤</span>
-      <span>Procesos</span>
-    </button>
-
-    <button>
-      <span class="icon">◉</span>
-      <span>Abogados</span>
-    </button>
-
-    <button>
-      <span class="icon">⚠</span>
-      <span>Calidad</span>
-    </button>
-
-  </nav>
-
-  <div class="me">
-    <div class="av">SF</div>
-
-    <div>
-      <b>Santiago Forero</b>
-      <small>Administrador</small>
-    </div>
-  </div>
-
-</aside>
-
-
-<!-- MAIN -->
-<main class="main">
-
-  <header class="bar">
-
-    <span class="crumb" id="crumb">
-      Dashboard · Vista ejecutiva
-    </span>
-
-    <div class="sp"></div>
-
-    <div class="role">
-
-      <button id="btnEjecutiva"
-              class="active"
-              onclick="mostrarVista('ejecutiva')">
-        Ejecutiva
-      </button>
-
-      <button id="btnOperativa"
-              onclick="mostrarVista('operativa')">
-        Operativa
-      </button>
-
-    </div>
-
-    <button class="tool">☼</button>
-
-  </header>
-
-
-  <div class="content">
-
-
-  <!-- ================================================= -->
-  <!-- VISTA EJECUTIVA -->
-  <!-- ================================================= -->
-
-  <section id="ejecutiva" class="view active">
-
-    <div class="titline">
-
-      <div>
-        <h1>Vista ejecutiva</h1>
-        <p>Resumen general del estado de los procesos de contratación.</p>
-      </div>
-
-    </div>
-
-
-    <!-- FILTROS -->
-
-    <div class="filters">
-
-      <button class="filter">Año: 2026 ▾</button>
-      <button class="filter">Área: Todas ▾</button>
-      <button class="filter">Tipo de proceso: Todos ▾</button>
-      <button class="filter">Etapa: Todas ▾</button>
-
-    </div>
-
-
-    <!-- KPIs -->
-
-    <div class="kpis">
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Procesos activos</span>
-          <div class="kpi-icon">●</div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Gestión judicial <span>Prototipo de seguimiento</span></div>
+      <nav class="nav">
+        <button class="active" data-view="dashboard">Resumen</button>
+        <button data-view="processes">Procesos</button>
+        <button data-view="actions">Actuaciones</button>
+        <button data-view="form">Registrar proceso</button>
+        <button data-view="backup">Datos / respaldo</button>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="top">
+        <div>
+          <div class="eyebrow">Panel de control</div>
+          <h1 id="pageTitle">Resumen general</h1>
+          <div class="muted" id="pageSubtitle">Estado de la información registrada</div>
         </div>
-
-        <strong>248</strong>
-        <small>Procesos actualmente activos</small>
-      </div>
-
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Procesos terminados</span>
-          <div class="kpi-icon">✓</div>
+        <div class="actions"><button class="secondary" onclick="showView('processes')">Ver procesos</button><button
+            onclick="newProcess()">+ Nuevo proceso</button></div>
+      </header>
+      <section id="dashboard" class="view">
+        <div class="stats">
+          <div class="stat"><small>Total de procesos</small><strong id="statTotal">0</strong></div>
+          <div class="stat"><small>Activos</small><strong id="statActive">0</strong></div>
+          <div class="stat"><small>Terminados</small><strong id="statClosed">0</strong></div>
+          <div class="stat"><small>Con datos por revisar</small><strong id="statIssues">0</strong></div>
         </div>
-
-        <strong>126</strong>
-        <small>Procesos finalizados</small>
-      </div>
-
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Desvinculados</span>
-          <div class="kpi-icon">↗</div>
-        </div>
-
-        <strong>17</strong>
-        <small>Procesos desvinculados</small>
-      </div>
-
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Medida cautelar</span>
-          <div class="kpi-icon">!</div>
-        </div>
-
-        <strong>23</strong>
-        <small>Procesos con medida cautelar</small>
-      </div>
-
-    </div>
-
-
-    <!-- PROCESOS POR TIPO / ETAPA -->
-
-    <div class="grid-2">
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Procesos por tipo</h3>
-          <span>Total: 391</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Contratación directa</span>
-              <b>142</b>
+        <div class="dashboard-charts">
+          <section class="panel chart-panel" aria-labelledby="stateChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="stateChartTitle">Procesos por estado</h2>
+                <div class="chart-subtitle">Distribución de la carga actual</div>
+              </div>
             </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:78%"></div>
+            <div id="stateChart" class="status-chart"></div>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="activityChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="activityChartTitle">Actuaciones por mes</h2>
+                <div class="chart-subtitle">Últimos seis meses</div>
+              </div>
             </div>
+            <div id="activityChart"></div>
+          </section>
+          <section class="panel chart-panel wide" aria-labelledby="typeChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="typeChartTitle">Procesos por tipo</h2>
+                <div class="chart-subtitle">Tipos más frecuentes en los registros</div>
+              </div>
+            </div>
+            <div id="typeChart"></div>
+          </section>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Procesos recientes</h2><button class="secondary small" onclick="showView('processes')">Abrir
+              listado</button>
           </div>
-
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Selección abreviada</span>
-              <b>96</b>
-            </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:55%"></div>
-            </div>
-          </div>
-
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Licitación pública</span>
-              <b>81</b>
-            </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:45%"></div>
-            </div>
-          </div>
-
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Mínima cuantía</span>
-              <b>72</b>
-            </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:38%"></div>
-            </div>
-          </div>
-
+          <div id="recentTable"></div>
         </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Procesos por etapa</h3>
-          <span>Estado actual</span>
+      </section>
+      <section id="processes" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Listado de procesos</h2>
+            <div class="toolbar"><input id="search" placeholder="Buscar radicado, demandante, abogado..."
+                oninput="renderProcesses()"><select id="filterState" onchange="renderProcesses()">
+                <option value="">Todos los estados</option>
+                <option>Activo</option>
+                <option>Terminado</option>
+                <option>Desvinculado</option>
+              </select></div>
+          </div>
+          <div id="processTable"></div>
         </div>
-
-        <div class="card-body">
-
-          <div class="stats-row">
-
-            <div class="stat-box">
-              <strong>84</strong>
-              <span>Revisión</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>71</strong>
-              <span>Evaluación</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>53</strong>
-              <span>Adjudicación</span>
-            </div>
-
+      </section>
+      <section id="actions" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Actuaciones registradas</h2>
+            <div class="toolbar"><input id="actionsSearch" placeholder="Buscar actuación, proceso o radicado..."
+                oninput="renderActions()"></div>
           </div>
-
-          <br>
-
-          <div class="stats-row">
-
-            <div class="stat-box">
-              <strong>27</strong>
-              <span>Legalización</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>13</strong>
-              <span>Cierre</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>--</strong>
-              <span>Otros</span>
-            </div>
-
-          </div>
-
+          <div id="allActionsTable"></div>
         </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- CALIDAD / ÁREA -->
-
-    <div class="grid-2">
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Calidad de los procesos</h3>
-          <span>Distribución</span>
+      </section>
+      <section id="form" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 id="formTitle">Registrar proceso</h2>
+              <div class="muted">Complete la información por etapas. Los campos marcados con * son obligatorios.</div>
+            </div><span class="pill" id="editBadge">Nuevo</span>
+          </div>
+          <div class="steps" id="steps">
+            <div class="step active">1. Identificación</div>
+            <div class="step">2. Partes</div>
+            <div class="step">3. Información judicial</div>
+            <div class="step">4. Pretensiones</div>
+            <div class="step">5. Revisión</div>
+          </div>
+          <form id="processForm" onsubmit="return false">
+            <div class="form-step" data-step="0">
+              <div class="field-grid">
+                <div class="field"><label>No. corto *</label><input name="shortNo" placeholder="AAAA-NNNNN" required>
+                </div>
+                <div class="field"><label>Radicado (23 dígitos) *</label><input name="radicado" inputmode="numeric"
+                    maxlength="23" placeholder="Solo números" required></div>
+                <div class="field"><label>Radicado actual</label><input name="currentRadicado"></div>
+                <div class="field"><label>ID SIPROJ</label><input name="siproJ"></div>
+                <div class="field"><label>Expediente ORFEO</label><input name="orfeo"></div>
+                <div class="field"><label>Cédulas / identificadores</label><input name="ids"></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="1">
+              <div class="field-grid">
+                <div class="field"><label>Demandante *</label><input name="claimant" required></div>
+                <div class="field"><label>Demandado *</label><input name="defendant" required></div>
+                <div class="field"><label>Área generadora del daño</label><input name="area"></div>
+                <div class="field"><label>Abogado / responsable</label><input name="lawyer"></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="2">
+              <div class="field-grid">
+                <div class="field"><label>Instancia</label><select name="instance">
+                    <option value="">Seleccione</option>
+                    <option>Primera</option>
+                    <option>Segunda</option>
+                    <option>Única</option>
+                    <option>Casación</option>
+                    <option>Otra</option>
+                  </select></div>
+                <div class="field"><label>Tipo de proceso</label><input name="type"
+                    placeholder="Ej. Reparación directa"></div>
+                <div class="field"><label>Despacho judicial inicial</label><input name="court"></div>
+                <div class="field"><label>Causa</label><input name="cause"></div>
+                <div class="field"><label>Estado *</label><select name="state" required>
+                    <option>Activo</option>
+                    <option>Terminado</option>
+                    <option>Desvinculado</option>
+                  </select></div>
+                <div class="field"><label>Fecha de inicio</label><input name="startDate" type="date"></div>
+                <div class="field"><label>Fecha de terminación</label><input name="endDate" type="date"></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="3">
+              <div class="field-grid">
+                <div class="field full"><label>Pretensión / asunto</label><textarea name="claim"></textarea></div>
+                <div class="field"><label>Valor de las pretensiones (COP)</label><input name="amount" type="number"
+                    min="0" step="1" placeholder="Ej. 150000000"></div>
+                <div class="field"><label>¿Medida cautelar?</label><select name="cautelar">
+                    <option>No informado</option>
+                    <option>Sí</option>
+                    <option>No</option>
+                  </select></div>
+                <div class="field full"><label>Observaciones</label><textarea name="notes"></textarea></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="4">
+              <div id="reviewBox" class="notice">Revise la información antes de guardar.</div>
+              <div class="field"><label><input type="checkbox" id="confirmData" style="width:auto"> Confirmo que revisé
+                  los datos ingresados.</label></div>
+            </div>
+            <div class="form-actions"><button type="button" class="secondary" id="prevBtn"
+                onclick="moveStep(-1)">Anterior</button>
+              <div><button type="button" class="secondary" onclick="showView('processes')">Cancelar</button> <button
+                  type="button" id="nextBtn" onclick="moveStep(1)">Siguiente</button><button type="button" id="saveBtn"
+                  class="hidden" onclick="saveProcess()">Guardar proceso</button></div>
+            </div>
+          </form>
         </div>
-
-        <div class="card-body">
-
-          <div class="stats-row">
-
-            <div class="stat-box">
-              <strong>276</strong>
-              <span>Óptimos</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>84</strong>
-              <span>Con observaciones</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>31</strong>
-              <span>Deficientes</span>
-            </div>
-
-          </div>
-
+      </section>
+      <section id="backup" class="view hidden">
+        <div class="panel">
+          <h2>Datos y Excel</h2>
+          <p class="muted">Descargue un archivo Excel con una hoja de procesos yotra de actuaciones.</p>
+          <div class="actions"><button onclick="exportExcel()">Descargar Excel</button><button class="danger"
+              onclick="clearData()">Eliminar todos los datos</button></div>
         </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Área generadora</h3>
-          <span>Procesos</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Dirección de Contratación</span>
-              <b>152</b>
-            </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:82%"></div>
-            </div>
-          </div>
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Planeación</span>
-              <b>103</b>
-            </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:58%"></div>
-            </div>
-          </div>
-
-          <div class="bar-item">
-            <div class="bar-info">
-              <span>Administrativa</span>
-              <b>81</b>
-            </div>
-
-            <div class="bar-track">
-              <div class="bar-fill" style="width:45%"></div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ABOGADOS -->
-
-    <div class="table-card">
-
-      <div class="table-head">
-
-        <h3>Carga de procesos por abogado</h3>
-
-        <span>Distribución actual</span>
-
-      </div>
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Abogado</th>
-            <th>Activos</th>
-            <th>Terminados</th>
-            <th>Observaciones</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          <tr>
-            <td>Laura Martínez</td>
-            <td>42</td>
-            <td>21</td>
-            <td><span class="badge yellow">4</span></td>
-            <td><b>67</b></td>
-          </tr>
-
-          <tr>
-            <td>Carlos Rodríguez</td>
-            <td>38</td>
-            <td>25</td>
-            <td><span class="badge green">2</span></td>
-            <td><b>65</b></td>
-          </tr>
-
-          <tr>
-            <td>Andrea Gómez</td>
-            <td>35</td>
-            <td>19</td>
-            <td><span class="badge red">7</span></td>
-            <td><b>61</b></td>
-          </tr>
-
-          <tr>
-            <td>Juan Pérez</td>
-            <td>31</td>
-            <td>24</td>
-            <td><span class="badge green">1</span></td>
-            <td><b>56</b></td>
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-
-    <!-- PRETENSIONES / FALLOS -->
-
-    <div class="grid-2">
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Valor de pretensiones</h3>
-          <span>Distribución por rangos</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="stats-row">
-
-            <div class="stat-box">
-              <strong>118</strong>
-              <span>Hasta $50 M</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>74</strong>
-              <span>$50 M - $200 M</span>
-            </div>
-
-            <div class="stat-box">
-              <strong>36</strong>
-              <span>Más de $200 M</span>
-            </div>
-
-          </div>
-
-          <div style="margin-top:15px;font-size:11px;color:#777;">
-            Valor agregado:
-            <b style="color:#2C3B4D;">$4.820.000.000</b>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Resultado de fallos</h3>
-          <span>Procesos judiciales</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="fallo">
-            <div class="fallo-dot" style="background:#6FA879"></div>
-
-            <div class="fallo-info">
-              <strong>Favorables</strong>
-              <span>Resultado favorable</span>
-            </div>
-
-            <div class="fallo-value">42</div>
-          </div>
-
-
-          <div class="fallo">
-            <div class="fallo-dot" style="background:#C96B67"></div>
-
-            <div class="fallo-info">
-              <strong>Desfavorables</strong>
-              <span>Resultado desfavorable</span>
-            </div>
-
-            <div class="fallo-value">18</div>
-          </div>
-
-
-          <div class="fallo">
-            <div class="fallo-dot" style="background:#D7A84D"></div>
-
-            <div class="fallo-info">
-              <strong>Mixtos</strong>
-              <span>Resultado mixto</span>
-            </div>
-
-            <div class="fallo-value">9</div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- PERMANENCIA -->
-
-    <div class="card">
-
-      <div class="card-head">
-        <h3>Procesos con larga permanencia sin actuación</h3>
-        <span>Requieren revisión</span>
-      </div>
-
-      <div class="card-body">
-
-        <div class="alert">
-          <div class="alert-icon">!</div>
-
+      </section>
+    </main>
+    <div id="actionsDialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="actionsTitle">
+      <section class="modal-card">
+        <div class="modal-head">
           <div>
-            <strong>SDM-CPS-1042-2026</strong>
-            <span>48 días sin actuación · Abogado: Laura Martínez</span>
-          </div>
-
-          <span class="badge red">48 días</span>
+            <h2 id="actionsTitle">Actuaciones</h2>
+            <div id="actionsProcess" class="muted"></div>
+          </div><button class="secondary small" type="button" onclick="closeActions()"
+            aria-label="Cerrar">Cerrar</button>
         </div>
-
-
-        <div class="alert">
-          <div class="alert-icon">!</div>
-
-          <div>
-            <strong>SDM-CPS-3105-2026</strong>
-            <span>39 días sin actualización · Abogado: Carlos Rodríguez</span>
-          </div>
-
-          <span class="badge yellow">39 días</span>
-        </div>
-
-      </div>
-
+        <div id="actionList" class="action-list"></div>
+        <form id="actionForm" class="action-form" onsubmit="saveAction(event)">
+          <div class="field"><label for="actionDate">Fecha</label><input id="actionDate" type="date" required></div>
+          <div class="field"><label for="actionDescription">Descripción</label><input id="actionDescription" required
+              maxlength="1000" placeholder="Descripción de la actuación"></div>
+          <div class="field"><label for="actionState">Estado del proceso</label><select id="actionState">
+              <option value="Activo">Activo</option>
+              <option value="Terminado">Terminado</option>
+              <option value="Desvinculado">Desvinculado</option>
+            </select></div>
+          <button type="submit">Agregar</button>
+        </form>
+      </section>
     </div>
-
-  </section>
-
-
-  <!-- ================================================= -->
-  <!-- VISTA OPERATIVA -->
-  <!-- ================================================= -->
-
-  <section id="operativa" class="view">
-
-    <div class="titline">
-
-      <div>
-        <h1>Vista operativa</h1>
-        <p>Seguimiento de registros, actuaciones, calidad e incidencias.</p>
-      </div>
-
-    </div>
-
-
-    <!-- KPIs OPERATIVOS -->
-
-    <div class="kpis">
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Sin actualización</span>
-          <div class="kpi-icon">!</div>
-        </div>
-
-        <strong>18</strong>
-        <small>Procesos pendientes de actualización</small>
-      </div>
-
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Errores de calidad</span>
-          <div class="kpi-icon">×</div>
-        </div>
-
-        <strong>11</strong>
-        <small>Registros con inconsistencias</small>
-      </div>
-
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Campos incompletos</span>
-          <div class="kpi-icon">□</div>
-        </div>
-
-        <strong>27</strong>
-        <small>Registros pendientes</small>
-      </div>
-
-
-      <div class="kpi">
-        <div class="kpi-top">
-          <span class="kpi-label">Incidencias</span>
-          <div class="kpi-icon">⚠</div>
-        </div>
-
-        <strong>9</strong>
-        <small>Incidencias de calidad abiertas</small>
-      </div>
-
-    </div>
-
-
-    <div class="operational-grid">
-
-      <!-- SIN ACTUALIZACIÓN -->
-
-      <div class="table-card">
-
-        <div class="table-head">
-          <h3>Procesos sin actualización reciente</h3>
-          <span>Últimos 30 días</span>
-        </div>
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>Radicado</th>
-              <th>Abogado</th>
-              <th>Última actuación</th>
-              <th>Días</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            <tr>
-              <td>SDM-CPS-1042-2026</td>
-              <td>Laura Martínez</td>
-              <td>12/08/2026</td>
-              <td><span class="badge red">48</span></td>
-            </tr>
-
-            <tr>
-              <td>SDM-CPS-3105-2026</td>
-              <td>Carlos Rodríguez</td>
-              <td>21/08/2026</td>
-              <td><span class="badge yellow">39</span></td>
-            </tr>
-
-            <tr>
-              <td>SDM-CPS-164-2026</td>
-              <td>Andrea Gómez</td>
-              <td>27/08/2026</td>
-              <td><span class="badge yellow">33</span></td>
-            </tr>
-
-            <tr>
-              <td>SDM-CPS-3612-2026</td>
-              <td>Juan Pérez</td>
-              <td>02/09/2026</td>
-              <td><span class="badge blue">27</span></td>
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-      <!-- ERRORES -->
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Errores y campos incompletos</h3>
-          <span>Pendientes</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="alert">
-
-            <div class="alert-icon">×</div>
-
-            <div>
-              <strong>Fecha de terminación</strong>
-              <span>5 registros sin información</span>
-            </div>
-
-            <span class="badge red">5</span>
-
-          </div>
-
-
-          <div class="alert">
-
-            <div class="alert-icon">×</div>
-
-            <div>
-              <strong>Abogado asignado</strong>
-              <span>4 registros sin asignación</span>
-            </div>
-
-            <span class="badge yellow">4</span>
-
-          </div>
-
-
-          <div class="alert">
-
-            <div class="alert-icon">×</div>
-
-            <div>
-              <strong>Área generadora</strong>
-              <span>3 registros incompletos</span>
-            </div>
-
-            <span class="badge yellow">3</span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ABOGADO + ESTADO -->
-
-    <div class="table-card">
-
-      <div class="table-head">
-
-        <h3>Procesos por abogado y estado</h3>
-
-        <span>Seguimiento operativo</span>
-
-      </div>
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Abogado</th>
-            <th>En revisión</th>
-            <th>En trámite</th>
-            <th>Terminados</th>
-            <th>Con incidencia</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          <tr>
-            <td>Laura Martínez</td>
-            <td>12</td>
-            <td>21</td>
-            <td>21</td>
-            <td><span class="badge red">4</span></td>
-            <td><b>58</b></td>
-          </tr>
-
-          <tr>
-            <td>Carlos Rodríguez</td>
-            <td>9</td>
-            <td>18</td>
-            <td>25</td>
-            <td><span class="badge yellow">2</span></td>
-            <td><b>52</b></td>
-          </tr>
-
-          <tr>
-            <td>Andrea Gómez</td>
-            <td>15</td>
-            <td>20</td>
-            <td>19</td>
-            <td><span class="badge red">7</span></td>
-            <td><b>54</b></td>
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-
-    <!-- ÚLTIMAS ACTUACIONES -->
-
-    <div class="grid-2">
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Últimas actuaciones registradas</h3>
-          <span>Actividad reciente</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="list">
-
-            <div class="list-row">
-
-              <div class="list-main">
-                <strong>SDM-CPS-3612-2026</strong>
-                <span>Reasignado a abogado</span>
-              </div>
-
-              <span class="date">Hoy 08:42</span>
-
-            </div>
-
-
-            <div class="list-row">
-
-              <div class="list-main">
-                <strong>SDM-CPS-164-2026</strong>
-                <span>CDP expedido · N.° 77</span>
-              </div>
-
-              <span class="date">Ayer</span>
-
-            </div>
-
-
-            <div class="list-row">
-
-              <div class="list-main">
-                <strong>SDM-CPS-3105-2026</strong>
-                <span>Devuelto por el área</span>
-              </div>
-
-              <span class="date">Ayer</span>
-
-            </div>
-
-
-            <div class="list-row">
-
-              <div class="list-main">
-                <strong>SDM-CPS-1042-2026</strong>
-                <span>Revisora aprobó el proceso</span>
-              </div>
-
-              <span class="date">12 sep</span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- TERMINADOS SIN FECHA -->
-
-      <div class="card">
-
-        <div class="card-head">
-          <h3>Terminados sin fecha de terminación</h3>
-          <span>Revisión requerida</span>
-        </div>
-
-        <div class="card-body">
-
-          <div class="alert">
-
-            <div class="alert-icon">!</div>
-
-            <div>
-              <strong>SDM-CPS-2501-2026</strong>
-              <span>Estado: Terminado · Fecha faltante</span>
-            </div>
-
-            <span class="badge red">Pendiente</span>
-
-          </div>
-
-
-          <div class="alert">
-
-            <div class="alert-icon">!</div>
-
-            <div>
-              <strong>SDM-CPS-2754-2026</strong>
-              <span>Estado: Terminado · Fecha faltante</span>
-            </div>
-
-            <span class="badge red">Pendiente</span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- INCIDENCIAS -->
-
-    <div class="table-card">
-
-      <div class="table-head">
-
-        <h3>Radicados y expedientes con incidencias de calidad</h3>
-
-        <span>9 pendientes</span>
-
-      </div>
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>Radicado</th>
-            <th>Incidencia</th>
-            <th>Responsable</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          <tr>
-            <td>SDM-CPS-1042-2026</td>
-            <td>Campo obligatorio incompleto</td>
-            <td>Laura Martínez</td>
-            <td>18/09/2026</td>
-            <td><span class="badge red">Pendiente</span></td>
-          </tr>
-
-          <tr>
-            <td>SDM-CPS-3105-2026</td>
-            <td>Fecha inconsistente</td>
-            <td>Carlos Rodríguez</td>
-            <td>17/09/2026</td>
-            <td><span class="badge yellow">En revisión</span></td>
-          </tr>
-
-          <tr>
-            <td>SDM-CPS-164-2026</td>
-            <td>Abogado sin asignar</td>
-            <td>Administración</td>
-            <td>16/09/2026</td>
-            <td><span class="badge red">Pendiente</span></td>
-          </tr>
-
-          <tr>
-            <td>SDM-CPS-3612-2026</td>
-            <td>Área generadora faltante</td>
-            <td>Juan Pérez</td>
-            <td>15/09/2026</td>
-            <td><span class="badge blue">En revisión</span></td>
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </section>
-
   </div>
+  <script>
+    const KEY = 'demo_procesos_judiciales_v1'; let records = []; let step = 0; let editingId = null; let actionProcessId = null;
+    const fields = ['shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids', 'claimant', 'defendant', 'area', 'lawyer', 'instance', 'type', 'court', 'cause', 'state', 'startDate', 'endDate', 'claim', 'amount', 'cautelar', 'notes'];
+    const labels = { shortNo: 'No. corto', radicado: 'Radicado', currentRadicado: 'Radicado actual', siproJ: 'ID SIPROJ', orfeo: 'Expediente ORFEO', ids: 'Cédulas / identificadores', claimant: 'Demandante', defendant: 'Demandado', area: 'Área generadora', lawyer: 'Responsable', instance: 'Instancia', type: 'Tipo de proceso', court: 'Despacho', cause: 'Causa', state: 'Estado', startDate: 'Fecha de inicio', endDate: 'Fecha de terminación', claim: 'Pretensión / asunto', amount: 'Valor de pretensiones', cautelar: 'Medida cautelar', notes: 'Observaciones' };
+    function load() { try { const saved = localStorage.getItem(KEY); records = saved ? JSON.parse(saved) : []; if (!Array.isArray(records)) records = [] } catch (error) { records = []; console.error(error) } renderAll() }
+    function persist() { localStorage.setItem(KEY, JSON.stringify(records)); renderAll() }
+    function showView(id) { document.querySelectorAll('.view').forEach(x => x.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id)); const titles = { dashboard: ['Resumen general', 'Estado de la información registrada'], processes: ['Procesos', 'Consulta y edición de registros'], actions: ['Actuaciones', 'Historial de actuaciones registradas'], form: ['Registro de proceso', 'Formulario por etapas'], backup: ['Datos y Excel', 'Descarga de información en formato Excel'] }; document.getElementById('pageTitle').textContent = titles[id][0]; document.getElementById('pageSubtitle').textContent = titles[id][1]; if (id === 'processes') renderProcesses(); if (id === 'actions') renderActions(); }
+    document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+    function newProcess() { editingId = null; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('editBadge').textContent = 'Nuevo'; document.getElementById('confirmData').checked = false; step = 0; setStep(); showView('form') }
+    function editProcess(id) { const r = records.find(x => x.id === id); if (!r) return; editingId = id; const f = document.getElementById('processForm'); f.reset(); fields.forEach(k => { if (f.elements[k]) f.elements[k].value = r[k] ?? '' }); document.getElementById('formTitle').textContent = 'Editar proceso'; document.getElementById('editBadge').textContent = 'Edición'; document.getElementById('confirmData').checked = false; step = 0; setStep(); showView('form') }
+    function setStep() { document.querySelectorAll('.form-step').forEach((el, i) => el.classList.toggle('hidden', i !== step)); document.querySelectorAll('.step').forEach((el, i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step) }); document.getElementById('prevBtn').disabled = step === 0; document.getElementById('nextBtn').classList.toggle('hidden', step === 4); document.getElementById('saveBtn').classList.toggle('hidden', step !== 4); if (step === 4) makeReview() }
+    function moveStep(delta) { if (delta > 0 && !validateStep()) return; step = Math.max(0, Math.min(4, step + delta)); setStep() }
+    function validateStep() {
+      const box = document.querySelector(`.form-step[data-step="${step}"]`); for (const el of box.querySelectorAll('[required]')) { if (!el.value.trim()) { el.focus(); alert('Complete el campo obligatorio: ' + (el.closest('.field').querySelector('label')?.textContent || el.name)); return false } }
+      if (step === 0) { let rad = document.querySelector('[name=radicado]').value.trim(); if (!/^\d{23}$/.test(rad)) { alert('El radicado debe contener exactamente 23 dígitos. Se conserva como texto para evitar pérdida de ceros.'); return false } }
+      return true
+    }
+    function makeReview() { let f = document.getElementById('processForm'); let data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value || ''])); document.getElementById('reviewBox').innerHTML = '<b>Resumen de revisión</b><br>' + ['shortNo', 'radicado', 'claimant', 'defendant', 'type', 'state', 'lawyer'].map(k => `<div>${labels[k]}: ${escapeHtml(data[k] || 'Sin diligenciar')}</div>`).join('') + '<br>Al guardar, el registro quedará disponible en este navegador.' }
+    async function saveProcess() { if (!document.getElementById('confirmData').checked) { alert('Marque la confirmación de revisión antes de guardar.'); return } const f = document.getElementById('processForm'); const data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value.trim() || ''])); if (!/^\d{23}$/.test(data.radicado)) { alert('Radicado inválido.'); step = 0; setStep(); return } const duplicate = records.find(r => r.radicado === data.radicado && r.id !== editingId); if (duplicate) { alert('Ya existe un registro con ese radicado. Revise el listado antes de continuar.'); return } if (data.state === 'Terminado' && !data.endDate && !confirm('El proceso está Terminado pero no tiene fecha de terminación. ¿Guardar de todas formas?')) return; const now = new Date().toISOString(); if (editingId) { let i = records.findIndex(r => r.id === editingId); records[i] = { ...records[i], ...data, updatedAt: now } } else records.unshift({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), ...data, createdAt: now, updatedAt: now, actions: [] }); try { await persist(); newProcess(); alert('Registro guardado. El formulario está listo para registrar otro proceso.') } catch (error) { alert(error.message) } }
+    function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
+    function fmtDate(s) { return s ? new Date(s + 'T00:00:00').toLocaleDateString('es-CO') : '—' }
+    function row(r) { return `<tr><td><div class="record-title">${escapeHtml(r.shortNo || 'Sin número')}</div><div class="record-sub">${escapeHtml(r.radicado)}</div></td><td>${escapeHtml(r.claimant || '—')}<div class="record-sub">Demandado: ${escapeHtml(r.defendant || '—')}</div></td><td>${escapeHtml(r.type || '—')}</td><td>${escapeHtml(r.lawyer || 'Sin asignar')}</td><td><span class="pill ${r.state === 'Activo' ? 'active' : r.state === 'Terminado' ? 'closed' : ''}">${escapeHtml(r.state)}</span></td><td><button class="secondary small" onclick="editProcess('${r.id}')">Editar</button> <button class="secondary small" onclick="openActions('${r.id}')">Actuaciones (${(r.actions || []).length})</button> <button class="danger small" onclick="deleteProcess('${r.id}')">Eliminar</button></td></tr>` }
+    function table(list) { return list.length ? `<div class="table-wrap"><table><thead><tr><th>Identificación</th><th>Partes</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>` : '<div class="empty">No hay procesos registrados.</div>' }
+    function renderProcesses() { let q = (document.getElementById('search')?.value || '').toLowerCase(); let st = document.getElementById('filterState')?.value || ''; let list = records.filter(r => (!st || r.state === st) && fields.some(k => String(r[k] || '').toLowerCase().includes(q))); document.getElementById('processTable').innerHTML = table(list) }
+    function renderActions() { const query = (document.getElementById('actionsSearch')?.value || '').trim().toLowerCase(); const entries = records.flatMap(record => (record.actions || []).map(action => ({ record, action }))).filter(({ record, action }) => [record.shortNo, record.radicado, record.claimant, action.date, action.description].some(value => String(value || '').toLowerCase().includes(query))).sort((a, b) => b.action.date.localeCompare(a.action.date) || String(b.action.createdAt || '').localeCompare(String(a.action.createdAt || ''))); document.getElementById('allActionsTable').innerHTML = entries.length ? `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Actuación</th><th>Demandante</th><th></th></tr></thead><tbody>${entries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(action.description)}</td><td>${escapeHtml(record.claimant || '—')}</td><td><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">No hay actuaciones registradas.</div>' }
+    function renderAll() { document.getElementById('statTotal').textContent = records.length; document.getElementById('statActive').textContent = records.filter(r => r.state === 'Activo').length; document.getElementById('statClosed').textContent = records.filter(r => r.state === 'Terminado').length; document.getElementById('statIssues').textContent = records.filter(issues).length; document.getElementById('recentTable').innerHTML = table(records.slice(0, 5)); renderCharts(); if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses(); if (!document.getElementById('actions').classList.contains('hidden')) renderActions(); }
+    function renderCharts() {
+      const statusColors = { Activo: '#287a59', Terminado: '#7a8792', Desvinculado: '#315d82', 'Sin estado': '#d88d53' };
+      const statusCounts = records.reduce((counts, record) => { const status = record.state || 'Sin estado'; counts.set(status, (counts.get(status) || 0) + 1); return counts }, new Map());
+      const statuses = [...statusCounts.entries()].sort((a, b) => (Object.keys(statusColors).indexOf(a[0]) + 1 || 99) - (Object.keys(statusColors).indexOf(b[0]) + 1 || 99));
+      const circumference = 2 * Math.PI * 52;
+      let offset = 0;
+      const segments = statuses.map(([status, count]) => {
+        const length = records.length ? count / records.length * circumference : 0;
+        const color = statusColors[status] || '#a6afb7';
+        const segment = `<circle cx="60" cy="60" r="52" fill="none" stroke="${color}" stroke-width="16" stroke-dasharray="${length} ${circumference}" stroke-dashoffset="${-offset}"/>`;
+        offset += length;
+        return segment;
+      }).join('');
+      document.getElementById('stateChart').innerHTML = records.length
+        ? `<div class="donut-wrap"><svg viewBox="0 0 120 120" role="img" aria-label="Distribución de ${records.length} procesos por estado"><circle cx="60" cy="60" r="52" fill="none" stroke="#edf1f4" stroke-width="16"/><g transform="rotate(-90 60 60)">${segments}</g></svg><div class="donut-center"><strong>${records.length}</strong><span>procesos</span></div></div><div class="chart-legend">${statuses.map(([status, count]) => `<div class="legend-row"><span class="legend-swatch" style="background:${statusColors[status] || '#a6afb7'}"></span><span class="legend-name">${escapeHtml(status)}</span><span class="legend-value">${count} · ${Math.round(count / records.length * 100)}%</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">Registra procesos para ver su distribución por estado.</div>';
 
-</main>
+      const today = new Date();
+      const months = Array.from({ length: 6 }, (_, index) => {
+        const date = new Date(today.getFullYear(), today.getMonth() - 5 + index, 1);
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const label = new Intl.DateTimeFormat('es-CO', { month: 'short' }).format(date).replace('.', '');
+        return { key, label, count: 0 };
+      });
+      const monthLookup = new Map(months.map(month => [month.key, month]));
+      records.forEach(record => (record.actions || []).forEach(action => {
+        const month = monthLookup.get(String(action.date || '').slice(0, 7));
+        if (month) month.count++;
+      }));
+      const maxMonthlyCount = Math.max(1, ...months.map(month => month.count));
+      const actionCount = months.reduce((sum, month) => sum + month.count, 0);
+      document.getElementById('activityChart').innerHTML = actionCount
+        ? `<div class="month-chart" role="img" aria-label="Actuaciones registradas por mes en los últimos seis meses">${months.map(month => `<div class="month-column"><span class="month-value">${month.count}</span><div class="month-track"><div class="month-bar" style="--bar-height:${month.count ? Math.max(4, month.count / maxMonthlyCount * 100) : 0}%"></div></div><span class="month-label">${escapeHtml(month.label)}</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">No hay actuaciones en los últimos seis meses.</div>';
 
-</div>
-</div>
-
-
-<script>
-
-function mostrarVista(vista, boton){
-
-  document.querySelectorAll(".view").forEach(function(v){
-    v.classList.remove("active");
-  });
-
-  document.getElementById(vista).classList.add("active");
-
-
-  document.querySelectorAll(".nav button").forEach(function(btn){
-    btn.classList.remove("active");
-  });
-
-  if(boton){
-    boton.classList.add("active");
-  }
-
-
-  document.querySelector("#btnEjecutiva").classList.remove("active");
-  document.querySelector("#btnOperativa").classList.remove("active");
-
-
-  if(vista === "ejecutiva"){
-
-    document.querySelector("#btnEjecutiva").classList.add("active");
-
-    document.querySelector("#crumb").textContent =
-      "Dashboard · Vista ejecutiva";
-
-  }else{
-
-    document.querySelector("#btnOperativa").classList.add("active");
-
-    document.querySelector("#crumb").textContent =
-      "Dashboard · Vista operativa";
-
-  }
-
-}
-
-</script>
-
+      const typeCounts = records.reduce((counts, record) => {
+        const type = String(record.type || '').trim() || 'Sin clasificar';
+        counts.set(type, (counts.get(type) || 0) + 1);
+        return counts;
+      }, new Map());
+      const sortedTypes = [...typeCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+      const visibleTypes = sortedTypes.slice(0, 5);
+      if (sortedTypes.length > 5) visibleTypes.push(['Otros', sortedTypes.slice(5).reduce((sum, entry) => sum + entry[1], 0)]);
+      const maxTypeCount = Math.max(1, ...visibleTypes.map(([, count]) => count));
+      document.getElementById('typeChart').innerHTML = visibleTypes.length
+        ? `<div class="rank-chart" role="img" aria-label="Procesos agrupados por tipo">${visibleTypes.map(([type, count]) => `<div class="rank-row"><span class="rank-name" title="${escapeHtml(type)}">${escapeHtml(type)}</span><div class="rank-track"><div class="rank-bar" style="width:${count / maxTypeCount * 100}%"></div></div><span class="rank-count">${count}</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">Registra procesos para comparar sus tipos.</div>';
+    }
+    function issues(r) { return !r.currentRadicado || !r.lawyer || (r.state === 'Terminado' && !r.endDate) || !r.area }
+    async function deleteProcess(id) { if (!confirm('¿Eliminar este registro y sus actuaciones de este navegador?')) return; records = records.filter(r => r.id !== id); try { await persist() } catch (error) { alert(error.message) } }
+    function openActions(id) { actionProcessId = id; const record = records.find(item => item.id === id); document.getElementById('actionDate').value = new Date().toISOString().slice(0, 10); document.getElementById('actionDescription').value = ''; document.getElementById('actionState').value = record?.state || ''; renderActionDialog(); document.getElementById('actionsDialog').classList.add('open') }
+    function closeActions() { document.getElementById('actionsDialog').classList.remove('open'); actionProcessId = null }
+    function renderActionDialog() { const record = records.find(r => r.id === actionProcessId); if (!record) return; document.getElementById('actionsTitle').textContent = 'Actuaciones · ' + (record.shortNo || 'Proceso'); document.getElementById('actionsProcess').textContent = `Radicado ${record.radicado || ''} · Estado actual: ${record.state || 'Sin estado'}`; const list = [...(record.actions || [])].sort((a, b) => b.date.localeCompare(a.date)); document.getElementById('actionList').innerHTML = list.length ? list.map(action => `<article class="action-item"><strong>${escapeHtml(fmtDate(action.date))}</strong><div>${escapeHtml(action.description)}</div></article>`).join('') : '<div class="empty">Este proceso aún no tiene actuaciones registradas.</div>' }
+    async function saveAction(event) { event.preventDefault(); const record = records.find(r => r.id === actionProcessId); if (!record) return; record.actions = record.actions || []; record.actions.push({ date: document.getElementById('actionDate').value, description: document.getElementById('actionDescription').value.trim(), createdAt: new Date().toISOString() }); const selectedState = document.getElementById('actionState').value; if (selectedState) record.state = selectedState; record.updatedAt = new Date().toISOString(); try { await persist(); closeActions() } catch (error) { alert(error.message) } }
+    function xmlEscape(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[char])) }
+    function excelCell(value, type = 'String') { return `<Cell><Data ss:Type="${type}">${xmlEscape(value)}</Data></Cell>` }
+    function excelRow(values, style = '') { return `<Row${style ? ` ss:StyleID="${style}"` : ''}>${values.map(value => value && typeof value === 'object' ? excelCell(value.value, value.type) : excelCell(value)).join('')}</Row>` }
+    function exportExcel() {
+      const processHeaders = [...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Actuaciones'];
+      const processRows = records.map(record => [
+        ...fields.map(field => record[field] || ''),
+        record.createdAt || '',
+        record.updatedAt || '',
+        { value: (record.actions || []).length, type: 'Number' }
+      ]);
+      const actionEntries = records.flatMap(record => (record.actions || []).map(action => [
+        record.shortNo || '', record.radicado || '', action.date || '', action.description || '', action.createdAt || ''
+      ]));
+      const actionHeaders = ['No. corto', 'Radicado', 'Fecha', 'Descripción', 'Registrada'];
+      const workbook = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#344554" ss:Pattern="Solid"/></Style></Styles><Worksheet ss:Name="Procesos"><Table>${excelRow(processHeaders, 'Header')}${processRows.map(row => excelRow(row)).join('')}</Table></Worksheet><Worksheet ss:Name="Actuaciones"><Table>${excelRow(actionHeaders, 'Header')}${actionEntries.map(row => excelRow(row)).join('')}</Table></Worksheet></Workbook>`;
+      const blob = new Blob(['\uFEFF', workbook], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'procesos_judiciales.xls';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    async function clearData() { if (!confirm('Esta acción elimina todos los registros guardados en este navegador. ¿Continuar?')) return; records = []; try { await persist() } catch (error) { alert(error.message) } }
+    load();
+  </script>
 </body>
+
 </html>
