@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de procesos judiciales</title>
-    <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -17,7 +17,7 @@
         <button data-view="processes">Procesos</button>
         <button data-view="actions">Actuaciones</button>
         <button data-view="form">Registrar proceso</button>
-        <button data-view="backup">Datos / respaldo</button>
+        <button data-view="backup">Descargar datos</button>
       </nav>
     </aside>
     <main class="main">
@@ -27,7 +27,7 @@
           <h1 id="pageTitle">Resumen general</h1>
           <div class="muted" id="pageSubtitle">Estado de la información registrada</div>
         </div>
-        <div class="actions"><button class="secondary" onclick="showView('processes')">Ver procesos</button><button
+        <div class="actions"><button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
             onclick="newProcess()">+ Nuevo proceso</button></div>
       </header>
       <section id="dashboard" class="view">
@@ -72,7 +72,7 @@
         </div>
         <div class="panel">
           <div class="panel-head">
-            <h2>Procesos recientes</h2><button class="secondary small" onclick="showView('processes')">Abrir
+            <h2>Procesos recientes</h2><button class="secondary small" onclick="showView('processOverview')">Abrir
               listado</button>
           </div>
           <div id="recentTable"></div>
@@ -94,10 +94,22 @@
           <div id="processTable"></div>
         </div>
       </section>
+      <section id="processOverview" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Vista completa de procesos</h2>
+              <div class="muted">Todos los datos registrados; desplácese horizontalmente para consultar las columnas.</div>
+            </div>
+            <button type="button" class="secondary" onclick="showView('processes')">Volver a procesos</button>
+          </div>
+          <div id="fullProcessTable"></div>
+        </div>
+      </section>
       <section id="actions" class="view hidden">
         <div class="panel">
           <div class="panel-head">
-            <h2>Actuaciones registradas</h2>
+            <h2>Actuaciones por proceso</h2>
             <div class="toolbar"><input id="actionsSearch" placeholder="Buscar actuación, proceso o radicado..."
                 oninput="renderActions()"></div>
           </div>
@@ -114,9 +126,9 @@
           </div>
           <div class="steps" id="steps">
             <div class="step active">1. Identificación</div>
-            <div class="step">2. Partes</div>
-            <div class="step">3. Información judicial</div>
-            <div class="step">4. Pretensiones</div>
+            <div class="step">2. Partes y representación</div>
+            <div class="step">3. Clasificación judicial</div>
+            <div class="step">4. Pretensiones y actuaciones</div>
             <div class="step">5. Revisión</div>
           </div>
           <form id="processForm" onsubmit="return false">
@@ -137,12 +149,23 @@
                 <div class="field"><label>Demandante *</label><input name="claimant" required></div>
                 <div class="field"><label>Demandado *</label><input name="defendant" required></div>
                 <div class="field"><label>Área generadora del daño</label><input name="area"></div>
-                <div class="field"><label>Abogado / responsable</label><input name="lawyer"></div>
+                <div class="field"><label>Abogado a cargo</label><input name="lawyer"></div>
+                <div class="field"><label>Calidad</label><input name="quality" placeholder="Ej. Activa o pasiva"></div>
+                <div class="field"><label>Tipo de vinculación del abogado</label><input name="lawyerLinkType"
+                    placeholder="Ej. Planta o contratista"></div>
+                <div class="field"><label>Representa</label><select name="represents">
+                    <option value="">Seleccione</option>
+                    <option>Demandante</option>
+                    <option>Demandado</option>
+                    <option>Representa</option>
+                    <option>Ambas partes</option>
+                    <option>No informado</option>
+                  </select></div>
               </div>
             </div>
             <div class="form-step hidden" data-step="2">
               <div class="field-grid">
-                <div class="field"><label>Instancia</label><select name="instance">
+                <div class="field"><label>Instancia del proceso</label><select name="instance">
                     <option value="">Seleccione</option>
                     <option>Primera</option>
                     <option>Segunda</option>
@@ -153,8 +176,11 @@
                 <div class="field"><label>Tipo de proceso</label><input name="type"
                     placeholder="Ej. Reparación directa"></div>
                 <div class="field"><label>Despacho judicial inicial</label><input name="court"></div>
+                <div class="field"><label>Despacho de segunda instancia</label><input name="secondCourt"></div>
                 <div class="field"><label>Causa</label><input name="cause"></div>
-                <div class="field"><label>Estado *</label><select name="state" required>
+                <div class="field"><label>Etapa del proceso</label><input name="stage"
+                    placeholder="Etapa procesal actual"></div>
+                <div class="field"><label>Estado del proceso *</label><select name="state" required>
                     <option>Activo</option>
                     <option>Terminado</option>
                     <option>Desvinculado</option>
@@ -168,11 +194,34 @@
                 <div class="field full"><label>Pretensión / asunto</label><textarea name="claim"></textarea></div>
                 <div class="field"><label>Valor de las pretensiones (COP)</label><input name="amount" type="number"
                     min="0" step="1" placeholder="Ej. 150000000"></div>
-                <div class="field"><label>¿Medida cautelar?</label><select name="cautelar">
+                <div class="field"><label>¿Presenta medida cautelar?</label><select name="cautelar">
                     <option>No informado</option>
                     <option>Sí</option>
                     <option>No</option>
                   </select></div>
+                <div class="field"><label>Fecha de notificación de la demanda</label><input name="notificationDate"
+                    type="date"></div>
+                <div class="field"><label>Fecha de contestación de medida cautelar</label><input
+                    name="measureResponseDate" type="date"></div>
+                <div class="field"><label>Fecha máxima de contestación de demanda</label><input
+                    name="maxDemandResponseDate" type="date"></div>
+                <div class="field"><label>Fecha de contestación de demanda</label><input name="demandResponseDate"
+                    type="date"></div>
+                <div class="field"><label>Audiencia inicial</label><input name="initialHearingDate" type="date"></div>
+                <div class="field full"><label>Pruebas</label><textarea name="evidence"
+                    placeholder="Información relacionada con las pruebas"></textarea></div>
+                <div class="field"><label>Fecha de alegatos de conclusión</label><input name="closingArgumentsDate"
+                    type="date"></div>
+                <div class="field"><label>Fecha de fallo de primera instancia</label><input
+                    name="firstInstanceDecisionDate" type="date"></div>
+                <div class="field"><label>Sentido del fallo de primera instancia</label><input
+                    name="firstInstanceDecisionSense" placeholder="Ej. Favorable, desfavorable o mixto"></div>
+                <div class="field"><label>Fecha de presentación del recurso</label><input name="appealDate" type="date">
+                </div>
+                <div class="field"><label>Fecha del fallo de segunda instancia</label><input
+                    name="secondInstanceDecisionDate" type="date"></div>
+                <div class="field full"><label>Fallo de segunda instancia</label><textarea
+                    name="secondInstanceDecision"></textarea></div>
                 <div class="field full"><label>Observaciones</label><textarea name="notes"></textarea></div>
               </div>
             </div>
@@ -192,9 +241,8 @@
       </section>
       <section id="backup" class="view hidden">
         <div class="panel">
-          <h2>Datos y Excel</h2>
-          <p class="muted">Descargue un archivo Excel con una hoja de procesos yotra de actuaciones.</p>
-            <div class="actions"><button onclick="exportExcel()">Descargar Excel</button></div>
+          <h2>Descargar datos</h2>
+          <div class="actions"><button type="button" onclick="exportExcel()">Descargar Excel</button></div>
         </div>
       </section>
     </main>
@@ -222,7 +270,7 @@
       </section>
     </div>
   </div>
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 
 </html>
