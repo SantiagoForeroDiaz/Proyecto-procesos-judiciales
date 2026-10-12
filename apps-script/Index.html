@@ -1,0 +1,1735 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de procesos judiciales</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #fff;
+      --text: #202b36;
+      --muted: #697785;
+      --line: #e2e7eb;
+      --accent: #d88d53;
+      --accent2: #b96d34;
+      --soft: #fff3e8;
+      --danger: #b54747;
+      --green: #287a59;
+      --blue: #315d82;
+      --shadow: 0 8px 28px rgba(26, 39, 51, .06)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 Inter, Segoe UI, Arial, sans-serif
+    }
+
+    body.auth-pending {
+      overflow: hidden
+    }
+
+    body.auth-pending .app {
+      display: none
+    }
+
+    .auth-screen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at top right, #e8edf1, transparent 42%), var(--bg)
+    }
+
+    .auth-card {
+      width: min(100%, 430px);
+      padding: 38px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 24px 70px rgba(26, 39, 51, .12);
+      text-align: center
+    }
+
+    .auth-mark {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 18px;
+      place-items: center;
+      border-radius: 15px;
+      background: var(--soft);
+      color: var(--accent2);
+      font-size: 18px;
+      font-weight: 800
+    }
+
+    .auth-eyebrow {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em
+    }
+
+    .auth-card h1 {
+      margin: 0 0 8px;
+      font-size: 24px
+    }
+
+    .auth-card p:not(.auth-eyebrow) {
+      margin: 0;
+      color: var(--muted)
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+      text-align: left
+    }
+
+    .auth-form button {
+      width: 100%
+    }
+
+    .auth-spinner {
+      width: 25px;
+      height: 25px;
+      margin: 22px auto 0;
+      border: 3px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: auth-spin .8s linear infinite
+    }
+
+    @keyframes auth-spin {
+      to { transform: rotate(360deg) }
+    }
+
+    .user-identity {
+      display: grid;
+      padding-right: 10px;
+      color: var(--text);
+      text-align: right
+    }
+
+    .user-identity span {
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600
+    }
+
+    button:hover {
+      background: var(--accent2)
+    }
+
+    button.secondary {
+      background: #edf1f4;
+      color: #344454
+    }
+
+    button.danger {
+      background: #fff0f0;
+      color: var(--danger)
+    }
+
+    button.small {
+      padding: 6px 10px;
+      font-size: 12px
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 245px 1fr;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      background: #202b36;
+      color: #eaf0f4;
+      padding: 24px 16px
+    }
+
+    .brand {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 10px 28px
+    }
+
+    .brand span {
+      display: block;
+      color: #aab8c4;
+      font-size: 11px;
+      font-weight: 400;
+      margin-top: 4px
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px
+    }
+
+    .nav button {
+      background: transparent;
+      color: #d6e0e7;
+      text-align: left;
+      font-weight: 500
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      background: #344554;
+      color: white
+    }
+
+    .side-note {
+      margin: 30px 10px;
+      color: #aab8c4;
+      font-size: 12px
+    }
+
+    .main {
+      min-width: 0;
+      padding: 26px clamp(16px, 3vw, 42px)
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px
+    }
+
+    .eyebrow {
+      color: var(--accent2);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .top h1 {
+      font-size: 25px;
+      margin: 2px 0
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px
+    }
+
+    .dashboard-charts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px
+    }
+
+    .chart-panel {
+      min-width: 0
+    }
+
+    .chart-panel.wide {
+      grid-column: 1 / -1
+    }
+
+    .chart-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px
+    }
+
+    .status-chart {
+      display: grid;
+      grid-template-columns: minmax(130px, 180px) 1fr;
+      align-items: center;
+      gap: 20px;
+      min-height: 190px
+    }
+
+    .donut-wrap {
+      display: grid;
+      place-items: center;
+      position: relative;
+      width: 170px;
+      aspect-ratio: 1
+    }
+
+    .donut-wrap svg {
+      display: block;
+      width: 100%;
+      height: 100%
+    }
+
+    .donut-center {
+      position: absolute;
+      display: grid;
+      text-align: center;
+      line-height: 1.2
+    }
+
+    .donut-center strong {
+      font-size: 25px
+    }
+
+    .donut-center span {
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    .chart-legend {
+      display: grid;
+      gap: 10px
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 10px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-size: 12px
+    }
+
+    .legend-swatch {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px
+    }
+
+    .legend-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .legend-value {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums
+    }
+
+    .month-chart {
+      display: grid;
+      grid-template-columns: repeat(var(--month-count), minmax(64px, 1fr));
+      gap: 10px;
+      align-items: end;
+      min-height: 190px;
+      padding: 16px 0 8px;
+      width: max-content;
+      min-width: 100%
+    }
+
+    #activityChart {
+      overflow-x: auto
+    }
+
+    .dashboard-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px
+    }
+
+    .print-report-title {
+      display: none
+    }
+
+    .month-column {
+      display: grid;
+      grid-template-rows: 20px 1fr 20px;
+      gap: 7px;
+      min-width: 0;
+      height: 170px;
+      text-align: center
+    }
+
+    .month-value,
+    .month-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums
+    }
+
+    .month-track {
+      display: flex;
+      align-items: end;
+      overflow: hidden;
+      background: #f0f3f5;
+      border-radius: 4px;
+      min-height: 0
+    }
+
+    .month-bar {
+      width: 100%;
+      height: var(--bar-height);
+      min-height: 0;
+      background: #287a59;
+      border-radius: 4px 4px 0 0
+    }
+
+    .rank-chart {
+      display: grid;
+      gap: 13px;
+      padding: 5px 0
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: minmax(100px, 190px) 1fr 32px;
+      align-items: center;
+      gap: 12px
+    }
+
+    .rank-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px
+    }
+
+    .rank-track {
+      height: 9px;
+      overflow: hidden;
+      background: #f0f3f5;
+      border-radius: 5px
+    }
+
+    .rank-bar {
+      height: 100%;
+      background: #315d82;
+      border-radius: inherit
+    }
+
+    .rank-count {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      font-variant-numeric: tabular-nums
+    }
+
+    .chart-empty {
+      display: grid;
+      place-items: center;
+      min-height: 165px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center
+    }
+
+    .stat,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      box-shadow: var(--shadow)
+    }
+
+    .stat {
+      padding: 16px
+    }
+
+    .stat small {
+      color: var(--muted)
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-top: 5px
+    }
+
+    .panel {
+      padding: 20px;
+      margin-bottom: 18px
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      margin: 0
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .toolbar input {
+      min-width: 210px
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px
+    }
+
+    .field {
+      display: grid;
+      gap: 5px
+    }
+
+    .field.full {
+      grid-column: 1/-1
+    }
+
+    label {
+      font-size: 12px;
+      color: #536272;
+      font-weight: 650
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d7dee4;
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text);
+      outline: none
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px #d88d5320
+    }
+
+    textarea {
+      min-height: 84px;
+      resize: vertical
+    }
+
+    .steps {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 20px;
+      overflow: auto
+    }
+
+    .step {
+      white-space: nowrap;
+      background: #edf1f4;
+      color: #657382;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 650
+    }
+
+    .step.active {
+      background: var(--soft);
+      color: var(--accent2);
+      outline: 1px solid #edc7a5
+    }
+
+    .step.done {
+      background: #e8f4ee;
+      color: var(--green)
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 18px
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .table-wrap {
+      overflow: auto
+    }
+
+    .table-summary {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 0 0 10px
+    }
+
+    .full-table-wrap {
+      max-height: min(70vh, 760px);
+      border: 1px solid var(--line);
+      border-radius: 8px
+    }
+
+    .full-process-table {
+      width: max-content;
+      min-width: 100%;
+      table-layout: auto
+    }
+
+    .full-process-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--panel);
+      white-space: nowrap
+    }
+
+    .full-process-table td {
+      max-width: 360px;
+      min-width: 120px;
+      vertical-align: top;
+      white-space: pre-line;
+      overflow-wrap: anywhere
+    }
+
+    .full-process-table td:first-child,
+    .full-process-table td:nth-child(2) {
+      min-width: 170px
+    }
+
+    .full-process-table .full-table-actions {
+      min-width: 200px;
+      white-space: normal
+    }
+
+    .action-group + .action-group {
+      margin-top: 24px
+    }
+
+    .action-group h3 {
+      margin: 0 0 10px;
+      font-size: 14px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle
+    }
+
+    th {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    td {
+      font-size: 13px
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: #edf1f4;
+      color: #4f6170;
+      font-size: 11px
+    }
+
+    .pill.active {
+      background: #e8f4ee;
+      color: var(--green)
+    }
+
+    .pill.closed {
+      background: #f1f0f0;
+      color: #68727b
+    }
+
+    .empty {
+      text-align: center;
+      padding: 35px;
+      color: var(--muted)
+    }
+
+    .record-title {
+      font-weight: 700
+    }
+
+    .record-sub {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .notice {
+      padding: 11px 13px;
+      border-radius: 8px;
+      background: #fff7eb;
+      color: #855b2f;
+      font-size: 12px;
+      margin-bottom: 14px
+    }
+
+    .actions-list {
+      display: grid;
+      gap: 10px
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 150px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      padding: 12px;
+      border-radius: 9px
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 15px
+    }
+
+    @media(max-width:850px) {
+      .app {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar {
+        padding: 12px
+      }
+
+      .brand {
+        margin: 5px 8px 12px
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, 1fr)
+      }
+
+      .nav button {
+        text-align: center;
+        padding: 8px
+      }
+
+      .side-note {
+        display: none
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .dashboard-charts {
+        grid-template-columns: 1fr
+      }
+
+      .chart-panel.wide {
+        grid-column: auto
+      }
+    }
+
+    @media(max-width:560px) {
+      .auth-card {
+        padding: 30px 22px
+      }
+
+      .main {
+        padding: 16px
+      }
+
+      .top {
+        align-items: flex-start;
+        flex-direction: column
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr
+      }
+
+      .field.full {
+        grid-column: auto
+      }
+
+      .stats {
+        gap: 8px
+      }
+
+      .stat {
+        padding: 12px
+      }
+
+      .action-row {
+        grid-template-columns: 1fr
+      }
+
+      .steps {
+        gap: 5px
+      }
+
+      .status-chart {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 14px
+      }
+
+      .chart-legend {
+        width: 100%
+      }
+
+      .rank-row {
+        grid-template-columns: minmax(82px, 125px) 1fr 28px;
+        gap: 8px
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 12mm
+      }
+
+      body {
+        background: #fff;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact
+      }
+
+      .sidebar,
+      .top,
+      .dashboard-footer,
+      #recentTable button {
+        display: none !important
+      }
+
+      .app {
+        display: block;
+        min-height: 0
+      }
+
+      .main {
+        padding: 0
+      }
+
+      .view.hidden {
+        display: none !important
+      }
+
+      #dashboard {
+        display: block !important
+      }
+
+      .print-report-title {
+        display: block;
+        margin-bottom: 14px
+      }
+
+      .print-report-title h1 {
+        margin: 0;
+        font-size: 22px
+      }
+
+      .print-report-title p {
+        margin: 3px 0 0;
+        color: #697785
+      }
+
+      .stat,
+      .panel {
+        box-shadow: none;
+        break-inside: avoid
+      }
+
+      .dashboard-charts {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .chart-panel.wide {
+        grid-column: 1 / -1
+      }
+
+      #activityChart {
+        overflow: visible
+      }
+
+      .month-chart {
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        grid-auto-flow: row;
+        width: auto;
+        min-width: 0;
+        gap: 6px
+      }
+
+      .month-column {
+        height: 90px
+      }
+
+      .table-wrap {
+        overflow: visible
+      }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      background: #17212bb8;
+      padding: 20px;
+      display: none;
+      place-items: center
+    }
+
+    .modal.open {
+      display: grid
+    }
+
+    .modal-card {
+      width: min(760px, 100%);
+      max-height: min(85vh, 760px);
+      overflow: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 18px 60px #10182055
+    }
+
+    .action-list {
+      display: grid;
+      gap: 8px;
+      margin: 16px 0
+    }
+
+    .action-item {
+      border-left: 3px solid var(--accent);
+      padding: 10px 12px;
+      background: #f7f8f9
+    }
+
+    .action-item strong {
+      display: block;
+      margin-bottom: 3px
+    }
+
+    .action-form {
+      display: grid;
+      grid-template-columns: 150px minmax(170px, 1fr) 170px auto;
+      gap: 8px;
+      align-items: end
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    @media(max-width:560px) {
+      .action-form {
+        grid-template-columns: 1fr
+      }
+    }
+</style>
+</head>
+
+<body class="auth-pending">
+  <main id="authGate" class="auth-screen" aria-live="polite">
+    <section class="auth-card">
+      <div class="auth-mark" aria-hidden="true">GJ</div>
+      <p class="auth-eyebrow">GESTIÓN JUDICIAL</p>
+      <h1 id="authTitle">Ingresa tu correo</h1>
+      <p id="authMessage">Te enviaremos un código para verificar tu dirección y autorizar el acceso.</p>
+      <form id="emailForm" class="auth-form">
+        <label for="accessEmail">Correo electrónico</label>
+        <input id="accessEmail" type="email" autocomplete="email" required>
+        <button id="sendCodeButton" type="submit">Enviar código</button>
+      </form>
+      <form id="codeForm" class="auth-form hidden">
+        <label for="accessCode">Código de verificación</label>
+        <input id="accessCode" type="text" inputmode="text" autocomplete="one-time-code" minlength="8" maxlength="8" pattern="[A-Fa-f0-9]{8}" required>
+        <button id="verifyCodeButton" type="submit">Verificar e ingresar</button>
+        <button id="changeEmailButton" class="secondary" type="button">Usar otro correo</button>
+      </form>
+      <div id="authSpinner" class="auth-spinner hidden" role="status" aria-label="Verificando"></div>
+      <button id="authRetry" class="hidden" type="button" onclick="location.reload()">Intentar de nuevo</button>
+    </section>
+  </main>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Gestión judicial <span>Prototipo de seguimiento</span></div>
+      <nav class="nav">
+        <button class="active" data-view="dashboard">Resumen</button>
+        <button data-view="processes">Procesos</button>
+        <button data-view="actions">Actuaciones</button>
+        <button data-view="form">Registrar proceso</button>
+        <button data-view="backup">Descargar datos</button>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="top">
+        <div>
+          <div class="eyebrow">Panel de control</div>
+          <h1 id="pageTitle">Resumen general</h1>
+          <div class="muted" id="pageSubtitle">Estado de la información registrada</div>
+        </div>
+        <div class="actions">
+          <div id="userIdentity" class="user-identity hidden"><strong id="userName"></strong><span id="userRole"></span></div>
+          <button id="logoutButton" class="secondary small hidden" type="button">Cerrar sesión</button>
+          <button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
+            onclick="newProcess()">+ Nuevo proceso</button>
+        </div>
+      </header>
+      <section id="dashboard" class="view">
+        <div class="print-report-title">
+          <h1>Reporte general de procesos judiciales</h1>
+          <p id="reportDate"></p>
+        </div>
+        <div class="stats">
+          <div class="stat"><small>Total de procesos</small><strong id="statTotal">0</strong></div>
+          <div class="stat"><small>Activos</small><strong id="statActive">0</strong></div>
+          <div class="stat"><small>Terminados</small><strong id="statClosed">0</strong></div>
+          <div class="stat"><small>Con datos por revisar</small><strong id="statIssues">0</strong></div>
+        </div>
+        <div class="dashboard-charts">
+          <section class="panel chart-panel" aria-labelledby="stateChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="stateChartTitle">Procesos por estado</h2>
+                <div class="chart-subtitle">Distribución de la carga actual</div>
+              </div>
+            </div>
+            <div id="stateChart" class="status-chart"></div>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="activityChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="activityChartTitle">Actuaciones por mes</h2>
+                <div class="chart-subtitle">Histórico completo de actuaciones</div>
+              </div>
+            </div>
+            <div id="activityChart"></div>
+          </section>
+          <section class="panel chart-panel wide" aria-labelledby="typeChartTitle">
+            <div class="panel-head">
+              <div>
+                <h2 id="typeChartTitle">Procesos por tipo</h2>
+                <div class="chart-subtitle">Tipos más frecuentes en los registros</div>
+              </div>
+            </div>
+            <div id="typeChart"></div>
+          </section>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Procesos recientes</h2><button class="secondary small" onclick="showView('processOverview')">Abrir
+              listado</button>
+          </div>
+          <div id="recentTable"></div>
+        </div>
+        <div class="dashboard-footer"><button type="button" onclick="downloadReport()">Descargar reporte</button></div>
+      </section>
+      <section id="processes" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Listado de procesos</h2>
+            <div class="toolbar"><input id="search" placeholder="Buscar radicado, demandante, abogado..."
+                oninput="renderProcesses()"><select id="filterState" onchange="renderProcesses()">
+                <option value="">Todos los estados</option>
+                <option>Activo</option>
+                <option>Terminado</option>
+                <option>Desvinculado</option>
+              </select></div>
+          </div>
+          <div id="processTable"></div>
+        </div>
+      </section>
+      <section id="processOverview" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Vista completa de procesos</h2>
+              <div class="muted">Todos los datos registrados; desplácese horizontalmente para consultar las columnas.</div>
+            </div>
+            <button type="button" class="secondary" onclick="showView('processes')">Volver a procesos</button>
+          </div>
+          <div id="fullProcessTable"></div>
+        </div>
+      </section>
+      <section id="actions" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Actuaciones por proceso</h2>
+            <div class="toolbar"><input id="actionsSearch" placeholder="Buscar actuación, proceso o radicado..."
+                oninput="renderActions()"></div>
+          </div>
+          <div id="allActionsTable"></div>
+        </div>
+      </section>
+      <section id="form" class="view hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 id="formTitle">Registrar proceso</h2>
+              <div class="muted">Complete la información por etapas. Los campos marcados con * son obligatorios.</div>
+            </div><span class="pill" id="editBadge">Nuevo</span>
+          </div>
+          <div class="steps" id="steps">
+            <div class="step active">1. Identificación</div>
+            <div class="step">2. Partes y representación</div>
+            <div class="step">3. Clasificación judicial</div>
+            <div class="step">4. Pretensiones y actuaciones</div>
+            <div class="step">5. Revisión</div>
+          </div>
+          <form id="processForm" onsubmit="return false">
+            <div class="form-step" data-step="0">
+              <div class="field-grid">
+                <div class="field"><label>No. corto *</label><input name="shortNo" placeholder="AAAA-NNNNN" required>
+                </div>
+                <div class="field"><label>Radicado (23 dígitos) *</label><input name="radicado" inputmode="numeric"
+                    maxlength="23" placeholder="Solo números" required></div>
+                <div class="field"><label>Radicado actual</label><input name="currentRadicado"></div>
+                <div class="field"><label>ID SIPROJ</label><input name="siproJ"></div>
+                <div class="field"><label>Expediente ORFEO</label><input name="orfeo"></div>
+                <div class="field"><label>Cédulas / identificadores</label><input name="ids"></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="1">
+              <div class="field-grid">
+                <div class="field"><label>Demandante *</label><input name="claimant" required></div>
+                <div class="field"><label>Demandado *</label><input name="defendant" required></div>
+                <div class="field"><label>Área generadora del daño</label><input name="area"></div>
+                <div class="field"><label>Abogado a cargo</label><input name="lawyer"></div>
+                <div class="field"><label>Calidad</label><input name="quality" placeholder="Ej. Activa o pasiva"></div>
+                <div class="field"><label>Tipo de vinculación del abogado</label><input name="lawyerLinkType"
+                    placeholder="Ej. Planta o contratista"></div>
+                <div class="field"><label>Representa</label><select name="represents">
+                    <option value="">Seleccione</option>
+                    <option>Demandante</option>
+                    <option>Demandado</option>
+                    <option>Representa</option>
+                    <option>Ambas partes</option>
+                    <option>No informado</option>
+                  </select></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="2">
+              <div class="field-grid">
+                <div class="field"><label>Instancia del proceso</label><select name="instance">
+                    <option value="">Seleccione</option>
+                    <option>Primera</option>
+                    <option>Segunda</option>
+                    <option>Única</option>
+                    <option>Casación</option>
+                    <option>Otra</option>
+                  </select></div>
+                <div class="field"><label>Tipo de proceso</label><input name="type"
+                    placeholder="Ej. Reparación directa"></div>
+                <div class="field"><label>Despacho judicial inicial</label><input name="court"></div>
+                <div class="field"><label>Despacho de segunda instancia</label><input name="secondCourt"></div>
+                <div class="field"><label>Causa</label><input name="cause"></div>
+                <div class="field"><label>Etapa del proceso</label><input name="stage"
+                    placeholder="Etapa procesal actual"></div>
+                <div class="field"><label>Estado del proceso *</label><select name="state" required>
+                    <option>Activo</option>
+                    <option>Terminado</option>
+                    <option>Desvinculado</option>
+                  </select></div>
+                <div class="field"><label>Fecha de inicio</label><input name="startDate" type="date"></div>
+                <div class="field"><label>Fecha de terminación</label><input name="endDate" type="date"></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="3">
+              <div class="field-grid">
+                <div class="field full"><label>Pretensión / asunto</label><textarea name="claim"></textarea></div>
+                <div class="field"><label>Valor de las pretensiones (COP)</label><input name="amount" type="number"
+                    min="0" step="1" placeholder="Ej. 150000000"></div>
+                <div class="field"><label>¿Presenta medida cautelar?</label><select name="cautelar">
+                    <option>No informado</option>
+                    <option>Sí</option>
+                    <option>No</option>
+                  </select></div>
+                <div class="field"><label>Fecha de notificación de la demanda</label><input name="notificationDate"
+                    type="date"></div>
+                <div class="field"><label>Fecha de contestación de medida cautelar</label><input
+                    name="measureResponseDate" type="date"></div>
+                <div class="field"><label>Fecha máxima de contestación de demanda</label><input
+                    name="maxDemandResponseDate" type="date"></div>
+                <div class="field"><label>Fecha de contestación de demanda</label><input name="demandResponseDate"
+                    type="date"></div>
+                <div class="field"><label>Audiencia inicial</label><input name="initialHearingDate" type="date"></div>
+                <div class="field full"><label>Pruebas</label><textarea name="evidence"
+                    placeholder="Información relacionada con las pruebas"></textarea></div>
+                <div class="field"><label>Fecha de alegatos de conclusión</label><input name="closingArgumentsDate"
+                    type="date"></div>
+                <div class="field"><label>Fecha de fallo de primera instancia</label><input
+                    name="firstInstanceDecisionDate" type="date"></div>
+                <div class="field"><label>Sentido del fallo de primera instancia</label><input
+                    name="firstInstanceDecisionSense" placeholder="Ej. Favorable, desfavorable o mixto"></div>
+                <div class="field"><label>Fecha de presentación del recurso</label><input name="appealDate" type="date">
+                </div>
+                <div class="field"><label>Fecha del fallo de segunda instancia</label><input
+                    name="secondInstanceDecisionDate" type="date"></div>
+                <div class="field full"><label>Fallo de segunda instancia</label><textarea
+                    name="secondInstanceDecision"></textarea></div>
+                <div class="field full"><label>Observaciones</label><textarea name="notes"></textarea></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="4">
+              <div id="reviewBox" class="notice">Revise la información antes de guardar.</div>
+              <div class="field"><label><input type="checkbox" id="confirmData" style="width:auto"> Confirmo que revisé
+                  los datos ingresados.</label></div>
+            </div>
+            <div class="form-actions"><button type="button" class="secondary" id="prevBtn"
+                onclick="moveStep(-1)">Anterior</button>
+              <div><button type="button" class="secondary" onclick="showView('processes')">Cancelar</button> <button
+                  type="button" id="nextBtn" onclick="moveStep(1)">Siguiente</button><button type="button" id="saveBtn"
+                  class="hidden" onclick="saveProcess()">Guardar proceso</button></div>
+            </div>
+          </form>
+        </div>
+      </section>
+      <section id="backup" class="view hidden">
+        <div class="panel">
+          <h2>Descargar datos</h2>
+          <div class="actions"><button type="button" onclick="exportExcel()">Descargar Excel</button></div>
+        </div>
+      </section>
+    </main>
+    <div id="actionsDialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="actionsTitle">
+      <section class="modal-card">
+        <div class="modal-head">
+          <div>
+            <h2 id="actionsTitle">Actuaciones</h2>
+            <div id="actionsProcess" class="muted"></div>
+          </div><button class="secondary small" type="button" onclick="closeActions()"
+            aria-label="Cerrar">Cerrar</button>
+        </div>
+        <div id="actionList" class="action-list"></div>
+        <form id="actionForm" class="action-form" onsubmit="saveAction(event)">
+          <div class="field"><label for="actionDate">Fecha</label><input id="actionDate" type="date" required></div>
+          <div class="field"><label for="actionDescription">Descripción</label><input id="actionDescription" required
+              maxlength="1000" placeholder="Descripción de la actuación"></div>
+          <div class="field"><label for="actionState">Estado del proceso</label><select id="actionState">
+              <option value="Activo">Activo</option>
+              <option value="Terminado">Terminado</option>
+              <option value="Desvinculado">Desvinculado</option>
+            </select></div>
+          <button type="submit">Agregar</button>
+        </form>
+      </section>
+    </div>
+  </div>
+  <script>
+    const KEY = 'demo_procesos_judiciales_v1'; const INITIAL_RECORDS_KEY = `${KEY}_initial_records_v1`; let records = []; let step = 0; let editingId = null; let actionProcessId = null;
+    const fields = ['shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids', 'claimant', 'defendant', 'area', 'lawyer', 'quality', 'lawyerLinkType', 'represents', 'instance', 'type', 'court', 'secondCourt', 'cause', 'stage', 'state', 'startDate', 'endDate', 'claim', 'amount', 'cautelar', 'notificationDate', 'measureResponseDate', 'maxDemandResponseDate', 'demandResponseDate', 'initialHearingDate', 'evidence', 'closingArgumentsDate', 'firstInstanceDecisionDate', 'firstInstanceDecisionSense', 'appealDate', 'secondInstanceDecisionDate', 'secondInstanceDecision', 'notes'];
+    const INITIAL_RECORDS = [
+      {
+        id: 'import-2023-00309', shortNo: '2023-00309', radicado: '11001333400420230030900', currentRadicado: '',
+        siproJ: '774937', orfeo: '20235101530010001124E', ids: '', claimant: 'LUIS FERNANDO ABRIL VELASCO',
+        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
+        lawyer: 'JUAN CAMILO CRIALES ZARATE', quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa',
+        instance: 'Primera', type: 'NULIDAD Y RESTABLECIMIENTO DEL DERECHO',
+        court: 'JUZGADO 4 ADMINISTRATIVO DEL CIRCUITO DE BOGOTÁ', secondCourt: '',
+        cause: 'ACTO ADMINISTRATIVO CONTRAVENCIONAL D-12', stage: 'TRASLADO EXCEPCIONES', state: 'Activo',
+        startDate: '', endDate: '', claim: 'PRIMERA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 25525 DEL 22 DE ABRIL DE 2022 “POR MEDIO DEL CUAL SE DECLARA COMO CONTRAVENTOR DE LA INFRACCIÓN D-12 AL SEÑOR LUIS FERNANDO ABRIL VELASCO”, SEGUNDA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 326-02 DEL 17 DE FEBRERO DE 2023 “POR MEDIO DE LA CUAL SE RESUELVE EL RECURSO DE APELACIÓN DENTRO DEL EXPEDIENTE NO. 25525”, EXPEDIDA POR BOGOTÁ DISTRITO CAPITAL- SECRETARÍA DISTRITAL DE MOVILIDAD',
+        amount: '1406400', cautelar: 'No', notificationDate: '2023-11-10', measureResponseDate: '',
+        maxDemandResponseDate: '2024-01-17', demandResponseDate: '2024-01-17', initialHearingDate: '',
+        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '', firstInstanceDecisionSense: '',
+        appealDate: '', secondInstanceDecisionDate: '', secondInstanceDecision: '',
+        notes: 'REVISION 22/06/2026: 2024-06-07 DESCORRE TRASLADO DE EXCEPCIONES',
+        createdAt: '', updatedAt: '',
+        actions: [
+          { date: '2023-11-10', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' }
+        ]
+      },
+      {
+        id: 'import-2023-00184', shortNo: '2023-00184', radicado: '11001333400420230018400', currentRadicado: '',
+        siproJ: '774933', orfeo: '20235101530010001123E', ids: '', claimant: 'ÁNGELO MOISÉS LADINO',
+        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
+        lawyer: 'DIEGO DANIEL VEGA', quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa',
+        instance: 'Primera', type: 'NULIDAD Y RESTABLECIMIENTO DEL DERECHO',
+        court: 'JUZGADO 4 ADMINISTRATIVO DEL CIRCUITO DE BOGOTÁ', secondCourt: '',
+        cause: 'ACTO ADMINISTRATIVO CONTRAVENCIONAL D-12', stage: 'TRASLADO EXCEPCIONES', state: 'Activo',
+        startDate: '', endDate: '', claim: 'PRIMERA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 15108 DEL 21 DE FEBRERO DE 2022 “POR MEDIO DEL CUAL SE DECLARA COMO CONTRAVENTOR DE LA INFRACCIÓN D-12 AL SEÑOR ANGELO MOISES LADINO”. SEGUNDA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 3817-02 DEL 11 DE NOVIEMBRE DE 2022 “POR MEDIO DE LA CUAL SE RESUELVE EL RECURSO DE APELACIÓN DENTRO DEL EXPEDIENTE NO. 15108”. TERCERA: QUE A TÍTULO DE RESTABLECIMIENTO DE DERECHO SE ORDENE A DEJAR SIN EFECTOS EL ACTO ADMINISTRATIVO NO. 15108 DEL 21 DE FEBRERO DE 2022 Y ACTO ADMINISTRATIVO NO. 3817-02 DEL 11 DE NOVIEMBRE DE 2022',
+        amount: '1406400', cautelar: 'No', notificationDate: '2023-11-10', measureResponseDate: '',
+        maxDemandResponseDate: '2024-01-17', demandResponseDate: '2024-01-16', initialHearingDate: '',
+        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '', firstInstanceDecisionSense: '',
+        appealDate: '', secondInstanceDecisionDate: '', secondInstanceDecision: '',
+        notes: '10/07/2026 SIN MOVIMIENTO DESDE EL 04/05/2026 AL DESPACHO CON CONTESTACION DE LA DEMANDA',
+        createdAt: '', updatedAt: '',
+        actions: [
+          { date: '2023-11-10', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
+          { date: '2023-11-22', description: 'INTERNO: PROCESO REASIGNADO A DIEGO VEGA POR INSTRUCCION DEL DR. JUAN MANUEL', createdAt: '' },
+          { date: '2023-12-18', description: 'CORREO ELECTRONICO: SDM RADICA NUEVO PODER', createdAt: '' }
+        ]
+      },
+      {
+        id: 'import-2023-00344', shortNo: '2023-00344', radicado: '11001334306620230034400', currentRadicado: '',
+        siproJ: '775633', orfeo: '20235101530010001126E', ids: '', claimant: 'LUÍS EMILIO MARTÍNEZ DEL VALLE',
+        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
+        lawyer: 'DIANA MILENA BERNAL CAICEDO', quality: 'Pasiva', lawyerLinkType: 'Planta', represents: 'Representa',
+        instance: 'Primera', type: 'ACCION DE CUMPLIMIENTO',
+        court: 'JUZGADO SESENTA Y SEIS (66) ADMINISTRATIVO ORAL DEL CIRCUITO JUDICIAL DE BOGOTÁ -SECCIÓN TERCERA-',
+        secondCourt: '', cause: 'CADUCIDAD DE LA ACCIÓN', stage: 'Terminado', state: 'Terminado',
+        startDate: '', endDate: '2024-01-31',
+        claim: '1) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ (AUTORIDAD DEMANDADA) EL CUMPLIMIENTO DE LO ESTABLECIDO EN LAS NORMAS MENCIONADAS COMO INCUMPLIDAS, O SEA, QUE APLIQUE LA CADUCIDAD. 2) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ QUE RETIRE EL (LOS) COMPARENDOS DE LA BASE DE DATOS DEL SIMIT Y DEMÁS BASES DE DATOS DE INFRACTORES EN CUMPLIMIENTO DE LA PRESCRIPCIÓN. 3) QUE SE ORDENE A LA AUTORIDAD DE CONTROL COMPETENTE, ADELANTAR LA INVESTIGACIÓN DEL CASO PARA EFECTOS DE RESPONSABILIDADES PENALES O DISCIPLINARIAS.',
+        amount: '0', cautelar: 'No', notificationDate: '2023-11-14', measureResponseDate: '',
+        maxDemandResponseDate: '2023-11-17', demandResponseDate: '2023-11-16', initialHearingDate: '',
+        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '2023-11-28',
+        firstInstanceDecisionSense: 'FAVORABLE', appealDate: '', secondInstanceDecisionDate: '',
+        secondInstanceDecision: '', notes: '31/01/2024 CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM. RECURSO: SIN RECURSO',
+        createdAt: '', updatedAt: '',
+        actions: [
+          { date: '2023-11-14', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
+          { date: '2023-11-28', description: 'CORREO ELECTRONICO: FALLO FAVORABLE DE PRIMERA INSTANCIA', createdAt: '' },
+          { date: '2024-01-31', description: 'CORREO ELECTRONICO: CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM.', createdAt: '' }
+        ]
+      },
+      {
+        id: 'import-2023-00384', shortNo: '2023-00384', radicado: '11001333501620230038400', currentRadicado: '',
+        siproJ: '777103', orfeo: '20235101530010001127E', ids: '', claimant: 'JAVIER JOSÉ OROZCO RODRÍGUEZ',
+        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
+        lawyer: 'DIANA MILENA BERNAL CAICEDO', quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa',
+        instance: 'Primera', type: 'ACCION DE CUMPLIMIENTO',
+        court: 'JUZGADO DIECISEIS ADMINISTRATIVO DE ORALIDAD DEL CIRCUITO DE BOGOTÁ SECCIÓN SEGUNDA',
+        secondCourt: '', cause: 'CADUCIDAD DE LA ACCIÓN', stage: 'Terminado', state: 'Terminado',
+        startDate: '', endDate: '2024-01-31',
+        claim: '1) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ (AUTORIDAD DEMANDADA) EL CUMPLIMIENTO DE LO ESTABLECIDO EN LAS NORMAS MENCIONADAS COMO INCUMPLIDAS, O SEA, QUE APLIQUE LA CADUCIDAD. 2) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ QUE RETIRE EL (LOS) COMPARENDOS DE LA BASE DE DATOS DEL SIMIT Y DEMÁS BASES DE DATOS DE INFRACTORES EN CUMPLIMIENTO DE LA PRESCRIPCIÓN. 3) QUE SE ORDENE A LA AUTORIDAD DE CONTROL COMPETENTE, ADELANTAR LA INVESTIGACIÓN DEL CASO PARA EFECTOS DE RESPONSABILIDADES PENALES O DISCIPLINARIAS.',
+        amount: '0', cautelar: 'No', notificationDate: '2023-11-14', measureResponseDate: '',
+        maxDemandResponseDate: '2023-11-17', demandResponseDate: '2023-11-16', initialHearingDate: '',
+        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '2023-11-27',
+        firstInstanceDecisionSense: 'FAVORABLE', appealDate: '', secondInstanceDecisionDate: '',
+        secondInstanceDecision: '', notes: '31/01/2024 CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM. RECURSO: SIN RECURSO',
+        createdAt: '', updatedAt: '',
+        actions: [
+          { date: '2023-11-14', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
+          { date: '2023-11-27', description: 'CORREO ELECTRONICO: FALLO FAVORABLE DE PRIMERA INSTANCIA', createdAt: '' },
+          { date: '2024-01-31', description: 'CORREO ELECTRONICO: CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM.', createdAt: '' }
+        ]
+      },
+      {
+        id: 'import-2023-00305', shortNo: '2023-00305', radicado: '11001333603720230030500',
+        currentRadicado: '11001333603720230030501', siproJ: '774311', orfeo: '20235101530010001128E',
+        ids: '', claimant: 'OLMAN ORLANDO GUAJE CARREÑO Y OTROS',
+        defendant: 'INSTITUTO DE DESARROLLO URBANO –IDU- Y ALCALDÍA MAYOR DE BOGOTÁ',
+        area: 'SUBSECRETARÍA DE GESTIÓN DE LA MOVILIDAD', lawyer: 'LEIDER EFREN SUAREZ ESPITIA',
+        quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa', instance: 'Primera',
+        type: 'REPARACION DIRECTA',
+        court: 'JUZGADO TREINTA Y SIETE (37) ADMINISTRATIVO DEL CIRCUITO JUDICIAL DE BOGOTÁ D.C. -SECCIÓN TERCERA-',
+        secondCourt: '', cause: 'ACCIDENTE DE TRÁNSITO MAL ESTADO DE LA VÍA',
+        stage: 'CONTESTACIÓN DEMANDA', state: 'Activo', startDate: '', endDate: '',
+        claim: '1) QUE LA NACION COLOMBIANA – ALCALDÍA MAYOR DE BOGOTÁ, D.C. – IDU, SON RESPONSABLES ADMINISTRATIVAMENTE POR LA CULPA CIVIL EXTRACONTRACTUAL, COMO CONSECUENCIA DE LA FALTA EN LA PRESTACIÓN DEL SERVICIO, POR LAS LESIONES CAUSADAS AL SEÑOR OLMAN ORLANDO GUAJE CARREÑO, CC 79667867, EN HECHOS OCURRIDOS EN LA CARRERA 72 CON CALLE 6, BOGOTÁ D.C. EN SENTIDO DE NORTE A SUR, EL 20 DE OCTUBRE DE 2022 A LAS 11:45 A.M. 2) POR LO ANTERIOR QUE SE PAGUE AL DEMANDANTE EL VALOR DE LOS PERJUICIOS MATERIALES Y MORALES DE TODO ORDEN.',
+        amount: '510242562', cautelar: 'No', notificationDate: '2023-11-01', measureResponseDate: '',
+        maxDemandResponseDate: '2023-12-18', demandResponseDate: '2023-12-18',
+        initialHearingDate: '2023-11-14', evidence: '03/06/2024', closingArgumentsDate: '2024-11-21',
+        firstInstanceDecisionDate: '', firstInstanceDecisionSense: '', appealDate: '',
+        secondInstanceDecisionDate: '', secondInstanceDecision: '',
+        notes: 'REVISION 10/03/2026: 2026-02-23 SE AUTORIZA ACCESO KAROLINE MEZA- POSTERIOR A AUTO QUE REGRESA DE LA SEGUNDA INSTANCIA',
+        createdAt: '', updatedAt: '',
+        actions: [
+          { date: '2023-12-11', description: 'APODERADO IDU ALLEGA CONTESTACIÓN DE LA DEMANDA', createdAt: '' },
+          { date: '2023-11-08', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
+          { date: '2023-11-20', description: 'CORREO ELECTRONICO: APODERADO SECRETARÍA DISTRITAL DE GOBIERNO- ALCALDIA LOCAL DE KENNEDY ALLEGA CONTESTACION DE LA DEMANDA', createdAt: '' },
+          { date: '2023-12-11', description: 'CORREO ELECTRONICO: APODERADO IDU ALLEGA CONTESTACIÓN DE LA DEMANDA', createdAt: '' },
+          { date: '2024-05-02', description: 'CORREO ELECTRONICO: AUTO SE TIENE POR CONTESTADA LA DEMANDA, EN TIEMPO POR LA SUM Y SE RECONOCE PERSONERÍA AL ABOGADO LEIDER EFREN SUAREZ ESPITIA', createdAt: '' }
+        ]
+      }
+    ];
+    const labels = { shortNo: 'No. corto', radicado: 'Radicado', currentRadicado: 'Radicado actual', siproJ: 'ID SIPROJ', orfeo: 'Expediente ORFEO', ids: 'Cédulas / identificadores', claimant: 'Demandante', defendant: 'Demandado', area: 'Área generadora del daño', lawyer: 'Abogado a cargo', quality: 'Calidad', lawyerLinkType: 'Tipo de vinculación del abogado', represents: 'Representa', instance: 'Instancia del proceso', type: 'Tipo de proceso', court: 'Despacho judicial inicial', secondCourt: 'Despacho de segunda instancia', cause: 'Causa', stage: 'Etapa del proceso', state: 'Estado del proceso', startDate: 'Fecha de inicio', endDate: 'Fecha de terminación', claim: 'Pretensión / asunto', amount: 'Valor de las pretensiones', cautelar: 'Presenta medida cautelar', notificationDate: 'Fecha de notificación de la demanda', measureResponseDate: 'Fecha de contestación de medida cautelar', maxDemandResponseDate: 'Fecha máxima de contestación de demanda', demandResponseDate: 'Fecha de contestación de demanda', initialHearingDate: 'Audiencia inicial', evidence: 'Pruebas', closingArgumentsDate: 'Fecha de alegatos de conclusión', firstInstanceDecisionDate: 'Fecha de fallo de primera instancia', firstInstanceDecisionSense: 'Sentido del fallo de primera instancia', appealDate: 'Fecha de presentación del recurso', secondInstanceDecisionDate: 'Fecha de fallo de segunda instancia', secondInstanceDecision: 'Fallo de segunda instancia', notes: 'Observaciones' };
+    function load() {
+      let saved;
+      try {
+        saved = localStorage.getItem(KEY);
+        records = saved ? JSON.parse(saved) : [];
+        if (!Array.isArray(records)) throw new Error('El almacenamiento de procesos tiene un formato inválido.');
+      } catch (error) {
+        records = [];
+        console.error('No se pudieron cargar los procesos guardados.', error);
+        alert('No se pudieron cargar los procesos guardados en este navegador. No se sobrescribieron los datos. Detalle: ' + error.message);
+        renderAll();
+        return;
+      }
+
+      try {
+        if (localStorage.getItem(INITIAL_RECORDS_KEY) !== '1') {
+          const existingRadicados = new Set(records.map(record => String(record.radicado || '').replace(/\D/g, '')));
+          const missingRecords = INITIAL_RECORDS.filter(record => !existingRadicados.has(record.radicado));
+          records = [...JSON.parse(JSON.stringify(missingRecords)), ...records];
+          localStorage.setItem(KEY, JSON.stringify(records));
+          localStorage.setItem(INITIAL_RECORDS_KEY, '1');
+        }
+      } catch (error) {
+        console.error('No se pudieron guardar los registros iniciales en este navegador.', error);
+        alert('Los cinco registros iniciales no se pudieron guardar en este navegador. Detalle: ' + error.message);
+      }
+      renderAll();
+    }
+    function persist() { localStorage.setItem(KEY, JSON.stringify(records)); renderAll() }
+    function showView(id) { document.querySelectorAll('.view').forEach(x => x.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id)); const titles = { dashboard: ['Resumen general', 'Estado de la información registrada'], processes: ['Procesos', 'Consulta y edición de registros'], processOverview: ['Vista completa de procesos', 'Todos los campos de cada registro'], actions: ['Actuaciones', 'Historial de actuaciones registradas'], form: ['Registro de proceso', 'Formulario por etapas'], backup: ['Descargar datos', 'Descarga de información en formato Excel'] }; document.getElementById('pageTitle').textContent = titles[id][0]; document.getElementById('pageSubtitle').textContent = titles[id][1]; if (id === 'processes') renderProcesses(); if (id === 'processOverview') renderFullProcesses(); if (id === 'actions') renderActions(); }
+    document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+    function newProcess() { editingId = null; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('editBadge').textContent = 'Nuevo'; document.getElementById('confirmData').checked = false; step = 0; setStep(); showView('form') }
+    function editProcess(id) { const r = records.find(x => x.id === id); if (!r) return; editingId = id; const f = document.getElementById('processForm'); f.reset(); fields.forEach(k => { if (f.elements[k]) f.elements[k].value = r[k] ?? '' }); document.getElementById('formTitle').textContent = 'Editar proceso'; document.getElementById('editBadge').textContent = 'Edición'; document.getElementById('confirmData').checked = false; step = 0; setStep(); showView('form') }
+    function setStep() { document.querySelectorAll('.form-step').forEach((el, i) => el.classList.toggle('hidden', i !== step)); document.querySelectorAll('.step').forEach((el, i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step) }); document.getElementById('prevBtn').disabled = step === 0; document.getElementById('nextBtn').classList.toggle('hidden', step === 4); document.getElementById('saveBtn').classList.toggle('hidden', step !== 4); if (step === 4) makeReview() }
+    function moveStep(delta) { if (delta > 0 && !validateStep()) return; step = Math.max(0, Math.min(4, step + delta)); setStep() }
+    function validateStep() {
+      const box = document.querySelector(`.form-step[data-step="${step}"]`); for (const el of box.querySelectorAll('[required]')) { if (!el.value.trim()) { el.focus(); alert('Complete el campo obligatorio: ' + (el.closest('.field').querySelector('label')?.textContent || el.name)); return false } }
+      if (step === 0) { let rad = document.querySelector('[name=radicado]').value.trim(); if (!/^\d{23}$/.test(rad)) { alert('El radicado debe contener exactamente 23 dígitos. Se conserva como texto para evitar pérdida de ceros.'); return false } }
+      return true
+    }
+    function makeReview() { let f = document.getElementById('processForm'); let data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value || ''])); document.getElementById('reviewBox').innerHTML = '<b>Resumen de revisión</b><br>' + ['shortNo', 'radicado', 'claimant', 'defendant', 'type', 'stage', 'state', 'lawyer', 'quality', 'endDate', 'firstInstanceDecisionSense', 'secondInstanceDecision'].map(k => `<div>${labels[k]}: ${escapeHtml(data[k] || 'Sin diligenciar')}</div>`).join('') + '<br>Al guardar, el registro quedará disponible en el almacenamiento local de este navegador.' }
+    async function saveProcess() { if (!document.getElementById('confirmData').checked) { alert('Marque la confirmación de revisión antes de guardar.'); return } const f = document.getElementById('processForm'); const data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value.trim() || ''])); if (!/^\d{23}$/.test(data.radicado)) { alert('Radicado inválido.'); step = 0; setStep(); return } const duplicate = records.find(r => r.radicado === data.radicado && r.id !== editingId); if (duplicate) { alert('Ya existe un registro con ese radicado. Revise el listado antes de continuar.'); return } if (data.state === 'Terminado' && !data.endDate && !confirm('El proceso está Terminado pero no tiene fecha de terminación. ¿Guardar de todas formas?')) return; const now = new Date().toISOString(); if (editingId) { let i = records.findIndex(r => r.id === editingId); records[i] = { ...records[i], ...data, updatedAt: now } } else records.unshift({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), ...data, createdAt: now, updatedAt: now, actions: [] }); try { await persist(); newProcess(); alert('Registro guardado. El formulario está listo para registrar otro proceso.') } catch (error) { alert(error.message) } }
+    function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
+    function fmtDate(s) { return s ? new Date(s + 'T00:00:00').toLocaleDateString('es-CO') : '—' }
+    function row(r) { return `<tr><td><div class="record-title">${escapeHtml(r.shortNo || 'Sin número')}</div><div class="record-sub">${escapeHtml(r.radicado)}</div></td><td>${escapeHtml(r.claimant || '—')}<div class="record-sub">Demandado: ${escapeHtml(r.defendant || '—')}</div></td><td>${escapeHtml(r.type || '—')}</td><td>${escapeHtml(r.lawyer || 'Sin asignar')}</td><td><span class="pill ${r.state === 'Activo' ? 'active' : r.state === 'Terminado' ? 'closed' : ''}">${escapeHtml(r.state)}</span></td><td><button class="secondary small" onclick="editProcess('${r.id}')">Editar</button> <button class="secondary small" onclick="openActions('${r.id}')">Actuaciones (${(r.actions || []).length})</button> <button class="danger small" onclick="deleteProcess('${r.id}')">Eliminar</button></td></tr>` }
+    function table(list) { return list.length ? `<div class="table-wrap"><table><thead><tr><th>Identificación</th><th>Partes</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>` : '<div class="empty">No hay procesos registrados.</div>' }
+    function fullProcessRow(record) {
+      const processCells = fields.map(field => {
+        const value = record[field];
+        const displayValue = value ? (/Date$/.test(field) ? fmtDate(value) : String(value)) : '—';
+        return `<td>${escapeHtml(displayValue)}</td>`;
+      });
+      const actionHistory = (record.actions || []).map(action => `${fmtDate(action.date)} · ${action.description}`).join('\n') || '—';
+      return `<tr>${processCells.join('')}<td>${escapeHtml(record.createdAt ? new Date(record.createdAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedAt ? new Date(record.updatedAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(actionHistory)}</td><td class="full-table-actions"><button class="secondary small" onclick="editProcess('${record.id}')">Editar</button> <button class="secondary small" onclick="openActions('${record.id}')">Actuaciones (${(record.actions || []).length})</button> <button class="danger small" onclick="deleteProcess('${record.id}')">Eliminar</button></td></tr>`;
+    }
+    function fullProcessTable(list) {
+      if (!list.length) return '<div class="empty">No hay procesos registrados.</div>';
+      const headers = [...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Historial de actuaciones', 'Administrar'];
+      return `<div class="table-wrap full-table-wrap" role="region" aria-label="Tabla general de procesos; desplácese horizontalmente para ver todas las columnas" tabindex="0"><table class="full-process-table"><thead><tr>${headers.map(header => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${list.map(fullProcessRow).join('')}</tbody></table></div>`;
+    }
+    function renderProcesses() { let q = (document.getElementById('search')?.value || '').toLowerCase(); let st = document.getElementById('filterState')?.value || ''; let list = records.filter(r => (!st || r.state === st) && fields.some(k => String(r[k] || '').toLowerCase().includes(q))); document.getElementById('processTable').innerHTML = table(list) }
+    function renderFullProcesses() { document.getElementById('fullProcessTable').innerHTML = `<p class="table-summary">${records.length} procesos registrados.</p>${fullProcessTable(records)}` }
+    function renderActions() {
+      const query = (document.getElementById('actionsSearch')?.value || '').trim().toLowerCase();
+      const entries = records.flatMap(record => (record.actions || []).map(action => ({ record, action })))
+        .filter(({ record, action }) => [record.shortNo, record.radicado, record.claimant, action.date, action.description]
+          .some(value => String(value || '').toLowerCase().includes(query)))
+        .sort((a, b) => b.action.date.localeCompare(a.action.date) || String(b.action.createdAt || '').localeCompare(String(a.action.createdAt || '')));
+      const groupedEntries = entries.reduce((groups, entry) => {
+        const processNumber = String(entry.record.shortNo || '').trim() || 'Sin número';
+        if (!groups.has(processNumber)) groups.set(processNumber, []);
+        groups.get(processNumber).push(entry);
+        return groups;
+      }, new Map());
+      const actionTable = groupEntries => `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Actuación</th><th>Demandante</th><th></th></tr></thead><tbody>${groupEntries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(action.description)}</td><td>${escapeHtml(record.claimant || '—')}</td><td><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>`;
+      document.getElementById('allActionsTable').innerHTML = groupedEntries.size
+        ? [...groupedEntries.entries()]
+          .sort(([processA], [processB]) => processA.localeCompare(processB, 'es', { numeric: true }))
+          .map(([processNumber, groupEntries]) => `<section class="action-group"><h3>Proceso ${escapeHtml(processNumber)} <span class="record-sub">(${groupEntries.length} actuaciones)</span></h3>${actionTable(groupEntries)}</section>`)
+          .join('')
+        : '<div class="empty">No hay actuaciones registradas.</div>';
+    }
+    function renderAll() { document.getElementById('statTotal').textContent = records.length; document.getElementById('statActive').textContent = records.filter(r => r.state === 'Activo').length; document.getElementById('statClosed').textContent = records.filter(r => r.state === 'Terminado').length; document.getElementById('statIssues').textContent = records.filter(issues).length; document.getElementById('recentTable').innerHTML = table(records.slice(0, 5)); renderCharts(); if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses(); if (!document.getElementById('actions').classList.contains('hidden')) renderActions(); }
+    function renderCharts() {
+      const statusColors = { Activo: '#287a59', Terminado: '#7a8792', Desvinculado: '#315d82', 'Sin estado': '#d88d53' };
+      const statusCounts = records.reduce((counts, record) => { const status = record.state || 'Sin estado'; counts.set(status, (counts.get(status) || 0) + 1); return counts }, new Map());
+      const statuses = [...statusCounts.entries()].sort((a, b) => (Object.keys(statusColors).indexOf(a[0]) + 1 || 99) - (Object.keys(statusColors).indexOf(b[0]) + 1 || 99));
+      const circumference = 2 * Math.PI * 52;
+      let offset = 0;
+      const segments = statuses.map(([status, count]) => {
+        const length = records.length ? count / records.length * circumference : 0;
+        const color = statusColors[status] || '#a6afb7';
+        const segment = `<circle cx="60" cy="60" r="52" fill="none" stroke="${color}" stroke-width="16" stroke-dasharray="${length} ${circumference}" stroke-dashoffset="${-offset}"/>`;
+        offset += length;
+        return segment;
+      }).join('');
+      document.getElementById('stateChart').innerHTML = records.length
+        ? `<div class="donut-wrap"><svg viewBox="0 0 120 120" role="img" aria-label="Distribución de ${records.length} procesos por estado"><circle cx="60" cy="60" r="52" fill="none" stroke="#edf1f4" stroke-width="16"/><g transform="rotate(-90 60 60)">${segments}</g></svg><div class="donut-center"><strong>${records.length}</strong><span>procesos</span></div></div><div class="chart-legend">${statuses.map(([status, count]) => `<div class="legend-row"><span class="legend-swatch" style="background:${statusColors[status] || '#a6afb7'}"></span><span class="legend-name">${escapeHtml(status)}</span><span class="legend-value">${count} · ${Math.round(count / records.length * 100)}%</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">Registra procesos para ver su distribución por estado.</div>';
+
+      const monthlyCounts = new Map();
+      let undatedActionCount = 0;
+      records.forEach(record => (record.actions || []).forEach(action => {
+        const match = String(action.date || '').match(/^(\d{4})-(0[1-9]|1[0-2])/);
+        if (!match) {
+          undatedActionCount++;
+          return;
+        }
+        const key = `${match[1]}-${match[2]}`;
+        monthlyCounts.set(key, (monthlyCounts.get(key) || 0) + 1);
+      }));
+      const monthIndexes = [...monthlyCounts.keys()].map(key => {
+        const [year, month] = key.split('-').map(Number);
+        return year * 12 + month - 1;
+      });
+      const months = [];
+      if (monthIndexes.length) {
+        const firstMonth = Math.min(...monthIndexes);
+        const lastMonth = Math.max(...monthIndexes);
+        for (let monthIndex = firstMonth; monthIndex <= lastMonth; monthIndex++) {
+          const year = Math.floor(monthIndex / 12);
+          const month = monthIndex % 12;
+          const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+          const date = new Date(year, month, 1);
+          const label = new Intl.DateTimeFormat('es-CO', { month: 'short', year: 'numeric' }).format(date).replace('.', '');
+          months.push({ label, count: monthlyCounts.get(key) || 0 });
+        }
+      }
+      if (undatedActionCount) months.push({ label: 'Sin fecha', count: undatedActionCount });
+      const maxMonthlyCount = Math.max(1, ...months.map(month => month.count));
+      const actionCount = [...monthlyCounts.values()].reduce((sum, count) => sum + count, 0) + undatedActionCount;
+      document.getElementById('activityChart').innerHTML = actionCount
+        ? `<div class="month-chart" style="--month-count:${months.length}" role="img" aria-label="Actuaciones registradas por mes en todo el historial">${months.map(month => `<div class="month-column"><span class="month-value">${month.count}</span><div class="month-track"><div class="month-bar" style="--bar-height:${month.count ? Math.max(4, month.count / maxMonthlyCount * 100) : 0}%"></div></div><span class="month-label">${escapeHtml(month.label)}</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">No hay actuaciones registradas.</div>';
+
+      const typeCounts = records.reduce((counts, record) => {
+        const type = String(record.type || '').trim() || 'Sin clasificar';
+        counts.set(type, (counts.get(type) || 0) + 1);
+        return counts;
+      }, new Map());
+      const sortedTypes = [...typeCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+      const visibleTypes = sortedTypes.slice(0, 5);
+      if (sortedTypes.length > 5) visibleTypes.push(['Otros', sortedTypes.slice(5).reduce((sum, entry) => sum + entry[1], 0)]);
+      const maxTypeCount = Math.max(1, ...visibleTypes.map(([, count]) => count));
+      document.getElementById('typeChart').innerHTML = visibleTypes.length
+        ? `<div class="rank-chart" role="img" aria-label="Procesos agrupados por tipo">${visibleTypes.map(([type, count]) => `<div class="rank-row"><span class="rank-name" title="${escapeHtml(type)}">${escapeHtml(type)}</span><div class="rank-track"><div class="rank-bar" style="width:${count / maxTypeCount * 100}%"></div></div><span class="rank-count">${count}</span></div>`).join('')}</div>`
+        : '<div class="chart-empty">Registra procesos para comparar sus tipos.</div>';
+    }
+    function issues(r) { return !r.currentRadicado || !r.lawyer || (r.state === 'Terminado' && !r.endDate) || !r.area }
+    async function deleteProcess(id) { if (!confirm('¿Eliminar este registro y sus actuaciones de este navegador?')) return; records = records.filter(r => r.id !== id); try { await persist() } catch (error) { alert(error.message) } }
+    function openActions(id) { actionProcessId = id; const record = records.find(item => item.id === id); document.getElementById('actionDate').value = new Date().toISOString().slice(0, 10); document.getElementById('actionDescription').value = ''; document.getElementById('actionState').value = record?.state || ''; renderActionDialog(); document.getElementById('actionsDialog').classList.add('open') }
+    function closeActions() { document.getElementById('actionsDialog').classList.remove('open'); actionProcessId = null }
+    function renderActionDialog() { const record = records.find(r => r.id === actionProcessId); if (!record) return; document.getElementById('actionsTitle').textContent = 'Actuaciones · ' + (record.shortNo || 'Proceso'); document.getElementById('actionsProcess').textContent = `Radicado ${record.radicado || ''} · Estado actual: ${record.state || 'Sin estado'}`; const list = [...(record.actions || [])].sort((a, b) => b.date.localeCompare(a.date)); document.getElementById('actionList').innerHTML = list.length ? list.map(action => `<article class="action-item"><strong>${escapeHtml(fmtDate(action.date))}</strong><div>${escapeHtml(action.description)}</div></article>`).join('') : '<div class="empty">Este proceso aún no tiene actuaciones registradas.</div>' }
+    async function saveAction(event) { event.preventDefault(); const record = records.find(r => r.id === actionProcessId); if (!record) return; record.actions = record.actions || []; record.actions.push({ date: document.getElementById('actionDate').value, description: document.getElementById('actionDescription').value.trim(), createdAt: new Date().toISOString() }); const selectedState = document.getElementById('actionState').value; if (selectedState) record.state = selectedState; record.updatedAt = new Date().toISOString(); try { await persist(); closeActions() } catch (error) { alert(error.message) } }
+    function xmlEscape(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[char])) }
+    function excelCell(value, type = 'String') { return `<Cell><Data ss:Type="${type}">${xmlEscape(value)}</Data></Cell>` }
+    function excelRow(values, style = '') { return `<Row${style ? ` ss:StyleID="${style}"` : ''}>${values.map(value => value && typeof value === 'object' ? excelCell(value.value, value.type) : excelCell(value)).join('')}</Row>` }
+    function exportExcel() {
+      const processHeaders = [...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Actuaciones'];
+      const processRows = records.map(record => [
+        ...fields.map(field => record[field] || ''),
+        record.createdAt || '',
+        record.updatedAt || '',
+        { value: (record.actions || []).length, type: 'Number' }
+      ]);
+      const actionEntries = records.flatMap(record => (record.actions || []).map(action => [
+        record.shortNo || '', record.radicado || '', action.date || '', action.description || '', action.createdAt || ''
+      ]));
+      const actionHeaders = ['No. corto', 'Radicado', 'Fecha', 'Descripción', 'Registrada'];
+      const workbook = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#344554" ss:Pattern="Solid"/></Style></Styles><Worksheet ss:Name="Procesos"><Table>${excelRow(processHeaders, 'Header')}${processRows.map(row => excelRow(row)).join('')}</Table></Worksheet><Worksheet ss:Name="Actuaciones"><Table>${excelRow(actionHeaders, 'Header')}${actionEntries.map(row => excelRow(row)).join('')}</Table></Worksheet></Workbook>`;
+      const blob = new Blob(['\uFEFF', workbook], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'procesos_judiciales.xls';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    function downloadReport() {
+      document.getElementById('reportDate').textContent = `Generado el ${new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date())}`;
+      window.print();
+    }
+    async function clearData() { if (!confirm('Esta acción elimina todos los registros guardados en este navegador. ¿Continuar?')) return; records = []; try { await persist() } catch (error) { alert(error.message) } }
+    const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
+    function showAuthFailure(message) {
+      document.getElementById('authTitle').textContent = 'Acceso no disponible';
+      document.getElementById('authMessage').textContent = message;
+      document.getElementById('emailForm').classList.add('hidden');
+      document.getElementById('codeForm').classList.add('hidden');
+      document.getElementById('authSpinner').classList.add('hidden');
+      document.getElementById('authRetry').classList.remove('hidden');
+    }
+    function showLogin(message) {
+      document.getElementById('authTitle').textContent = 'Ingresa tu correo';
+      document.getElementById('authMessage').textContent = message || 'Te enviaremos un código para verificar tu dirección y autorizar el acceso.';
+      document.getElementById('authRetry').classList.add('hidden');
+      document.getElementById('authSpinner').classList.add('hidden');
+      document.getElementById('codeForm').classList.add('hidden');
+      document.getElementById('emailForm').classList.remove('hidden');
+      document.getElementById('authGate').classList.remove('hidden');
+      document.body.classList.add('auth-pending');
+      document.getElementById('userIdentity').classList.add('hidden');
+      document.getElementById('logoutButton').classList.add('hidden');
+      document.getElementById('logoutButton').disabled = false;
+    }
+    function enterApp(user) {
+      document.getElementById('userName').textContent = user.nombre || user.correo;
+      document.getElementById('userRole').textContent = user.rol === 'ADMINISTRADOR' ? 'Administrador' : 'Colaborador';
+      document.getElementById('userIdentity').classList.remove('hidden');
+      document.getElementById('logoutButton').classList.remove('hidden');
+      document.body.classList.remove('auth-pending');
+      document.getElementById('authGate').classList.add('hidden');
+      load();
+    }
+    function setAuthBusy(isBusy, buttonId) {
+      document.getElementById(buttonId).disabled = isBusy;
+      document.getElementById('authSpinner').classList.toggle('hidden', !isBusy);
+    }
+    function requestAccessCode(event) {
+      event.preventDefault();
+      const email = document.getElementById('accessEmail').value.trim().toLowerCase();
+      setAuthBusy(true, 'sendCodeButton');
+      google.script.run
+        .withSuccessHandler(result => {
+          setAuthBusy(false, 'sendCodeButton');
+          if (!result || !result.enviado) {
+            document.getElementById('authMessage').textContent = result?.mensaje || 'No se pudo solicitar el código.';
+            return;
+          }
+          document.getElementById('authTitle').textContent = 'Revisa tu correo';
+          document.getElementById('authMessage').textContent = result.mensaje;
+          document.getElementById('emailForm').classList.add('hidden');
+          document.getElementById('codeForm').classList.remove('hidden');
+          document.getElementById('accessCode').focus();
+        })
+        .withFailureHandler(error => {
+          setAuthBusy(false, 'sendCodeButton');
+          document.getElementById('authMessage').textContent = error?.message || 'No se pudo enviar el código. Intenta nuevamente.';
+        })
+        .solicitarCodigoAcceso(email);
+    }
+    function verifyAccessCode(event) {
+      event.preventDefault();
+      const email = document.getElementById('accessEmail').value.trim().toLowerCase();
+      const code = document.getElementById('accessCode').value.trim();
+      setAuthBusy(true, 'verifyCodeButton');
+      google.script.run
+        .withSuccessHandler(user => {
+          setAuthBusy(false, 'verifyCodeButton');
+          if (!user || !user.autorizado) {
+            document.getElementById('authMessage').textContent = user?.mensaje || 'No fue posible verificar el código.';
+            return;
+          }
+          if (!user.sessionToken) {
+            document.getElementById('authMessage').textContent = 'No se pudo crear la sesión. Intenta nuevamente.';
+            return;
+          }
+          try {
+            localStorage.setItem(ACCESS_SESSION_KEY, user.sessionToken);
+          } catch (error) {
+            console.error('No se pudo guardar la sesión en este navegador.', error);
+            document.getElementById('authMessage').textContent = 'El navegador no permite guardar la sesión. Habilita el almacenamiento local e inténtalo de nuevo.';
+            return;
+          }
+          enterApp(user);
+        })
+        .withFailureHandler(error => {
+          setAuthBusy(false, 'verifyCodeButton');
+          document.getElementById('authMessage').textContent = error?.message || 'Ocurrió un error al verificar el código.';
+        })
+        .verificarCodigoAcceso(email, code);
+    }
+    function startApp() {
+      if (typeof google === 'undefined' || !google.script || !google.script.run) {
+        showAuthFailure('Abre esta aplicación desde su implementación de Google Apps Script para verificar tu correo autorizado.');
+        return;
+      }
+      const authMessage = document.getElementById('authMessage');
+      document.getElementById('emailForm').addEventListener('submit', requestAccessCode);
+      document.getElementById('codeForm').addEventListener('submit', verifyAccessCode);
+      document.getElementById('changeEmailButton').addEventListener('click', () => {
+        showLogin();
+        document.getElementById('accessCode').value = '';
+        document.getElementById('accessEmail').focus();
+      });
+      document.getElementById('logoutButton').addEventListener('click', () => {
+        const logoutButton = document.getElementById('logoutButton');
+        let token = '';
+        try {
+          token = localStorage.getItem(ACCESS_SESSION_KEY) || '';
+          localStorage.removeItem(ACCESS_SESSION_KEY);
+        } catch (error) {
+          console.error('No se pudo limpiar la sesión del navegador.', error);
+          showAuthFailure('No se pudo limpiar la sesión guardada en este navegador. Habilita el almacenamiento local e inténtalo de nuevo.');
+          return;
+        }
+        logoutButton.disabled = true;
+        document.getElementById('authTitle').textContent = 'Cerrando sesión';
+        document.getElementById('authMessage').textContent = 'Estamos cerrando tu sesión de forma segura.';
+        document.getElementById('emailForm').classList.add('hidden');
+        document.getElementById('codeForm').classList.add('hidden');
+        document.getElementById('authRetry').classList.add('hidden');
+        document.getElementById('authSpinner').classList.remove('hidden');
+        document.getElementById('authGate').classList.remove('hidden');
+        document.body.classList.add('auth-pending');
+        google.script.run
+          .withSuccessHandler(() => showLogin('Sesión cerrada. Ingresa tu correo para volver a entrar.'))
+          .withFailureHandler(error => {
+            console.error('No se pudo invalidar la sesión en el servidor.', error);
+            showLogin('Se cerró la sesión en este navegador, pero Apps Script no confirmó la invalidación del token. Si compartiste este navegador, vuelve a cargar la página e inténtalo de nuevo.');
+          })
+          .cerrarSesionAcceso(token);
+      });
+
+      let token;
+      try {
+        token = localStorage.getItem(ACCESS_SESSION_KEY);
+      } catch (error) {
+        console.error('No se pudo leer la sesión guardada.', error);
+        showAuthFailure('El navegador no permite consultar la sesión guardada. Habilita el almacenamiento local e inténtalo de nuevo.');
+        return;
+      }
+      if (!token) {
+        showLogin();
+        return;
+      }
+
+      document.getElementById('authTitle').textContent = 'Restaurando sesión';
+      authMessage.textContent = 'Estamos comprobando tu sesión guardada.';
+      document.getElementById('emailForm').classList.add('hidden');
+      document.getElementById('authSpinner').classList.remove('hidden');
+      google.script.run
+        .withSuccessHandler(user => {
+          if (user && user.autorizado) {
+            enterApp(user);
+            return;
+          }
+          try {
+            localStorage.removeItem(ACCESS_SESSION_KEY);
+          } catch (error) {
+            console.error('No se pudo limpiar una sesión vencida.', error);
+          }
+          showLogin(user?.mensaje || 'La sesión venció. Ingresa de nuevo.');
+        })
+        .withFailureHandler(error => {
+          console.error('No se pudo restaurar la sesión.', error);
+          showAuthFailure(error?.message || 'No se pudo comprobar la sesión. Intenta nuevamente.');
+        })
+        .verificarSesionAcceso(token);
+    }
+    startApp();
+</script>
+</body>
+
+</html>
