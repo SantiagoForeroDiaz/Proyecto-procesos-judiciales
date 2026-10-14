@@ -16,7 +16,9 @@
         <button class="active" data-view="dashboard">Resumen</button>
         <button data-view="processes">Procesos</button>
         <button data-view="actions">Actuaciones</button>
-        <button data-view="form">Registrar proceso</button>
+        <button data-view="hearings">Audiencias</button>
+        <button data-view="form" data-admin-only>Registrar proceso</button>
+        <button data-view="catalogs" data-admin-only>Catálogos</button>
         <button data-view="backup">Descargar datos</button>
       </nav>
     </aside>
@@ -27,18 +29,32 @@
           <h1 id="pageTitle">Resumen general</h1>
           <div class="muted" id="pageSubtitle">Estado de la información registrada</div>
         </div>
-        <div class="actions"><button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
-            onclick="newProcess()">+ Nuevo proceso</button></div>
+        <div class="actions"><div id="userIdentity" class="user-identity hidden"><strong id="userName"></strong><span id="userRole"></span></div><button id="logoutButton" class="secondary small hidden" type="button">Cerrar sesión</button><button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
+            data-admin-only onclick="newProcess()">+ Nuevo proceso</button></div>
       </header>
       <section id="dashboard" class="view">
         <div class="print-report-title">
           <h1>Reporte general de procesos judiciales</h1>
           <p id="reportDate"></p>
         </div>
+        <div class="panel dashboard-filter-panel">
+          <div class="panel-head"><h2>Filtros del tablero y consultas</h2></div>
+          <div class="toolbar filters">
+            <input id="dashboardSearch" placeholder="Radicado, número, ID o expediente ORFEO..." oninput="syncFilter('query', this.value)">
+            <select id="dashboardFilterState" onchange="syncFilter('state', this.value)"><option value="">Todos los estados</option><option>Activo</option><option>Terminado</option></select>
+            <select id="dashboardFilterInstance" onchange="syncFilter('instance', this.value)"><option value="">Todas las instancias</option></select>
+            <select id="dashboardFilterType" onchange="syncFilter('type', this.value)"><option value="">Todos los tipos</option></select>
+            <select id="dashboardFilterCause" onchange="syncFilter('cause', this.value)"><option value="">Todas las causas</option></select>
+            <select id="dashboardFilterLawyer" onchange="syncFilter('lawyer', this.value)"><option value="">Todos los abogados</option></select>
+            <select id="dashboardFilterYear" onchange="syncFilter('year', this.value)"><option value="">Todos los años</option></select>
+            <select id="dashboardFilterQuality" onchange="syncFilter('quality', this.value)"><option value="">Activa y pasiva</option><option>Activa</option><option>Pasiva</option></select>
+          </div>
+        </div>
         <div class="stats">
           <div class="stat"><small>Total de procesos</small><strong id="statTotal">0</strong></div>
           <div class="stat"><small>Activos</small><strong id="statActive">0</strong></div>
           <div class="stat"><small>Terminados</small><strong id="statClosed">0</strong></div>
+          <div class="stat"><small>Actuaciones</small><strong id="statActions">0</strong></div>
           <div class="stat"><small>Con datos por revisar</small><strong id="statIssues">0</strong></div>
         </div>
         <div class="dashboard-charts">
@@ -69,6 +85,10 @@
             </div>
             <div id="typeChart"></div>
           </section>
+          <section class="panel chart-panel" aria-labelledby="yearChartTitle"><div class="panel-head"><h2 id="yearChartTitle">Procesos por año</h2></div><div id="yearChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="qualityChartTitle"><div class="panel-head"><h2 id="qualityChartTitle">Activa y pasiva</h2></div><div id="qualityChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="lawyerChartTitle"><div class="panel-head"><h2 id="lawyerChartTitle">Procesos por abogado</h2></div><div id="lawyerChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="causeChartTitle"><div class="panel-head"><h2 id="causeChartTitle">Procesos por causa</h2></div><div id="causeChart"></div></section>
         </div>
         <div class="panel">
           <div class="panel-head">
@@ -83,13 +103,17 @@
         <div class="panel">
           <div class="panel-head">
             <h2>Listado de procesos</h2>
-            <div class="toolbar"><input id="search" placeholder="Buscar radicado, demandante, abogado..."
-                oninput="renderProcesses()"><select id="filterState" onchange="renderProcesses()">
+            <div class="toolbar filters"><input id="search" placeholder="Buscar radicado, número, ID o expediente ORFEO..."
+                oninput="syncFilter('query', this.value)"><select id="filterState" onchange="syncFilter('state', this.value)">
                 <option value="">Todos los estados</option>
                 <option>Activo</option>
                 <option>Terminado</option>
-                <option>Desvinculado</option>
-              </select></div>
+              </select><select id="filterInstance" onchange="syncFilter('instance', this.value)"><option value="">Todas las instancias</option></select>
+              <select id="filterType" onchange="syncFilter('type', this.value)"><option value="">Todos los tipos</option></select>
+              <select id="filterCause" onchange="syncFilter('cause', this.value)"><option value="">Todas las causas</option></select>
+              <select id="filterLawyer" onchange="syncFilter('lawyer', this.value)"><option value="">Todos los abogados</option></select>
+              <select id="filterYear" onchange="syncFilter('year', this.value)"><option value="">Todos los años</option></select>
+              <select id="filterQuality" onchange="syncFilter('quality', this.value)"><option value="">Activa y pasiva</option><option>Activa</option><option>Pasiva</option></select></div>
           </div>
           <div id="processTable"></div>
         </div>
@@ -116,28 +140,44 @@
           <div id="allActionsTable"></div>
         </div>
       </section>
+      <section id="hearings" class="view hidden">
+        <div class="panel"><div class="panel-head"><h2>Audiencias por sesión</h2></div><div id="allHearingsTable"></div></div>
+      </section>
+      <section id="catalogs" class="view hidden">
+        <div class="panel">
+          <div class="panel-head"><div><h2>Catálogos autorizados</h2><div class="muted">Solo los administradores pueden actualizar estas listas.</div></div></div>
+          <form id="catalogForm" onsubmit="saveCatalog(event)">
+            <div class="field-grid">
+              <div class="field"><label for="catalogCategory">Catálogo</label><select id="catalogCategory"><option value="lawyer">Abogados</option><option value="lawyerLinkType">Tipo de vinculación</option><option value="type">Tipo de proceso</option><option value="cause">Causa</option><option value="hearingType">Tipo de audiencia</option><option value="terminationForm">Forma de terminación</option></select></div>
+              <div class="field full"><label for="catalogValues">Valores (uno por línea)</label><textarea id="catalogValues" required></textarea></div>
+            </div>
+            <div class="form-actions"><span></span><button type="submit">Guardar catálogo</button></div>
+          </form>
+          <div id="catalogSummary" class="action-list"></div>
+        </div>
+      </section>
       <section id="form" class="view hidden">
         <div class="panel">
           <div class="panel-head">
             <div>
               <h2 id="formTitle">Registrar proceso</h2>
-              <div class="muted">Complete la información por etapas. Los campos marcados con * son obligatorios.</div>
+              <div class="muted">Complete la información por etapas. La lista definitiva de campos obligatorios está pendiente de validación jurídica.</div>
             </div><span class="pill" id="editBadge">Nuevo</span>
           </div>
           <div class="steps" id="steps">
             <div class="step active">1. Identificación</div>
             <div class="step">2. Partes y representación</div>
             <div class="step">3. Clasificación judicial</div>
-            <div class="step">4. Pretensiones y actuaciones</div>
+            <div class="step">4. Etapas y seguimiento</div>
             <div class="step">5. Revisión</div>
           </div>
           <form id="processForm" onsubmit="return false">
             <div class="form-step" data-step="0">
               <div class="field-grid">
-                <div class="field"><label>No. corto *</label><input name="shortNo" placeholder="AAAA-NNNNN" required>
+                <div class="field"><label>No. corto</label><input name="shortNo" placeholder="AAAA-NNNNN">
                 </div>
-                <div class="field"><label>Radicado (23 dígitos) *</label><input name="radicado" inputmode="numeric"
-                    maxlength="23" placeholder="Solo números" required></div>
+                <div class="field"><label>Radicado judicial (23 dígitos)</label><input name="radicado" inputmode="numeric"
+                    maxlength="23" pattern="[0-9]{23}" placeholder="Solo números"></div>
                 <div class="field"><label>Radicado actual</label><input name="currentRadicado"></div>
                 <div class="field"><label>ID SIPROJ</label><input name="siproJ"></div>
                 <div class="field"><label>Expediente ORFEO</label><input name="orfeo"></div>
@@ -146,13 +186,13 @@
             </div>
             <div class="form-step hidden" data-step="1">
               <div class="field-grid">
-                <div class="field"><label>Demandante *</label><input name="claimant" required></div>
-                <div class="field"><label>Demandado *</label><input name="defendant" required></div>
+                <div class="field"><label>Demandante</label><input name="claimant"></div>
+                <div class="field"><label>Demandados / entidades (uno por línea)</label><textarea name="defendant"></textarea></div>
                 <div class="field"><label>Área generadora del daño</label><input name="area"></div>
-                <div class="field"><label>Abogado a cargo</label><input name="lawyer"></div>
-                <div class="field"><label>Calidad</label><input name="quality" placeholder="Ej. Activa o pasiva"></div>
-                <div class="field"><label>Tipo de vinculación del abogado</label><input name="lawyerLinkType"
-                    placeholder="Ej. Planta o contratista"></div>
+                <div class="field"><label>Abogado a cargo</label><select name="lawyer" id="lawyerSelect"><option value="">Seleccione</option></select></div>
+                <div class="field"><label>Activa / pasiva</label><select name="quality"><option value="">Seleccione</option><option>Activa</option><option>Pasiva</option></select></div>
+                <div class="field"><label>Tipo de vinculación del abogado</label><select name="lawyerLinkType" id="lawyerLinkTypeSelect"><option value="">Seleccione</option></select></div>
+                <div class="field"><label>Correo de persona asignada (control de acceso)</label><input name="assignedEmail" type="email"></div>
                 <div class="field"><label>Representa</label><select name="represents">
                     <option value="">Seleccione</option>
                     <option>Demandante</option>
@@ -173,20 +213,22 @@
                     <option>Casación</option>
                     <option>Otra</option>
                   </select></div>
-                <div class="field"><label>Tipo de proceso</label><input name="type"
-                    placeholder="Ej. Reparación directa"></div>
+                <div class="field"><label>Tipo de proceso</label><input name="type" list="typeOptions"
+                    placeholder="Ej. Reparación directa"><datalist id="typeOptions"></datalist></div>
                 <div class="field"><label>Despacho judicial inicial</label><input name="court"></div>
                 <div class="field"><label>Despacho de segunda instancia</label><input name="secondCourt"></div>
-                <div class="field"><label>Causa</label><input name="cause"></div>
+                <div class="field"><label>Causa</label><input name="cause" list="causeOptions"><datalist id="causeOptions"></datalist></div>
                 <div class="field"><label>Etapa del proceso</label><input name="stage"
                     placeholder="Etapa procesal actual"></div>
-                <div class="field"><label>Estado del proceso *</label><select name="state" required>
+                <div class="field"><label>Estado del proceso</label><select name="state">
+                    <option value="">Seleccione</option>
                     <option>Activo</option>
                     <option>Terminado</option>
-                    <option>Desvinculado</option>
                   </select></div>
-                <div class="field"><label>Fecha de inicio</label><input name="startDate" type="date"></div>
                 <div class="field"><label>Fecha de terminación</label><input name="endDate" type="date"></div>
+                <div class="field"><label>Forma de terminación</label><input name="terminationForm" list="terminationFormOptions"><datalist id="terminationFormOptions"><option>Sentencia</option><option>Conciliación</option><option>Transacción</option><option>Desvinculación</option><option>Otra</option></datalist></div>
+                <div class="field"><label>Instancia de terminación</label><select name="terminationInstance"><option value="">Seleccione</option><option>Primera</option><option>Segunda</option><option>Única</option><option>Casación</option><option>Otra</option></select></div>
+                <div class="field full"><label>Observaciones de terminación</label><textarea name="terminationNotes"></textarea></div>
               </div>
             </div>
             <div class="form-step hidden" data-step="3">
@@ -201,13 +243,25 @@
                   </select></div>
                 <div class="field"><label>Fecha de notificación de la demanda</label><input name="notificationDate"
                     type="date"></div>
+                <div class="field full"><div id="deadlineNotice" class="notice">La fecha máxima debe registrarse manualmente; el cálculo del término requiere validación jurídica.</div></div>
                 <div class="field"><label>Fecha de contestación de medida cautelar</label><input
                     name="measureResponseDate" type="date"></div>
                 <div class="field"><label>Fecha máxima de contestación de demanda</label><input
                     name="maxDemandResponseDate" type="date"></div>
                 <div class="field"><label>Fecha de contestación de demanda</label><input name="demandResponseDate"
                     type="date"></div>
-                <div class="field"><label>Audiencia inicial</label><input name="initialHearingDate" type="date"></div>
+                <div class="field full">
+                  <label>Audiencias (cada sesión se conserva por separado)</label>
+                  <div class="field-grid">
+                    <div class="field"><input id="hearingType" list="hearingTypeOptions" value="Inicial" aria-label="Tipo de audiencia"><datalist id="hearingTypeOptions"><option>Inicial</option><option>Pruebas</option><option>Otra</option></datalist></div>
+                    <div class="field"><input id="hearingDate" type="date" aria-label="Fecha de audiencia"></div>
+                    <div class="field"><input id="hearingObservation" placeholder="Observación o resultado" aria-label="Observación de audiencia"></div>
+                    <div class="field"><button type="button" class="secondary" onclick="addHearing()">Agregar fecha de audiencia</button></div>
+                  </div>
+                  <div id="hearingList" class="action-list"></div>
+                </div>
+                <div class="field"><label>¿Sentencia anticipada?</label><select name="anticipatedJudgment"><option value="">Seleccione</option><option>No</option><option>Sí</option></select></div>
+                <div class="field full"><div id="judicialFlowNotice" class="notice">Las etapas no aplicables pueden ocultarse temporalmente; los datos registrados se conservan.</div></div>
                 <div class="field full"><label>Pruebas</label><textarea name="evidence"
                     placeholder="Información relacionada con las pruebas"></textarea></div>
                 <div class="field"><label>Fecha de alegatos de conclusión</label><input name="closingArgumentsDate"
@@ -218,8 +272,12 @@
                     name="firstInstanceDecisionSense" placeholder="Ej. Favorable, desfavorable o mixto"></div>
                 <div class="field"><label>Fecha de presentación del recurso</label><input name="appealDate" type="date">
                 </div>
+                <div class="field"><label>Estado del recurso de apelación</label><select name="appealStatus"><option value="">Seleccione</option><option>No presentado</option><option>Presentado en término</option><option>Presentado fuera de término</option></select></div>
+                <div class="field"><label>Fecha del auto que concede la apelación</label><input name="appealGrantedOrderDate" type="date"></div>
+                <div class="field"><label>Fecha del auto que admite la apelación</label><input name="appealAdmittedOrderDate" type="date"></div>
                 <div class="field"><label>Fecha del fallo de segunda instancia</label><input
                     name="secondInstanceDecisionDate" type="date"></div>
+                <div class="field"><label>Sentido del fallo de segunda instancia</label><input name="secondInstanceDecisionSense"></div>
                 <div class="field full"><label>Fallo de segunda instancia</label><textarea
                     name="secondInstanceDecision"></textarea></div>
                 <div class="field full"><label>Observaciones</label><textarea name="notes"></textarea></div>
@@ -257,14 +315,11 @@
         </div>
         <div id="actionList" class="action-list"></div>
         <form id="actionForm" class="action-form" onsubmit="saveAction(event)">
-          <div class="field"><label for="actionDate">Fecha</label><input id="actionDate" type="date" required></div>
-          <div class="field"><label for="actionDescription">Descripción</label><input id="actionDescription" required
-              maxlength="1000" placeholder="Descripción de la actuación"></div>
-          <div class="field"><label for="actionState">Estado del proceso</label><select id="actionState">
-              <option value="Activo">Activo</option>
-              <option value="Terminado">Terminado</option>
-              <option value="Desvinculado">Desvinculado</option>
-            </select></div>
+          <div class="field"><label for="actionDate">Fecha de actuación</label><input id="actionDate" type="date" required></div>
+          <div class="field"><label for="actionType">Tipo</label><select id="actionType"><option>Contestación de demanda</option><option>Contestación de medida cautelar</option><option>Fijación de audiencia</option><option>Traslado para alegatos</option><option>Fallo</option><option>Recurso</option><option>Otra</option></select></div>
+          <div class="field"><label for="actionTitle">Título</label><input id="actionTitle" maxlength="160" placeholder="Resumen corto" required></div>
+          <div class="field"><label for="actionDescription">Descripción</label><textarea id="actionDescription" required maxlength="1000"></textarea></div>
+          <div class="field"><label for="actionState">Estado de la actuación (opcional)</label><select id="actionState"><option value="">Sin estado</option><option>Pendiente</option><option>En trámite</option><option>Completada</option></select></div>
           <button type="submit">Agregar</button>
         </form>
       </section>

@@ -46,7 +46,7 @@
       display: grid;
       place-items: center;
       padding: 24px;
-      background: radial-gradient(circle at top right, #e8edf1, transparent 42%), var(--bg)
+      background: var(--bg)
     }
 
     .auth-card {
@@ -68,26 +68,7 @@
       border-radius: 15px;
       background: var(--soft);
       color: var(--accent2);
-      font-size: 18px;
       font-weight: 800
-    }
-
-    .auth-eyebrow {
-      margin: 0 0 8px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .12em
-    }
-
-    .auth-card h1 {
-      margin: 0 0 8px;
-      font-size: 24px
-    }
-
-    .auth-card p:not(.auth-eyebrow) {
-      margin: 0;
-      color: var(--muted)
     }
 
     .auth-form {
@@ -117,14 +98,14 @@
 
     .user-identity {
       display: grid;
-      padding-right: 10px;
-      color: var(--text);
-      text-align: right
-    }
-
-    .user-identity span {
+      gap: 2px;
       color: var(--muted);
       font-size: 11px
+    }
+
+    .user-identity strong {
+      color: var(--text);
+      font-size: 12px
     }
 
     button,
@@ -251,7 +232,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 20px
     }
@@ -498,6 +479,10 @@
       flex-wrap: wrap
     }
 
+    .filters select {
+      min-width: 145px
+    }
+
     .toolbar input {
       min-width: 210px
     }
@@ -711,6 +696,13 @@
       margin-bottom: 14px
     }
 
+    .deadline-alert {
+      margin-top: 5px;
+      color: #9a3e25;
+      font-size: 11px;
+      font-weight: 650
+    }
+
     .actions-list {
       display: grid;
       gap: 10px
@@ -772,10 +764,6 @@
     }
 
     @media(max-width:560px) {
-      .auth-card {
-        padding: 30px 22px
-      }
-
       .main {
         padding: 16px
       }
@@ -954,7 +942,7 @@
 
     .action-form {
       display: grid;
-      grid-template-columns: 150px minmax(170px, 1fr) 170px auto;
+      grid-template-columns: 150px 180px minmax(170px, 1fr) minmax(170px, 1fr);
       gap: 8px;
       align-items: end
     }
@@ -974,8 +962,7 @@
 </style>
 </head>
 
-<body class="auth-pending">
-  <main id="authGate" class="auth-screen" aria-live="polite">
+<body class="auth-pending"><main id="authGate" class="auth-screen" aria-live="polite">
     <section class="auth-card">
       <div class="auth-mark" aria-hidden="true">GJ</div>
       <p class="auth-eyebrow">GESTIÓN JUDICIAL</p>
@@ -1003,7 +990,9 @@
         <button class="active" data-view="dashboard">Resumen</button>
         <button data-view="processes">Procesos</button>
         <button data-view="actions">Actuaciones</button>
-        <button data-view="form">Registrar proceso</button>
+        <button data-view="hearings">Audiencias</button>
+        <button data-view="form" data-admin-only>Registrar proceso</button>
+        <button data-view="catalogs" data-admin-only>Catálogos</button>
         <button data-view="backup">Descargar datos</button>
       </nav>
     </aside>
@@ -1014,22 +1003,32 @@
           <h1 id="pageTitle">Resumen general</h1>
           <div class="muted" id="pageSubtitle">Estado de la información registrada</div>
         </div>
-        <div class="actions">
-          <div id="userIdentity" class="user-identity hidden"><strong id="userName"></strong><span id="userRole"></span></div>
-          <button id="logoutButton" class="secondary small hidden" type="button">Cerrar sesión</button>
-          <button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
-            onclick="newProcess()">+ Nuevo proceso</button>
-        </div>
+        <div class="actions"><div id="userIdentity" class="user-identity hidden"><strong id="userName"></strong><span id="userRole"></span></div><button id="logoutButton" class="secondary small hidden" type="button">Cerrar sesión</button><button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
+            data-admin-only onclick="newProcess()">+ Nuevo proceso</button></div>
       </header>
       <section id="dashboard" class="view">
         <div class="print-report-title">
           <h1>Reporte general de procesos judiciales</h1>
           <p id="reportDate"></p>
         </div>
+        <div class="panel dashboard-filter-panel">
+          <div class="panel-head"><h2>Filtros del tablero y consultas</h2></div>
+          <div class="toolbar filters">
+            <input id="dashboardSearch" placeholder="Radicado, número, ID o expediente ORFEO..." oninput="syncFilter('query', this.value)">
+            <select id="dashboardFilterState" onchange="syncFilter('state', this.value)"><option value="">Todos los estados</option><option>Activo</option><option>Terminado</option></select>
+            <select id="dashboardFilterInstance" onchange="syncFilter('instance', this.value)"><option value="">Todas las instancias</option></select>
+            <select id="dashboardFilterType" onchange="syncFilter('type', this.value)"><option value="">Todos los tipos</option></select>
+            <select id="dashboardFilterCause" onchange="syncFilter('cause', this.value)"><option value="">Todas las causas</option></select>
+            <select id="dashboardFilterLawyer" onchange="syncFilter('lawyer', this.value)"><option value="">Todos los abogados</option></select>
+            <select id="dashboardFilterYear" onchange="syncFilter('year', this.value)"><option value="">Todos los años</option></select>
+            <select id="dashboardFilterQuality" onchange="syncFilter('quality', this.value)"><option value="">Activa y pasiva</option><option>Activa</option><option>Pasiva</option></select>
+          </div>
+        </div>
         <div class="stats">
           <div class="stat"><small>Total de procesos</small><strong id="statTotal">0</strong></div>
           <div class="stat"><small>Activos</small><strong id="statActive">0</strong></div>
           <div class="stat"><small>Terminados</small><strong id="statClosed">0</strong></div>
+          <div class="stat"><small>Actuaciones</small><strong id="statActions">0</strong></div>
           <div class="stat"><small>Con datos por revisar</small><strong id="statIssues">0</strong></div>
         </div>
         <div class="dashboard-charts">
@@ -1060,6 +1059,10 @@
             </div>
             <div id="typeChart"></div>
           </section>
+          <section class="panel chart-panel" aria-labelledby="yearChartTitle"><div class="panel-head"><h2 id="yearChartTitle">Procesos por año</h2></div><div id="yearChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="qualityChartTitle"><div class="panel-head"><h2 id="qualityChartTitle">Activa y pasiva</h2></div><div id="qualityChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="lawyerChartTitle"><div class="panel-head"><h2 id="lawyerChartTitle">Procesos por abogado</h2></div><div id="lawyerChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="causeChartTitle"><div class="panel-head"><h2 id="causeChartTitle">Procesos por causa</h2></div><div id="causeChart"></div></section>
         </div>
         <div class="panel">
           <div class="panel-head">
@@ -1074,13 +1077,17 @@
         <div class="panel">
           <div class="panel-head">
             <h2>Listado de procesos</h2>
-            <div class="toolbar"><input id="search" placeholder="Buscar radicado, demandante, abogado..."
-                oninput="renderProcesses()"><select id="filterState" onchange="renderProcesses()">
+            <div class="toolbar filters"><input id="search" placeholder="Buscar radicado, número, ID o expediente ORFEO..."
+                oninput="syncFilter('query', this.value)"><select id="filterState" onchange="syncFilter('state', this.value)">
                 <option value="">Todos los estados</option>
                 <option>Activo</option>
                 <option>Terminado</option>
-                <option>Desvinculado</option>
-              </select></div>
+              </select><select id="filterInstance" onchange="syncFilter('instance', this.value)"><option value="">Todas las instancias</option></select>
+              <select id="filterType" onchange="syncFilter('type', this.value)"><option value="">Todos los tipos</option></select>
+              <select id="filterCause" onchange="syncFilter('cause', this.value)"><option value="">Todas las causas</option></select>
+              <select id="filterLawyer" onchange="syncFilter('lawyer', this.value)"><option value="">Todos los abogados</option></select>
+              <select id="filterYear" onchange="syncFilter('year', this.value)"><option value="">Todos los años</option></select>
+              <select id="filterQuality" onchange="syncFilter('quality', this.value)"><option value="">Activa y pasiva</option><option>Activa</option><option>Pasiva</option></select></div>
           </div>
           <div id="processTable"></div>
         </div>
@@ -1107,28 +1114,44 @@
           <div id="allActionsTable"></div>
         </div>
       </section>
+      <section id="hearings" class="view hidden">
+        <div class="panel"><div class="panel-head"><h2>Audiencias por sesión</h2></div><div id="allHearingsTable"></div></div>
+      </section>
+      <section id="catalogs" class="view hidden">
+        <div class="panel">
+          <div class="panel-head"><div><h2>Catálogos autorizados</h2><div class="muted">Solo los administradores pueden actualizar estas listas.</div></div></div>
+          <form id="catalogForm" onsubmit="saveCatalog(event)">
+            <div class="field-grid">
+              <div class="field"><label for="catalogCategory">Catálogo</label><select id="catalogCategory"><option value="lawyer">Abogados</option><option value="lawyerLinkType">Tipo de vinculación</option><option value="type">Tipo de proceso</option><option value="cause">Causa</option><option value="hearingType">Tipo de audiencia</option><option value="terminationForm">Forma de terminación</option></select></div>
+              <div class="field full"><label for="catalogValues">Valores (uno por línea)</label><textarea id="catalogValues" required></textarea></div>
+            </div>
+            <div class="form-actions"><span></span><button type="submit">Guardar catálogo</button></div>
+          </form>
+          <div id="catalogSummary" class="action-list"></div>
+        </div>
+      </section>
       <section id="form" class="view hidden">
         <div class="panel">
           <div class="panel-head">
             <div>
               <h2 id="formTitle">Registrar proceso</h2>
-              <div class="muted">Complete la información por etapas. Los campos marcados con * son obligatorios.</div>
+              <div class="muted">Complete la información por etapas. La lista definitiva de campos obligatorios está pendiente de validación jurídica.</div>
             </div><span class="pill" id="editBadge">Nuevo</span>
           </div>
           <div class="steps" id="steps">
             <div class="step active">1. Identificación</div>
             <div class="step">2. Partes y representación</div>
             <div class="step">3. Clasificación judicial</div>
-            <div class="step">4. Pretensiones y actuaciones</div>
+            <div class="step">4. Etapas y seguimiento</div>
             <div class="step">5. Revisión</div>
           </div>
           <form id="processForm" onsubmit="return false">
             <div class="form-step" data-step="0">
               <div class="field-grid">
-                <div class="field"><label>No. corto *</label><input name="shortNo" placeholder="AAAA-NNNNN" required>
+                <div class="field"><label>No. corto</label><input name="shortNo" placeholder="AAAA-NNNNN">
                 </div>
-                <div class="field"><label>Radicado (23 dígitos) *</label><input name="radicado" inputmode="numeric"
-                    maxlength="23" placeholder="Solo números" required></div>
+                <div class="field"><label>Radicado judicial (23 dígitos)</label><input name="radicado" inputmode="numeric"
+                    maxlength="23" pattern="[0-9]{23}" placeholder="Solo números"></div>
                 <div class="field"><label>Radicado actual</label><input name="currentRadicado"></div>
                 <div class="field"><label>ID SIPROJ</label><input name="siproJ"></div>
                 <div class="field"><label>Expediente ORFEO</label><input name="orfeo"></div>
@@ -1137,13 +1160,13 @@
             </div>
             <div class="form-step hidden" data-step="1">
               <div class="field-grid">
-                <div class="field"><label>Demandante *</label><input name="claimant" required></div>
-                <div class="field"><label>Demandado *</label><input name="defendant" required></div>
+                <div class="field"><label>Demandante</label><input name="claimant"></div>
+                <div class="field"><label>Demandados / entidades (uno por línea)</label><textarea name="defendant"></textarea></div>
                 <div class="field"><label>Área generadora del daño</label><input name="area"></div>
-                <div class="field"><label>Abogado a cargo</label><input name="lawyer"></div>
-                <div class="field"><label>Calidad</label><input name="quality" placeholder="Ej. Activa o pasiva"></div>
-                <div class="field"><label>Tipo de vinculación del abogado</label><input name="lawyerLinkType"
-                    placeholder="Ej. Planta o contratista"></div>
+                <div class="field"><label>Abogado a cargo</label><select name="lawyer" id="lawyerSelect"><option value="">Seleccione</option></select></div>
+                <div class="field"><label>Activa / pasiva</label><select name="quality"><option value="">Seleccione</option><option>Activa</option><option>Pasiva</option></select></div>
+                <div class="field"><label>Tipo de vinculación del abogado</label><select name="lawyerLinkType" id="lawyerLinkTypeSelect"><option value="">Seleccione</option></select></div>
+                <div class="field"><label>Correo de persona asignada (control de acceso)</label><input name="assignedEmail" type="email"></div>
                 <div class="field"><label>Representa</label><select name="represents">
                     <option value="">Seleccione</option>
                     <option>Demandante</option>
@@ -1164,20 +1187,22 @@
                     <option>Casación</option>
                     <option>Otra</option>
                   </select></div>
-                <div class="field"><label>Tipo de proceso</label><input name="type"
-                    placeholder="Ej. Reparación directa"></div>
+                <div class="field"><label>Tipo de proceso</label><input name="type" list="typeOptions"
+                    placeholder="Ej. Reparación directa"><datalist id="typeOptions"></datalist></div>
                 <div class="field"><label>Despacho judicial inicial</label><input name="court"></div>
                 <div class="field"><label>Despacho de segunda instancia</label><input name="secondCourt"></div>
-                <div class="field"><label>Causa</label><input name="cause"></div>
+                <div class="field"><label>Causa</label><input name="cause" list="causeOptions"><datalist id="causeOptions"></datalist></div>
                 <div class="field"><label>Etapa del proceso</label><input name="stage"
                     placeholder="Etapa procesal actual"></div>
-                <div class="field"><label>Estado del proceso *</label><select name="state" required>
+                <div class="field"><label>Estado del proceso</label><select name="state">
+                    <option value="">Seleccione</option>
                     <option>Activo</option>
                     <option>Terminado</option>
-                    <option>Desvinculado</option>
                   </select></div>
-                <div class="field"><label>Fecha de inicio</label><input name="startDate" type="date"></div>
                 <div class="field"><label>Fecha de terminación</label><input name="endDate" type="date"></div>
+                <div class="field"><label>Forma de terminación</label><input name="terminationForm" list="terminationFormOptions"><datalist id="terminationFormOptions"><option>Sentencia</option><option>Conciliación</option><option>Transacción</option><option>Desvinculación</option><option>Otra</option></datalist></div>
+                <div class="field"><label>Instancia de terminación</label><select name="terminationInstance"><option value="">Seleccione</option><option>Primera</option><option>Segunda</option><option>Única</option><option>Casación</option><option>Otra</option></select></div>
+                <div class="field full"><label>Observaciones de terminación</label><textarea name="terminationNotes"></textarea></div>
               </div>
             </div>
             <div class="form-step hidden" data-step="3">
@@ -1192,13 +1217,25 @@
                   </select></div>
                 <div class="field"><label>Fecha de notificación de la demanda</label><input name="notificationDate"
                     type="date"></div>
+                <div class="field full"><div id="deadlineNotice" class="notice">La fecha máxima debe registrarse manualmente; el cálculo del término requiere validación jurídica.</div></div>
                 <div class="field"><label>Fecha de contestación de medida cautelar</label><input
                     name="measureResponseDate" type="date"></div>
                 <div class="field"><label>Fecha máxima de contestación de demanda</label><input
                     name="maxDemandResponseDate" type="date"></div>
                 <div class="field"><label>Fecha de contestación de demanda</label><input name="demandResponseDate"
                     type="date"></div>
-                <div class="field"><label>Audiencia inicial</label><input name="initialHearingDate" type="date"></div>
+                <div class="field full">
+                  <label>Audiencias (cada sesión se conserva por separado)</label>
+                  <div class="field-grid">
+                    <div class="field"><input id="hearingType" list="hearingTypeOptions" value="Inicial" aria-label="Tipo de audiencia"><datalist id="hearingTypeOptions"><option>Inicial</option><option>Pruebas</option><option>Otra</option></datalist></div>
+                    <div class="field"><input id="hearingDate" type="date" aria-label="Fecha de audiencia"></div>
+                    <div class="field"><input id="hearingObservation" placeholder="Observación o resultado" aria-label="Observación de audiencia"></div>
+                    <div class="field"><button type="button" class="secondary" onclick="addHearing()">Agregar fecha de audiencia</button></div>
+                  </div>
+                  <div id="hearingList" class="action-list"></div>
+                </div>
+                <div class="field"><label>¿Sentencia anticipada?</label><select name="anticipatedJudgment"><option value="">Seleccione</option><option>No</option><option>Sí</option></select></div>
+                <div class="field full"><div id="judicialFlowNotice" class="notice">Las etapas no aplicables pueden ocultarse temporalmente; los datos registrados se conservan.</div></div>
                 <div class="field full"><label>Pruebas</label><textarea name="evidence"
                     placeholder="Información relacionada con las pruebas"></textarea></div>
                 <div class="field"><label>Fecha de alegatos de conclusión</label><input name="closingArgumentsDate"
@@ -1209,8 +1246,12 @@
                     name="firstInstanceDecisionSense" placeholder="Ej. Favorable, desfavorable o mixto"></div>
                 <div class="field"><label>Fecha de presentación del recurso</label><input name="appealDate" type="date">
                 </div>
+                <div class="field"><label>Estado del recurso de apelación</label><select name="appealStatus"><option value="">Seleccione</option><option>No presentado</option><option>Presentado en término</option><option>Presentado fuera de término</option></select></div>
+                <div class="field"><label>Fecha del auto que concede la apelación</label><input name="appealGrantedOrderDate" type="date"></div>
+                <div class="field"><label>Fecha del auto que admite la apelación</label><input name="appealAdmittedOrderDate" type="date"></div>
                 <div class="field"><label>Fecha del fallo de segunda instancia</label><input
                     name="secondInstanceDecisionDate" type="date"></div>
+                <div class="field"><label>Sentido del fallo de segunda instancia</label><input name="secondInstanceDecisionSense"></div>
                 <div class="field full"><label>Fallo de segunda instancia</label><textarea
                     name="secondInstanceDecision"></textarea></div>
                 <div class="field full"><label>Observaciones</label><textarea name="notes"></textarea></div>
@@ -1248,181 +1289,187 @@
         </div>
         <div id="actionList" class="action-list"></div>
         <form id="actionForm" class="action-form" onsubmit="saveAction(event)">
-          <div class="field"><label for="actionDate">Fecha</label><input id="actionDate" type="date" required></div>
-          <div class="field"><label for="actionDescription">Descripción</label><input id="actionDescription" required
-              maxlength="1000" placeholder="Descripción de la actuación"></div>
-          <div class="field"><label for="actionState">Estado del proceso</label><select id="actionState">
-              <option value="Activo">Activo</option>
-              <option value="Terminado">Terminado</option>
-              <option value="Desvinculado">Desvinculado</option>
-            </select></div>
+          <div class="field"><label for="actionDate">Fecha de actuación</label><input id="actionDate" type="date" required></div>
+          <div class="field"><label for="actionType">Tipo</label><select id="actionType"><option>Contestación de demanda</option><option>Contestación de medida cautelar</option><option>Fijación de audiencia</option><option>Traslado para alegatos</option><option>Fallo</option><option>Recurso</option><option>Otra</option></select></div>
+          <div class="field"><label for="actionTitle">Título</label><input id="actionTitle" maxlength="160" placeholder="Resumen corto" required></div>
+          <div class="field"><label for="actionDescription">Descripción</label><textarea id="actionDescription" required maxlength="1000"></textarea></div>
+          <div class="field"><label for="actionState">Estado de la actuación (opcional)</label><select id="actionState"><option value="">Sin estado</option><option>Pendiente</option><option>En trámite</option><option>Completada</option></select></div>
           <button type="submit">Agregar</button>
         </form>
       </section>
     </div>
   </div>
   <script>
-    const KEY = 'demo_procesos_judiciales_v1'; const INITIAL_RECORDS_KEY = `${KEY}_initial_records_v1`; let records = []; let step = 0; let editingId = null; let actionProcessId = null;
-    const fields = ['shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids', 'claimant', 'defendant', 'area', 'lawyer', 'quality', 'lawyerLinkType', 'represents', 'instance', 'type', 'court', 'secondCourt', 'cause', 'stage', 'state', 'startDate', 'endDate', 'claim', 'amount', 'cautelar', 'notificationDate', 'measureResponseDate', 'maxDemandResponseDate', 'demandResponseDate', 'initialHearingDate', 'evidence', 'closingArgumentsDate', 'firstInstanceDecisionDate', 'firstInstanceDecisionSense', 'appealDate', 'secondInstanceDecisionDate', 'secondInstanceDecision', 'notes'];
-    const INITIAL_RECORDS = [
-      {
-        id: 'import-2023-00309', shortNo: '2023-00309', radicado: '11001333400420230030900', currentRadicado: '',
-        siproJ: '774937', orfeo: '20235101530010001124E', ids: '', claimant: 'LUIS FERNANDO ABRIL VELASCO',
-        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
-        lawyer: 'JUAN CAMILO CRIALES ZARATE', quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa',
-        instance: 'Primera', type: 'NULIDAD Y RESTABLECIMIENTO DEL DERECHO',
-        court: 'JUZGADO 4 ADMINISTRATIVO DEL CIRCUITO DE BOGOTÁ', secondCourt: '',
-        cause: 'ACTO ADMINISTRATIVO CONTRAVENCIONAL D-12', stage: 'TRASLADO EXCEPCIONES', state: 'Activo',
-        startDate: '', endDate: '', claim: 'PRIMERA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 25525 DEL 22 DE ABRIL DE 2022 “POR MEDIO DEL CUAL SE DECLARA COMO CONTRAVENTOR DE LA INFRACCIÓN D-12 AL SEÑOR LUIS FERNANDO ABRIL VELASCO”, SEGUNDA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 326-02 DEL 17 DE FEBRERO DE 2023 “POR MEDIO DE LA CUAL SE RESUELVE EL RECURSO DE APELACIÓN DENTRO DEL EXPEDIENTE NO. 25525”, EXPEDIDA POR BOGOTÁ DISTRITO CAPITAL- SECRETARÍA DISTRITAL DE MOVILIDAD',
-        amount: '1406400', cautelar: 'No', notificationDate: '2023-11-10', measureResponseDate: '',
-        maxDemandResponseDate: '2024-01-17', demandResponseDate: '2024-01-17', initialHearingDate: '',
-        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '', firstInstanceDecisionSense: '',
-        appealDate: '', secondInstanceDecisionDate: '', secondInstanceDecision: '',
-        notes: 'REVISION 22/06/2026: 2024-06-07 DESCORRE TRASLADO DE EXCEPCIONES',
-        createdAt: '', updatedAt: '',
-        actions: [
-          { date: '2023-11-10', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' }
-        ]
-      },
-      {
-        id: 'import-2023-00184', shortNo: '2023-00184', radicado: '11001333400420230018400', currentRadicado: '',
-        siproJ: '774933', orfeo: '20235101530010001123E', ids: '', claimant: 'ÁNGELO MOISÉS LADINO',
-        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
-        lawyer: 'DIEGO DANIEL VEGA', quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa',
-        instance: 'Primera', type: 'NULIDAD Y RESTABLECIMIENTO DEL DERECHO',
-        court: 'JUZGADO 4 ADMINISTRATIVO DEL CIRCUITO DE BOGOTÁ', secondCourt: '',
-        cause: 'ACTO ADMINISTRATIVO CONTRAVENCIONAL D-12', stage: 'TRASLADO EXCEPCIONES', state: 'Activo',
-        startDate: '', endDate: '', claim: 'PRIMERA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 15108 DEL 21 DE FEBRERO DE 2022 “POR MEDIO DEL CUAL SE DECLARA COMO CONTRAVENTOR DE LA INFRACCIÓN D-12 AL SEÑOR ANGELO MOISES LADINO”. SEGUNDA: QUE SE DECLARE LA NULIDAD DEL ACTO ADMINISTRATIVO NO. 3817-02 DEL 11 DE NOVIEMBRE DE 2022 “POR MEDIO DE LA CUAL SE RESUELVE EL RECURSO DE APELACIÓN DENTRO DEL EXPEDIENTE NO. 15108”. TERCERA: QUE A TÍTULO DE RESTABLECIMIENTO DE DERECHO SE ORDENE A DEJAR SIN EFECTOS EL ACTO ADMINISTRATIVO NO. 15108 DEL 21 DE FEBRERO DE 2022 Y ACTO ADMINISTRATIVO NO. 3817-02 DEL 11 DE NOVIEMBRE DE 2022',
-        amount: '1406400', cautelar: 'No', notificationDate: '2023-11-10', measureResponseDate: '',
-        maxDemandResponseDate: '2024-01-17', demandResponseDate: '2024-01-16', initialHearingDate: '',
-        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '', firstInstanceDecisionSense: '',
-        appealDate: '', secondInstanceDecisionDate: '', secondInstanceDecision: '',
-        notes: '10/07/2026 SIN MOVIMIENTO DESDE EL 04/05/2026 AL DESPACHO CON CONTESTACION DE LA DEMANDA',
-        createdAt: '', updatedAt: '',
-        actions: [
-          { date: '2023-11-10', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
-          { date: '2023-11-22', description: 'INTERNO: PROCESO REASIGNADO A DIEGO VEGA POR INSTRUCCION DEL DR. JUAN MANUEL', createdAt: '' },
-          { date: '2023-12-18', description: 'CORREO ELECTRONICO: SDM RADICA NUEVO PODER', createdAt: '' }
-        ]
-      },
-      {
-        id: 'import-2023-00344', shortNo: '2023-00344', radicado: '11001334306620230034400', currentRadicado: '',
-        siproJ: '775633', orfeo: '20235101530010001126E', ids: '', claimant: 'LUÍS EMILIO MARTÍNEZ DEL VALLE',
-        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
-        lawyer: 'DIANA MILENA BERNAL CAICEDO', quality: 'Pasiva', lawyerLinkType: 'Planta', represents: 'Representa',
-        instance: 'Primera', type: 'ACCION DE CUMPLIMIENTO',
-        court: 'JUZGADO SESENTA Y SEIS (66) ADMINISTRATIVO ORAL DEL CIRCUITO JUDICIAL DE BOGOTÁ -SECCIÓN TERCERA-',
-        secondCourt: '', cause: 'CADUCIDAD DE LA ACCIÓN', stage: 'Terminado', state: 'Terminado',
-        startDate: '', endDate: '2024-01-31',
-        claim: '1) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ (AUTORIDAD DEMANDADA) EL CUMPLIMIENTO DE LO ESTABLECIDO EN LAS NORMAS MENCIONADAS COMO INCUMPLIDAS, O SEA, QUE APLIQUE LA CADUCIDAD. 2) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ QUE RETIRE EL (LOS) COMPARENDOS DE LA BASE DE DATOS DEL SIMIT Y DEMÁS BASES DE DATOS DE INFRACTORES EN CUMPLIMIENTO DE LA PRESCRIPCIÓN. 3) QUE SE ORDENE A LA AUTORIDAD DE CONTROL COMPETENTE, ADELANTAR LA INVESTIGACIÓN DEL CASO PARA EFECTOS DE RESPONSABILIDADES PENALES O DISCIPLINARIAS.',
-        amount: '0', cautelar: 'No', notificationDate: '2023-11-14', measureResponseDate: '',
-        maxDemandResponseDate: '2023-11-17', demandResponseDate: '2023-11-16', initialHearingDate: '',
-        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '2023-11-28',
-        firstInstanceDecisionSense: 'FAVORABLE', appealDate: '', secondInstanceDecisionDate: '',
-        secondInstanceDecision: '', notes: '31/01/2024 CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM. RECURSO: SIN RECURSO',
-        createdAt: '', updatedAt: '',
-        actions: [
-          { date: '2023-11-14', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
-          { date: '2023-11-28', description: 'CORREO ELECTRONICO: FALLO FAVORABLE DE PRIMERA INSTANCIA', createdAt: '' },
-          { date: '2024-01-31', description: 'CORREO ELECTRONICO: CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM.', createdAt: '' }
-        ]
-      },
-      {
-        id: 'import-2023-00384', shortNo: '2023-00384', radicado: '11001333501620230038400', currentRadicado: '',
-        siproJ: '777103', orfeo: '20235101530010001127E', ids: '', claimant: 'JAVIER JOSÉ OROZCO RODRÍGUEZ',
-        defendant: 'BOGOTÁ D.C. – SECRETARÍA DE MOVILIDAD', area: 'SUBSECRETARÍA DE SERVICIOS A LA CIUDADANIA',
-        lawyer: 'DIANA MILENA BERNAL CAICEDO', quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa',
-        instance: 'Primera', type: 'ACCION DE CUMPLIMIENTO',
-        court: 'JUZGADO DIECISEIS ADMINISTRATIVO DE ORALIDAD DEL CIRCUITO DE BOGOTÁ SECCIÓN SEGUNDA',
-        secondCourt: '', cause: 'CADUCIDAD DE LA ACCIÓN', stage: 'Terminado', state: 'Terminado',
-        startDate: '', endDate: '2024-01-31',
-        claim: '1) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ (AUTORIDAD DEMANDADA) EL CUMPLIMIENTO DE LO ESTABLECIDO EN LAS NORMAS MENCIONADAS COMO INCUMPLIDAS, O SEA, QUE APLIQUE LA CADUCIDAD. 2) QUE SE ORDENE A LA SECRETARÍA DE MOVILIDAD (TRÁNSITO) DE BOGOTÁ QUE RETIRE EL (LOS) COMPARENDOS DE LA BASE DE DATOS DEL SIMIT Y DEMÁS BASES DE DATOS DE INFRACTORES EN CUMPLIMIENTO DE LA PRESCRIPCIÓN. 3) QUE SE ORDENE A LA AUTORIDAD DE CONTROL COMPETENTE, ADELANTAR LA INVESTIGACIÓN DEL CASO PARA EFECTOS DE RESPONSABILIDADES PENALES O DISCIPLINARIAS.',
-        amount: '0', cautelar: 'No', notificationDate: '2023-11-14', measureResponseDate: '',
-        maxDemandResponseDate: '2023-11-17', demandResponseDate: '2023-11-16', initialHearingDate: '',
-        evidence: '', closingArgumentsDate: '', firstInstanceDecisionDate: '2023-11-27',
-        firstInstanceDecisionSense: 'FAVORABLE', appealDate: '', secondInstanceDecisionDate: '',
-        secondInstanceDecision: '', notes: '31/01/2024 CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM. RECURSO: SIN RECURSO',
-        createdAt: '', updatedAt: '',
-        actions: [
-          { date: '2023-11-14', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
-          { date: '2023-11-27', description: 'CORREO ELECTRONICO: FALLO FAVORABLE DE PRIMERA INSTANCIA', createdAt: '' },
-          { date: '2024-01-31', description: 'CORREO ELECTRONICO: CONSULTADA LA INFORMACIÓN REGISTRADA EN RAMA JUDICIAL NO SE EVIDENCIA IMPUGNACIÓN, POR LO TANTO, SE TERMINA EL PROCESO CON FALLO DE PRIMERA INSTANCIA FAVORABLE A LA SDM.', createdAt: '' }
-        ]
-      },
-      {
-        id: 'import-2023-00305', shortNo: '2023-00305', radicado: '11001333603720230030500',
-        currentRadicado: '11001333603720230030501', siproJ: '774311', orfeo: '20235101530010001128E',
-        ids: '', claimant: 'OLMAN ORLANDO GUAJE CARREÑO Y OTROS',
-        defendant: 'INSTITUTO DE DESARROLLO URBANO –IDU- Y ALCALDÍA MAYOR DE BOGOTÁ',
-        area: 'SUBSECRETARÍA DE GESTIÓN DE LA MOVILIDAD', lawyer: 'LEIDER EFREN SUAREZ ESPITIA',
-        quality: 'Pasiva', lawyerLinkType: 'Contratista', represents: 'Representa', instance: 'Primera',
-        type: 'REPARACION DIRECTA',
-        court: 'JUZGADO TREINTA Y SIETE (37) ADMINISTRATIVO DEL CIRCUITO JUDICIAL DE BOGOTÁ D.C. -SECCIÓN TERCERA-',
-        secondCourt: '', cause: 'ACCIDENTE DE TRÁNSITO MAL ESTADO DE LA VÍA',
-        stage: 'CONTESTACIÓN DEMANDA', state: 'Activo', startDate: '', endDate: '',
-        claim: '1) QUE LA NACION COLOMBIANA – ALCALDÍA MAYOR DE BOGOTÁ, D.C. – IDU, SON RESPONSABLES ADMINISTRATIVAMENTE POR LA CULPA CIVIL EXTRACONTRACTUAL, COMO CONSECUENCIA DE LA FALTA EN LA PRESTACIÓN DEL SERVICIO, POR LAS LESIONES CAUSADAS AL SEÑOR OLMAN ORLANDO GUAJE CARREÑO, CC 79667867, EN HECHOS OCURRIDOS EN LA CARRERA 72 CON CALLE 6, BOGOTÁ D.C. EN SENTIDO DE NORTE A SUR, EL 20 DE OCTUBRE DE 2022 A LAS 11:45 A.M. 2) POR LO ANTERIOR QUE SE PAGUE AL DEMANDANTE EL VALOR DE LOS PERJUICIOS MATERIALES Y MORALES DE TODO ORDEN.',
-        amount: '510242562', cautelar: 'No', notificationDate: '2023-11-01', measureResponseDate: '',
-        maxDemandResponseDate: '2023-12-18', demandResponseDate: '2023-12-18',
-        initialHearingDate: '2023-11-14', evidence: '03/06/2024', closingArgumentsDate: '2024-11-21',
-        firstInstanceDecisionDate: '', firstInstanceDecisionSense: '', appealDate: '',
-        secondInstanceDecisionDate: '', secondInstanceDecision: '',
-        notes: 'REVISION 10/03/2026: 2026-02-23 SE AUTORIZA ACCESO KAROLINE MEZA- POSTERIOR A AUTO QUE REGRESA DE LA SEGUNDA INSTANCIA',
-        createdAt: '', updatedAt: '',
-        actions: [
-          { date: '2023-12-11', description: 'APODERADO IDU ALLEGA CONTESTACIÓN DE LA DEMANDA', createdAt: '' },
-          { date: '2023-11-08', description: 'CORREO ELECTRONICO: NOTIFICACIÓN PERSONAL DE LA DEMANDA', createdAt: '' },
-          { date: '2023-11-20', description: 'CORREO ELECTRONICO: APODERADO SECRETARÍA DISTRITAL DE GOBIERNO- ALCALDIA LOCAL DE KENNEDY ALLEGA CONTESTACION DE LA DEMANDA', createdAt: '' },
-          { date: '2023-12-11', description: 'CORREO ELECTRONICO: APODERADO IDU ALLEGA CONTESTACIÓN DE LA DEMANDA', createdAt: '' },
-          { date: '2024-05-02', description: 'CORREO ELECTRONICO: AUTO SE TIENE POR CONTESTADA LA DEMANDA, EN TIEMPO POR LA SUM Y SE RECONOCE PERSONERÍA AL ABOGADO LEIDER EFREN SUAREZ ESPITIA', createdAt: '' }
-        ]
-      }
-    ];
-    const labels = { shortNo: 'No. corto', radicado: 'Radicado', currentRadicado: 'Radicado actual', siproJ: 'ID SIPROJ', orfeo: 'Expediente ORFEO', ids: 'Cédulas / identificadores', claimant: 'Demandante', defendant: 'Demandado', area: 'Área generadora del daño', lawyer: 'Abogado a cargo', quality: 'Calidad', lawyerLinkType: 'Tipo de vinculación del abogado', represents: 'Representa', instance: 'Instancia del proceso', type: 'Tipo de proceso', court: 'Despacho judicial inicial', secondCourt: 'Despacho de segunda instancia', cause: 'Causa', stage: 'Etapa del proceso', state: 'Estado del proceso', startDate: 'Fecha de inicio', endDate: 'Fecha de terminación', claim: 'Pretensión / asunto', amount: 'Valor de las pretensiones', cautelar: 'Presenta medida cautelar', notificationDate: 'Fecha de notificación de la demanda', measureResponseDate: 'Fecha de contestación de medida cautelar', maxDemandResponseDate: 'Fecha máxima de contestación de demanda', demandResponseDate: 'Fecha de contestación de demanda', initialHearingDate: 'Audiencia inicial', evidence: 'Pruebas', closingArgumentsDate: 'Fecha de alegatos de conclusión', firstInstanceDecisionDate: 'Fecha de fallo de primera instancia', firstInstanceDecisionSense: 'Sentido del fallo de primera instancia', appealDate: 'Fecha de presentación del recurso', secondInstanceDecisionDate: 'Fecha de fallo de segunda instancia', secondInstanceDecision: 'Fallo de segunda instancia', notes: 'Observaciones' };
+    const KEY = 'demo_procesos_judiciales_v1'; const CATALOG_KEY = 'demo_procesos_judiciales_catalogs_v1'; let records = []; let catalogs = {}; let step = 0; let editingId = null; let actionProcessId = null; let hearingEntries = [];
+    const activeFilters = { query: '', state: '', instance: '', type: '', cause: '', lawyer: '', year: '', quality: '' };
+    const fields = ['shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids', 'claimant', 'defendant', 'area', 'lawyer', 'assignedEmail', 'quality', 'lawyerLinkType', 'represents', 'instance', 'type', 'court', 'secondCourt', 'cause', 'stage', 'state', 'endDate', 'terminationForm', 'terminationInstance', 'terminationNotes', 'claim', 'amount', 'cautelar', 'notificationDate', 'measureResponseDate', 'maxDemandResponseDate', 'demandResponseDate', 'anticipatedJudgment', 'evidence', 'closingArgumentsDate', 'firstInstanceDecisionDate', 'firstInstanceDecisionSense', 'appealStatus', 'appealDate', 'appealGrantedOrderDate', 'appealAdmittedOrderDate', 'secondInstanceDecisionDate', 'secondInstanceDecisionSense', 'secondInstanceDecision', 'notes'];
+    const labels = { shortNo: 'No. corto', radicado: 'Radicado', currentRadicado: 'Radicado actual', siproJ: 'ID SIPROJ', orfeo: 'Expediente ORFEO', ids: 'Cédulas / identificadores', claimant: 'Demandante', defendant: 'Demandados / entidades', area: 'Área generadora del daño', lawyer: 'Abogado a cargo', assignedEmail: 'Correo asignado', quality: 'Activa / pasiva', lawyerLinkType: 'Tipo de vinculación del abogado', represents: 'Representa', instance: 'Instancia del proceso', type: 'Tipo de proceso', court: 'Despacho judicial inicial', secondCourt: 'Despacho de segunda instancia', cause: 'Causa', stage: 'Etapa del proceso', state: 'Estado del proceso', endDate: 'Fecha de terminación', terminationForm: 'Forma de terminación', terminationInstance: 'Instancia de terminación', terminationNotes: 'Observaciones de terminación', claim: 'Pretensión / asunto', amount: 'Valor de las pretensiones', cautelar: 'Presenta medida cautelar', notificationDate: 'Fecha de notificación / inicio', measureResponseDate: 'Fecha de contestación de medida cautelar', maxDemandResponseDate: 'Fecha máxima de contestación de demanda', demandResponseDate: 'Fecha de contestación de demanda', anticipatedJudgment: 'Sentencia anticipada', evidence: 'Pruebas', closingArgumentsDate: 'Fecha de alegatos de conclusión', firstInstanceDecisionDate: 'Fecha de fallo de primera instancia', firstInstanceDecisionSense: 'Sentido del fallo de primera instancia', appealStatus: 'Estado del recurso de apelación', appealDate: 'Fecha de presentación del recurso', appealGrantedOrderDate: 'Auto que concede la apelación', appealAdmittedOrderDate: 'Auto que admite la apelación', secondInstanceDecisionDate: 'Fecha de fallo de segunda instancia', secondInstanceDecisionSense: 'Sentido del fallo de segunda instancia', secondInstanceDecision: 'Fallo de segunda instancia', notes: 'Observaciones' };
+    function isAppsScript() { return typeof google !== 'undefined' && google.script && google.script.run }
+    function accessToken() { try { return localStorage.getItem('judicial_access_session_v1') || '' } catch (error) { console.error('No se pudo leer la sesión de acceso.', error); return '' } }
     function load() {
-      let saved;
+      if (isAppsScript()) {
+        records = [];
+        renderAll();
+        if (window.currentAuthenticatedUser && accessToken()) loadRemoteApplicationData();
+        return;
+      }
       try {
-        saved = localStorage.getItem(KEY);
+        const saved = localStorage.getItem(KEY);
         records = saved ? JSON.parse(saved) : [];
         if (!Array.isArray(records)) throw new Error('El almacenamiento de procesos tiene un formato inválido.');
+        records = records.map(record => ({
+          ...record,
+          notificationDate: record.notificationDate || record.startDate || '',
+          notificationYear: (record.notificationDate || record.startDate || '').slice(0, 4),
+          hearings: record.hearings || (record.initialHearingDate
+            ? [{ id: newId(), type: 'Inicial', number: 1, date: record.initialHearingDate, observation: '' }]
+            : []),
+          actions: (record.actions || []).map(action => ({
+            ...action, id: action.id || newId(), type: action.type || 'Otra',
+            title: action.title || action.description || 'Actuación registrada',
+            processId: action.processId || record.id
+          })),
+          audit: record.audit || []
+        }));
       } catch (error) {
         records = [];
         console.error('No se pudieron cargar los procesos guardados.', error);
         alert('No se pudieron cargar los procesos guardados en este navegador. No se sobrescribieron los datos. Detalle: ' + error.message);
-        renderAll();
-        return;
       }
-
       try {
-        if (localStorage.getItem(INITIAL_RECORDS_KEY) !== '1') {
-          const existingRadicados = new Set(records.map(record => String(record.radicado || '').replace(/\D/g, '')));
-          const missingRecords = INITIAL_RECORDS.filter(record => !existingRadicados.has(record.radicado));
-          records = [...JSON.parse(JSON.stringify(missingRecords)), ...records];
-          localStorage.setItem(KEY, JSON.stringify(records));
-          localStorage.setItem(INITIAL_RECORDS_KEY, '1');
-        }
+        const savedCatalogs = JSON.parse(localStorage.getItem(CATALOG_KEY) || '{}');
+        catalogs = savedCatalogs && typeof savedCatalogs === 'object' && !Array.isArray(savedCatalogs)
+          ? Object.fromEntries(Object.entries(savedCatalogs).filter(([, values]) => Array.isArray(values)))
+          : {};
       } catch (error) {
-        console.error('No se pudieron guardar los registros iniciales en este navegador.', error);
-        alert('Los cinco registros iniciales no se pudieron guardar en este navegador. Detalle: ' + error.message);
+        catalogs = {};
+        console.error('No se pudieron cargar los catálogos locales.', error);
+        alert('No se pudieron cargar los catálogos guardados en este navegador. Detalle: ' + error.message);
       }
+      updateCatalogControls();
       renderAll();
     }
-    function persist() { localStorage.setItem(KEY, JSON.stringify(records)); renderAll() }
-    function showView(id) { document.querySelectorAll('.view').forEach(x => x.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id)); const titles = { dashboard: ['Resumen general', 'Estado de la información registrada'], processes: ['Procesos', 'Consulta y edición de registros'], processOverview: ['Vista completa de procesos', 'Todos los campos de cada registro'], actions: ['Actuaciones', 'Historial de actuaciones registradas'], form: ['Registro de proceso', 'Formulario por etapas'], backup: ['Descargar datos', 'Descarga de información en formato Excel'] }; document.getElementById('pageTitle').textContent = titles[id][0]; document.getElementById('pageSubtitle').textContent = titles[id][1]; if (id === 'processes') renderProcesses(); if (id === 'processOverview') renderFullProcesses(); if (id === 'actions') renderActions(); }
+    function newId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}` }
+    function callAppsScript(method, token, payload, category) { return new Promise((resolve, reject) => { let runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(error => reject(new Error(error.message || String(error)))); if (method === 'load') runner.loadApplicationData(token); else if (method === 'save') runner.saveApplicationData(token, payload); else if (method === 'delete') runner.deleteApplicationProcess(token, payload); else if (method === 'catalogs') runner.loadCatalogs(token); else runner.saveCatalogs(token, category, payload) }) }
+    async function loadRemoteApplicationData() { if (!isAppsScript() || !accessToken()) return; try { const token = accessToken(); [records, catalogs] = await Promise.all([callAppsScript('load', token), callAppsScript('catalogs', token)]); updateCatalogControls(); renderAll() } catch (error) { console.error('No se pudieron cargar los procesos y catálogos desde Google Sheets.', error); alert('No se pudieron cargar los procesos o catálogos desde Google Sheets. ' + error.message) } }
+    window.loadRemoteApplicationData = loadRemoteApplicationData;
+    async function persist() { if (isAppsScript()) { const token = accessToken(); if (!token) throw new Error('La sesión no es válida. Ingresa nuevamente.'); await callAppsScript('save', token, records) } else { localStorage.setItem(KEY, JSON.stringify(records)) } updateCatalogControls(); renderAll() }
+    function showView(id) { document.querySelectorAll('.view').forEach(x => x.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id)); const titles = { dashboard: ['Resumen general', 'Estado de la información registrada'], processes: ['Procesos', 'Consulta y edición de registros'], processOverview: ['Vista completa de procesos', 'Todos los campos de cada registro'], actions: ['Actuaciones', 'Historial de actuaciones registradas'], hearings: ['Audiencias', 'Sesiones conservadas cronológicamente'], catalogs: ['Catálogos', 'Listas autorizadas para estandarizar registros'], form: ['Registro de proceso', 'Formulario por etapas'], backup: ['Descargar datos', 'Descarga de información en formato Excel'] }; document.getElementById('pageTitle').textContent = titles[id][0]; document.getElementById('pageSubtitle').textContent = titles[id][1]; if (id === 'processes') renderProcesses(); if (id === 'processOverview') renderFullProcesses(); if (id === 'actions') renderActions(); if (id === 'hearings') renderHearingsTable(); if (id === 'catalogs') { renderCatalogSummary(); renderCatalogEditor() } }
     document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
-    function newProcess() { editingId = null; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('editBadge').textContent = 'Nuevo'; document.getElementById('confirmData').checked = false; step = 0; setStep(); showView('form') }
-    function editProcess(id) { const r = records.find(x => x.id === id); if (!r) return; editingId = id; const f = document.getElementById('processForm'); f.reset(); fields.forEach(k => { if (f.elements[k]) f.elements[k].value = r[k] ?? '' }); document.getElementById('formTitle').textContent = 'Editar proceso'; document.getElementById('editBadge').textContent = 'Edición'; document.getElementById('confirmData').checked = false; step = 0; setStep(); showView('form') }
-    function setStep() { document.querySelectorAll('.form-step').forEach((el, i) => el.classList.toggle('hidden', i !== step)); document.querySelectorAll('.step').forEach((el, i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step) }); document.getElementById('prevBtn').disabled = step === 0; document.getElementById('nextBtn').classList.toggle('hidden', step === 4); document.getElementById('saveBtn').classList.toggle('hidden', step !== 4); if (step === 4) makeReview() }
+    function newProcess() { editingId = null; hearingEntries = []; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('editBadge').textContent = 'Nuevo'; document.getElementById('confirmData').checked = false; renderHearings(); step = 0; setStep(); showView('form') }
+    function editProcess(id) { const r = records.find(x => x.id === id); if (!r) return; editingId = id; hearingEntries = [...(r.hearings || [])]; const f = document.getElementById('processForm'); f.reset(); fields.forEach(k => { if (f.elements[k]) f.elements[k].value = r[k] ?? '' }); if (f.elements.notificationDate && !f.elements.notificationDate.value) f.elements.notificationDate.value = r.startDate || ''; document.getElementById('formTitle').textContent = 'Editar proceso'; document.getElementById('editBadge').textContent = 'Edición'; document.getElementById('confirmData').checked = false; renderHearings(); step = 0; setStep(); showView('form') }
+    function setStep() { document.querySelectorAll('.form-step').forEach((el, i) => el.classList.toggle('hidden', i !== step)); document.querySelectorAll('.step').forEach((el, i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step) }); document.getElementById('prevBtn').disabled = step === 0; document.getElementById('nextBtn').classList.toggle('hidden', step === 4); document.getElementById('saveBtn').classList.toggle('hidden', step !== 4); updateConditionalFields(); if (step === 4) makeReview() }
     function moveStep(delta) { if (delta > 0 && !validateStep()) return; step = Math.max(0, Math.min(4, step + delta)); setStep() }
     function validateStep() {
       const box = document.querySelector(`.form-step[data-step="${step}"]`); for (const el of box.querySelectorAll('[required]')) { if (!el.value.trim()) { el.focus(); alert('Complete el campo obligatorio: ' + (el.closest('.field').querySelector('label')?.textContent || el.name)); return false } }
-      if (step === 0) { let rad = document.querySelector('[name=radicado]').value.trim(); if (!/^\d{23}$/.test(rad)) { alert('El radicado debe contener exactamente 23 dígitos. Se conserva como texto para evitar pérdida de ceros.'); return false } }
+      if (step === 0) { let rad = document.querySelector('[name=radicado]').value.trim(); if (rad && !/^\d{23}$/.test(rad)) { alert('Si registra un radicado, debe contener exactamente 23 dígitos numéricos. Se conserva como texto para evitar pérdida de ceros.'); return false } }
       return true
     }
-    function makeReview() { let f = document.getElementById('processForm'); let data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value || ''])); document.getElementById('reviewBox').innerHTML = '<b>Resumen de revisión</b><br>' + ['shortNo', 'radicado', 'claimant', 'defendant', 'type', 'stage', 'state', 'lawyer', 'quality', 'endDate', 'firstInstanceDecisionSense', 'secondInstanceDecision'].map(k => `<div>${labels[k]}: ${escapeHtml(data[k] || 'Sin diligenciar')}</div>`).join('') + '<br>Al guardar, el registro quedará disponible en el almacenamiento local de este navegador.' }
-    async function saveProcess() { if (!document.getElementById('confirmData').checked) { alert('Marque la confirmación de revisión antes de guardar.'); return } const f = document.getElementById('processForm'); const data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value.trim() || ''])); if (!/^\d{23}$/.test(data.radicado)) { alert('Radicado inválido.'); step = 0; setStep(); return } const duplicate = records.find(r => r.radicado === data.radicado && r.id !== editingId); if (duplicate) { alert('Ya existe un registro con ese radicado. Revise el listado antes de continuar.'); return } if (data.state === 'Terminado' && !data.endDate && !confirm('El proceso está Terminado pero no tiene fecha de terminación. ¿Guardar de todas formas?')) return; const now = new Date().toISOString(); if (editingId) { let i = records.findIndex(r => r.id === editingId); records[i] = { ...records[i], ...data, updatedAt: now } } else records.unshift({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), ...data, createdAt: now, updatedAt: now, actions: [] }); try { await persist(); newProcess(); alert('Registro guardado. El formulario está listo para registrar otro proceso.') } catch (error) { alert(error.message) } }
+    function makeReview() { let f = document.getElementById('processForm'); let data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value || ''])); const storage = isAppsScript() ? 'Google Sheets' : 'el almacenamiento local de este navegador'; document.getElementById('reviewBox').innerHTML = '<b>Resumen de revisión</b><br>' + ['shortNo', 'radicado', 'claimant', 'defendant', 'notificationDate', 'maxDemandResponseDate', 'type', 'stage', 'state', 'lawyer', 'quality', 'endDate', 'appealStatus'].map(k => `<div>${labels[k]}: ${escapeHtml(data[k] || 'Sin diligenciar')}</div>`).join('') + `<div>Sesiones de audiencia: ${hearingEntries.length}</div><br>Los campos obligatorios definitivos y los términos deben ser validados por el equipo jurídico. El registro se guardará en ${storage}.` }
+    async function saveProcess() {
+      if (!document.getElementById('confirmData').checked) {
+        alert('Marque la confirmación de revisión antes de guardar.');
+        return;
+      }
+      const form = document.getElementById('processForm');
+      const data = Object.fromEntries(fields.map(key => [key, form.elements[key]?.value.trim() || '']));
+      if (data.radicado && !/^\d{23}$/.test(data.radicado)) {
+        alert('Si registra un radicado, debe contener exactamente 23 dígitos numéricos.');
+        step = 0;
+        setStep();
+        return;
+      }
+      const duplicate = data.radicado && records.find(record => record.radicado === data.radicado && record.id !== editingId);
+      if (duplicate) {
+        alert('Ya existe un registro con ese radicado. Revise el listado antes de continuar.');
+        return;
+      }
+      if (data.state === 'Terminado' && !data.endDate && !confirm('El proceso está Terminado pero no tiene fecha de terminación. ¿Guardar de todas formas?')) return;
+
+      const beforeSave = JSON.stringify(records);
+      const now = new Date().toISOString();
+      if (editingId) {
+        const index = records.findIndex(record => record.id === editingId);
+        const previous = records[index];
+        const changedFields = fields.filter(key => String(previous[key] ?? '') !== String(data[key] ?? ''));
+        if (JSON.stringify(previous.hearings || []) !== JSON.stringify(hearingEntries)) changedFields.push('hearings');
+        const audit = [...(previous.audit || [])];
+        if (changedFields.length) audit.push({ changedAt: now, changedBy: currentActor(), changedFields });
+        records[index] = {
+          ...previous, ...data, notificationYear: data.notificationDate.slice(0, 4),
+          hearings: hearingEntries, updatedAt: now, updatedBy: currentActor(),
+          audit
+        };
+      } else {
+        records.unshift({
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          ...data, notificationYear: data.notificationDate.slice(0, 4), hearings: hearingEntries,
+          createdAt: now, updatedAt: now, updatedBy: currentActor(), audit: [], actions: []
+        });
+      }
+      try {
+        await persist();
+        newProcess();
+        alert('Registro guardado. El formulario está listo para registrar otro proceso.');
+      } catch (error) {
+        records = JSON.parse(beforeSave);
+        renderAll();
+        alert(error.message);
+      }
+    }
+    function currentActor() { return document.getElementById('userName')?.textContent.trim() || 'Usuario local' }
+    function addHearing() { const date = document.getElementById('hearingDate').value; const type = document.getElementById('hearingType').value.trim(); if (!date || !type) { alert('Selecciona el tipo y la fecha de la sesión de audiencia.'); return } const number = hearingEntries.filter(item => item.type === type).length + 1; hearingEntries.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), type, number, date, observation: document.getElementById('hearingObservation').value.trim() }); document.getElementById('hearingDate').value = ''; document.getElementById('hearingObservation').value = ''; renderHearings() }
+    function renderHearings() { const target = document.getElementById('hearingList'); if (!target) return; const sorted = [...hearingEntries].sort((a, b) => a.date.localeCompare(b.date)); target.innerHTML = sorted.length ? sorted.map(item => `<article class="action-item"><strong>${escapeHtml(item.type)} · Sesión ${item.number} · ${escapeHtml(fmtDate(item.date))}</strong><div>${escapeHtml(item.observation || 'Sin observación')}</div></article>`).join('') : '<div class="empty">Aún no hay sesiones registradas.</div>' }
+    function updateConditionalFields() {
+      const form = document.getElementById('processForm');
+      const anticipated = form.elements.anticipatedJudgment?.value === 'Sí';
+      const appealStatus = form.elements.appealStatus?.value || '';
+      const hearingField = document.getElementById('hearingList')?.closest('.field');
+      const flowNotice = document.getElementById('judicialFlowNotice');
+      if (hearingField) hearingField.classList.toggle('hidden', anticipated);
+      ['evidence', 'closingArgumentsDate'].forEach(name => {
+        const field = form.elements[name]?.closest('.field');
+        if (field) field.classList.toggle('hidden', anticipated);
+      });
+      const appealFiled = appealStatus === 'Presentado en término';
+      ['appealGrantedOrderDate', 'appealAdmittedOrderDate', 'secondInstanceDecisionDate', 'secondInstanceDecisionSense', 'secondInstanceDecision'].forEach(name => {
+        const field = form.elements[name]?.closest('.field');
+        if (field) field.classList.toggle('hidden', appealStatus !== '' && !appealFiled);
+      });
+      if (flowNotice) {
+        flowNotice.textContent = anticipated
+          ? 'Sentencia anticipada seleccionada: se ocultan las audiencias, pruebas y alegatos. Cualquier dato ya registrado se conserva.'
+          : appealStatus === 'No presentado' || appealStatus === 'Presentado fuera de término'
+            ? `Estado del recurso: ${appealStatus}. No se marcará automáticamente el proceso como terminado; confirme el estado y la terminación según el criterio jurídico.`
+            : 'Las etapas no aplicables pueden ocultarse temporalmente; los datos registrados se conservan.';
+      }
+      const deadline = form.elements.maxDemandResponseDate?.value;
+      const responded = form.elements.demandResponseDate?.value;
+      const notice = document.getElementById('deadlineNotice');
+      if (notice && deadline) {
+        const today = new Date().toISOString().slice(0, 10);
+        notice.textContent = responded
+          ? `Fecha máxima registrada: ${fmtDate(deadline)}. Fecha real de contestación: ${fmtDate(responded)}. ${responded > deadline ? 'La contestación fue posterior al vencimiento registrado.' : 'La contestación no fue posterior al vencimiento registrado.'}`
+          : deadline < today
+            ? `Alerta: la fecha máxima registrada (${fmtDate(deadline)}) ya pasó y no se ha ingresado fecha real de contestación.`
+            : deadline === today
+              ? `Alerta: la fecha máxima registrada (${fmtDate(deadline)}) es hoy.`
+              : `Fecha máxima registrada: ${fmtDate(deadline)}. El cálculo del término no está automatizado y requiere validación jurídica.`;
+      }
+    }
+    document.querySelectorAll('#processForm [name="anticipatedJudgment"], #processForm [name="appealStatus"], #processForm [name="maxDemandResponseDate"], #processForm [name="demandResponseDate"]').forEach(input => input.addEventListener('change', updateConditionalFields));
+    function renderHearingsTable() {
+      const entries = applyFilters().flatMap(record => (record.hearings || []).map(hearing => ({ record, hearing })))
+        .sort((a, b) => a.hearing.date.localeCompare(b.hearing.date));
+      document.getElementById('allHearingsTable').innerHTML = entries.length
+        ? `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Tipo</th><th>Sesión</th><th>Fecha</th><th>Observación</th><th></th></tr></thead><tbody>${entries.map(({ record, hearing }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(hearing.type)}</td><td>${hearing.number}</td><td>${escapeHtml(fmtDate(hearing.date))}</td><td>${escapeHtml(hearing.observation || '—')}</td><td><button class="secondary small" onclick="editProcess('${record.id}')">Ver proceso</button></td></tr>`).join('')}</tbody></table></div>`
+        : '<div class="empty">No hay sesiones de audiencia registradas.</div>';
+    }
     function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
     function fmtDate(s) { return s ? new Date(s + 'T00:00:00').toLocaleDateString('es-CO') : '—' }
-    function row(r) { return `<tr><td><div class="record-title">${escapeHtml(r.shortNo || 'Sin número')}</div><div class="record-sub">${escapeHtml(r.radicado)}</div></td><td>${escapeHtml(r.claimant || '—')}<div class="record-sub">Demandado: ${escapeHtml(r.defendant || '—')}</div></td><td>${escapeHtml(r.type || '—')}</td><td>${escapeHtml(r.lawyer || 'Sin asignar')}</td><td><span class="pill ${r.state === 'Activo' ? 'active' : r.state === 'Terminado' ? 'closed' : ''}">${escapeHtml(r.state)}</span></td><td><button class="secondary small" onclick="editProcess('${r.id}')">Editar</button> <button class="secondary small" onclick="openActions('${r.id}')">Actuaciones (${(r.actions || []).length})</button> <button class="danger small" onclick="deleteProcess('${r.id}')">Eliminar</button></td></tr>` }
+    function adminOnlyClass() { return isAppsScript() && window.currentAuthenticatedUser?.rol !== 'ADMINISTRADOR' ? 'hidden' : '' }
+    function deadlineStatus(record) { if (!record.maxDemandResponseDate) return ''; if (record.demandResponseDate) return record.demandResponseDate > record.maxDemandResponseDate ? `Contestación ${fmtDate(record.demandResponseDate)} posterior al vencimiento ${fmtDate(record.maxDemandResponseDate)}.` : ''; const today = new Date().toISOString().slice(0, 10); return record.maxDemandResponseDate < today ? 'Vencimiento de contestación superado; verifique la actuación.' : record.maxDemandResponseDate === today ? 'El vencimiento de contestación registrado es hoy.' : `Vencimiento registrado: ${fmtDate(record.maxDemandResponseDate)}.` }
+    function row(r) { const deadline = deadlineStatus(r); return `<tr><td><div class="record-title">${escapeHtml(r.shortNo || 'Sin número')}</div><div class="record-sub">${escapeHtml(r.radicado || 'Sin radicado')}</div>${deadline ? `<div class="deadline-alert">${escapeHtml(deadline)}</div>` : ''}</td><td>${escapeHtml(r.claimant || '—')}<div class="record-sub">Demandados: ${escapeHtml(r.defendant || '—')}</div></td><td>${escapeHtml(r.type || '—')}</td><td>${escapeHtml(r.lawyer || 'Sin asignar')}</td><td><span class="pill ${r.state === 'Activo' ? 'active' : r.state === 'Terminado' ? 'closed' : ''}">${escapeHtml(r.state || 'Sin estado')}</span></td><td><button class="secondary small" onclick="editProcess('${r.id}')">Editar</button> <button class="secondary small" onclick="openActions('${r.id}')">Actuaciones (${(r.actions || []).length})</button> <button class="danger small ${adminOnlyClass()}" onclick="deleteProcess('${r.id}')">Eliminar</button></td></tr>` }
     function table(list) { return list.length ? `<div class="table-wrap"><table><thead><tr><th>Identificación</th><th>Partes</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>` : '<div class="empty">No hay procesos registrados.</div>' }
     function fullProcessRow(record) {
       const processCells = fields.map(field => {
@@ -1430,20 +1477,124 @@
         const displayValue = value ? (/Date$/.test(field) ? fmtDate(value) : String(value)) : '—';
         return `<td>${escapeHtml(displayValue)}</td>`;
       });
-      const actionHistory = (record.actions || []).map(action => `${fmtDate(action.date)} · ${action.description}`).join('\n') || '—';
-      return `<tr>${processCells.join('')}<td>${escapeHtml(record.createdAt ? new Date(record.createdAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedAt ? new Date(record.updatedAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(actionHistory)}</td><td class="full-table-actions"><button class="secondary small" onclick="editProcess('${record.id}')">Editar</button> <button class="secondary small" onclick="openActions('${record.id}')">Actuaciones (${(record.actions || []).length})</button> <button class="danger small" onclick="deleteProcess('${record.id}')">Eliminar</button></td></tr>`;
+      const actionHistory = (record.actions || []).map(action => `${fmtDate(action.date)} · ${action.title || action.description}`).join('\n') || '—';
+      const hearingHistory = (record.hearings || []).map(item => `${item.type} ${item.number}: ${fmtDate(item.date)}${item.observation ? ` · ${item.observation}` : ''}`).join('\n') || '—';
+      const audit = (record.audit || []).map(item => `${new Date(item.changedAt).toLocaleString('es-CO')} · ${item.changedBy}: ${(item.changedFields || []).join(', ')}`).join('\n') || '—';
+      return `<tr>${processCells.join('')}<td>${escapeHtml(hearingHistory)}</td><td>${escapeHtml(record.createdAt ? new Date(record.createdAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedAt ? new Date(record.updatedAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedBy || '—')}</td><td>${escapeHtml(audit)}</td><td>${escapeHtml(actionHistory)}</td><td class="full-table-actions"><button class="secondary small" onclick="editProcess('${record.id}')">Editar</button> <button class="secondary small" onclick="openActions('${record.id}')">Actuaciones (${(record.actions || []).length})</button> <button class="danger small ${adminOnlyClass()}" onclick="deleteProcess('${record.id}')">Eliminar</button></td></tr>`;
     }
     function fullProcessTable(list) {
       if (!list.length) return '<div class="empty">No hay procesos registrados.</div>';
-      const headers = [...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Historial de actuaciones', 'Administrar'];
+      const headers = [...fields.map(field => labels[field]), 'Sesiones de audiencia', 'Creado', 'Actualizado', 'Modificado por', 'Historial de cambios', 'Historial de actuaciones', 'Administrar'];
       return `<div class="table-wrap full-table-wrap" role="region" aria-label="Tabla general de procesos; desplácese horizontalmente para ver todas las columnas" tabindex="0"><table class="full-process-table"><thead><tr>${headers.map(header => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${list.map(fullProcessRow).join('')}</tbody></table></div>`;
     }
-    function renderProcesses() { let q = (document.getElementById('search')?.value || '').toLowerCase(); let st = document.getElementById('filterState')?.value || ''; let list = records.filter(r => (!st || r.state === st) && fields.some(k => String(r[k] || '').toLowerCase().includes(q))); document.getElementById('processTable').innerHTML = table(list) }
-    function renderFullProcesses() { document.getElementById('fullProcessTable').innerHTML = `<p class="table-summary">${records.length} procesos registrados.</p>${fullProcessTable(records)}` }
+    function fillFilterOptions(id, values, label) {
+      const ids = [id];
+      if (id.startsWith('filter')) ids.push('dashboard' + id[0].toUpperCase() + id.slice(1));
+      const unique = [...new Set(values.map(value => String(value || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+      ids.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        const selected = select.value;
+        select.innerHTML = `<option value="">${label}</option>` + unique.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        if (unique.includes(selected)) select.value = selected;
+      });
+    }
+    function catalogValues(category, fallback = []) {
+      const values = catalogs[category] || [];
+      return [...new Set([...fallback, ...values].map(value => String(value || '').trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'es'));
+    }
+    function fillDatalist(id, values) {
+      const datalist = document.getElementById(id);
+      if (datalist) datalist.innerHTML = values.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
+    }
+    function updateCatalogControls() {
+      const lawyerSelect = document.getElementById('lawyerSelect');
+      const previousLawyer = lawyerSelect?.value || '';
+      if (lawyerSelect) {
+        const lawyers = catalogValues('lawyer', records.map(record => record.lawyer));
+        lawyerSelect.innerHTML = '<option value="">Seleccione</option>' + lawyers.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+        if (previousLawyer && !lawyers.includes(previousLawyer)) lawyerSelect.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(previousLawyer)}">${escapeHtml(previousLawyer)}</option>`);
+        lawyerSelect.value = previousLawyer;
+      }
+      const linkTypeSelect = document.getElementById('lawyerLinkTypeSelect');
+      if (linkTypeSelect) {
+        const previousValue = linkTypeSelect.value;
+        const linkTypes = catalogValues('lawyerLinkType', [...records.map(record => record.lawyerLinkType), 'Planta', 'Contratista', 'Otro', 'No informado']);
+        linkTypeSelect.innerHTML = '<option value="">Seleccione</option>' + linkTypes.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        linkTypeSelect.value = previousValue;
+      }
+      fillDatalist('typeOptions', catalogValues('type', records.map(record => record.type)));
+      fillDatalist('causeOptions', catalogValues('cause', records.map(record => record.cause)));
+      fillDatalist('hearingTypeOptions', catalogValues('hearingType', ['Inicial', 'Pruebas', 'Otra']));
+      fillDatalist('terminationFormOptions', catalogValues('terminationForm', ['Sentencia', 'Conciliación', 'Transacción', 'Desvinculación', 'Otra']));
+      renderCatalogSummary();
+    }
+    function renderCatalogSummary() {
+      const target = document.getElementById('catalogSummary');
+      if (!target) return;
+      const labelsByCategory = { lawyer: 'Abogados', lawyerLinkType: 'Tipo de vinculación', type: 'Tipo de proceso', cause: 'Causas', hearingType: 'Tipo de audiencia', terminationForm: 'Forma de terminación' };
+      target.innerHTML = Object.keys(labelsByCategory).map(category => `<article class="action-item"><strong>${labelsByCategory[category]}</strong><div>${(catalogs[category] || []).map(escapeHtml).join(', ') || 'Sin valores configurados'}</div></article>`).join('');
+    }
+    function renderCatalogEditor() {
+      const category = document.getElementById('catalogCategory').value;
+      document.getElementById('catalogValues').value = (catalogs[category] || []).join('\n');
+    }
+    async function saveCatalog(event) {
+      event.preventDefault();
+      const category = document.getElementById('catalogCategory').value;
+      const values = [...new Set(document.getElementById('catalogValues').value.split(/\r?\n/).map(value => value.trim()).filter(Boolean))];
+      try {
+        if (isAppsScript()) {
+          const token = accessToken();
+          if (!token) throw new Error('La sesión no es válida. Ingresa nuevamente.');
+          catalogs = await callAppsScript('saveCatalogs', token, values, category);
+        } else {
+          catalogs[category] = values;
+          localStorage.setItem(CATALOG_KEY, JSON.stringify(catalogs));
+        }
+        updateCatalogControls();
+        renderCatalogEditor();
+        alert('Catálogo guardado.');
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+    document.getElementById('catalogCategory').addEventListener('change', renderCatalogEditor);
+    function syncFilter(key, value) {
+      activeFilters[key] = value;
+      const processId = { query: 'search', state: 'filterState', instance: 'filterInstance', type: 'filterType', cause: 'filterCause', lawyer: 'filterLawyer', year: 'filterYear', quality: 'filterQuality' }[key];
+      const dashboardId = { query: 'dashboardSearch', state: 'dashboardFilterState', instance: 'dashboardFilterInstance', type: 'dashboardFilterType', cause: 'dashboardFilterCause', lawyer: 'dashboardFilterLawyer', year: 'dashboardFilterYear', quality: 'dashboardFilterQuality' }[key];
+      [processId, dashboardId].forEach(id => { const element = document.getElementById(id); if (element && element.value !== value) element.value = value; });
+      renderAll();
+    }
+    function applyFilters(source = records) {
+      const query = activeFilters.query.trim().toLowerCase();
+      return source.filter(record => {
+        const searchable = ['shortNo', 'radicado', 'currentRadicado', 'id', 'orfeo', 'siproJ', 'claimant', 'defendant', 'ids'].some(key => String(record[key] || '').toLowerCase().includes(query));
+        const recordYear = (record.notificationDate || '').slice(0, 4);
+        return searchable && (!activeFilters.state || record.state === activeFilters.state) &&
+          (!activeFilters.instance || record.instance === activeFilters.instance) &&
+          (!activeFilters.type || record.type === activeFilters.type) &&
+          (!activeFilters.cause || record.cause === activeFilters.cause) &&
+          (!activeFilters.lawyer || record.lawyer === activeFilters.lawyer) &&
+          (!activeFilters.year || recordYear === activeFilters.year) &&
+          (!activeFilters.quality || record.quality === activeFilters.quality);
+      });
+    }
+    function renderProcesses() {
+      fillFilterOptions('filterInstance', records.map(record => record.instance), 'Todas las instancias');
+      fillFilterOptions('filterType', records.map(record => record.type), 'Todos los tipos');
+      fillFilterOptions('filterCause', records.map(record => record.cause), 'Todas las causas');
+      fillFilterOptions('filterLawyer', records.map(record => record.lawyer), 'Todos los abogados');
+      fillFilterOptions('filterYear', records.map(record => (record.notificationDate || '').slice(0, 4)), 'Todos los años');
+      document.getElementById('processTable').innerHTML = table(applyFilters());
+    }
+    function renderFullProcesses() { const list = applyFilters(); document.getElementById('fullProcessTable').innerHTML = `<p class="table-summary">${list.length} procesos consultados.</p>${fullProcessTable(list)}` }
     function renderActions() {
       const query = (document.getElementById('actionsSearch')?.value || '').trim().toLowerCase();
-      const entries = records.flatMap(record => (record.actions || []).map(action => ({ record, action })))
-        .filter(({ record, action }) => [record.shortNo, record.radicado, record.claimant, action.date, action.description]
+      const entries = applyFilters().flatMap(record => (record.actions || []).map(action => ({ record, action })))
+        .filter(({ record, action }) => [record.shortNo, record.radicado, record.claimant, action.date, action.type, action.title, action.description, action.status, action.registeredBy]
           .some(value => String(value || '').toLowerCase().includes(query)))
         .sort((a, b) => b.action.date.localeCompare(a.action.date) || String(b.action.createdAt || '').localeCompare(String(a.action.createdAt || '')));
       const groupedEntries = entries.reduce((groups, entry) => {
@@ -1452,7 +1603,7 @@
         groups.get(processNumber).push(entry);
         return groups;
       }, new Map());
-      const actionTable = groupEntries => `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Actuación</th><th>Demandante</th><th></th></tr></thead><tbody>${groupEntries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(action.description)}</td><td>${escapeHtml(record.claimant || '—')}</td><td><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>`;
+      const actionTable = groupEntries => `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Tipo</th><th>Título / detalle</th><th>Estado</th><th>Demandante</th><th></th></tr></thead><tbody>${groupEntries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(action.type || 'Otra')}</td><td><strong>${escapeHtml(action.title || '')}</strong><div>${escapeHtml(action.description)}</div></td><td>${escapeHtml(action.status || '—')}</td><td>${escapeHtml(record.claimant || '—')}</td><td><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>`;
       document.getElementById('allActionsTable').innerHTML = groupedEntries.size
         ? [...groupedEntries.entries()]
           .sort(([processA], [processB]) => processA.localeCompare(processB, 'es', { numeric: true }))
@@ -1460,8 +1611,27 @@
           .join('')
         : '<div class="empty">No hay actuaciones registradas.</div>';
     }
-    function renderAll() { document.getElementById('statTotal').textContent = records.length; document.getElementById('statActive').textContent = records.filter(r => r.state === 'Activo').length; document.getElementById('statClosed').textContent = records.filter(r => r.state === 'Terminado').length; document.getElementById('statIssues').textContent = records.filter(issues).length; document.getElementById('recentTable').innerHTML = table(records.slice(0, 5)); renderCharts(); if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses(); if (!document.getElementById('actions').classList.contains('hidden')) renderActions(); }
-    function renderCharts() {
+    function renderAll() {
+      const list = applyFilters();
+      fillFilterOptions('filterInstance', records.map(record => record.instance), 'Todas las instancias');
+      fillFilterOptions('filterType', records.map(record => record.type), 'Todos los tipos');
+      fillFilterOptions('filterCause', records.map(record => record.cause), 'Todas las causas');
+      fillFilterOptions('filterLawyer', records.map(record => record.lawyer), 'Todos los abogados');
+      fillFilterOptions('filterYear', records.map(record => (record.notificationDate || '').slice(0, 4)), 'Todos los años');
+      document.getElementById('statTotal').textContent = list.length;
+      document.getElementById('statActive').textContent = list.filter(record => record.state === 'Activo').length;
+      document.getElementById('statClosed').textContent = list.filter(record => record.state === 'Terminado').length;
+      document.getElementById('statActions').textContent = list.reduce((sum, record) => sum + (record.actions || []).length, 0);
+      document.getElementById('statIssues').textContent = list.filter(issues).length;
+      document.getElementById('recentTable').innerHTML = table(list.slice(0, 5));
+      renderCharts(list);
+      if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses();
+      if (!document.getElementById('actions').classList.contains('hidden')) renderActions();
+      if (!document.getElementById('hearings').classList.contains('hidden')) renderHearingsTable();
+      if (!document.getElementById('processOverview').classList.contains('hidden')) renderFullProcesses();
+    }
+    function renderCharts(chartRecords = applyFilters()) {
+      const records = chartRecords;
       const statusColors = { Activo: '#287a59', Terminado: '#7a8792', Desvinculado: '#315d82', 'Sin estado': '#d88d53' };
       const statusCounts = records.reduce((counts, record) => { const status = record.state || 'Sin estado'; counts.set(status, (counts.get(status) || 0) + 1); return counts }, new Map());
       const statuses = [...statusCounts.entries()].sort((a, b) => (Object.keys(statusColors).indexOf(a[0]) + 1 || 99) - (Object.keys(statusColors).indexOf(b[0]) + 1 || 99));
@@ -1525,29 +1695,84 @@
       document.getElementById('typeChart').innerHTML = visibleTypes.length
         ? `<div class="rank-chart" role="img" aria-label="Procesos agrupados por tipo">${visibleTypes.map(([type, count]) => `<div class="rank-row"><span class="rank-name" title="${escapeHtml(type)}">${escapeHtml(type)}</span><div class="rank-track"><div class="rank-bar" style="width:${count / maxTypeCount * 100}%"></div></div><span class="rank-count">${count}</span></div>`).join('')}</div>`
         : '<div class="chart-empty">Registra procesos para comparar sus tipos.</div>';
+      const ranked = (key, emptyLabel) => {
+        const counts = records.reduce((map, record) => {
+          const value = String(record[key] || '').trim() || 'Sin clasificar';
+          map.set(value, (map.get(value) || 0) + 1);
+          return map;
+        }, new Map());
+        const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es')).slice(0, 8);
+        const max = Math.max(1, ...entries.map(([, count]) => count));
+        return entries.length
+          ? `<div class="rank-chart">${entries.map(([name, count]) => `<div class="rank-row"><span class="rank-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span><div class="rank-track"><div class="rank-bar" style="width:${count / max * 100}%"></div></div><span class="rank-count">${count}</span></div>`).join('')}</div>`
+          : `<div class="chart-empty">${emptyLabel}</div>`;
+      };
+      document.getElementById('yearChart').innerHTML = ranked('notificationYear', 'Registra fechas de notificación para consultar por año.');
+      document.getElementById('qualityChart').innerHTML = ranked('quality', 'No hay datos de clasificación activa o pasiva.');
+      document.getElementById('lawyerChart').innerHTML = ranked('lawyer', 'No hay abogados asignados.');
+      document.getElementById('causeChart').innerHTML = ranked('cause', 'No hay causas clasificadas.');
     }
     function issues(r) { return !r.currentRadicado || !r.lawyer || (r.state === 'Terminado' && !r.endDate) || !r.area }
-    async function deleteProcess(id) { if (!confirm('¿Eliminar este registro y sus actuaciones de este navegador?')) return; records = records.filter(r => r.id !== id); try { await persist() } catch (error) { alert(error.message) } }
-    function openActions(id) { actionProcessId = id; const record = records.find(item => item.id === id); document.getElementById('actionDate').value = new Date().toISOString().slice(0, 10); document.getElementById('actionDescription').value = ''; document.getElementById('actionState').value = record?.state || ''; renderActionDialog(); document.getElementById('actionsDialog').classList.add('open') }
+    async function deleteProcess(id) { if (!confirm('¿Eliminar este proceso y sus audiencias, actuaciones e historial de auditoría? Esta acción no se puede deshacer.')) return; const beforeSave = JSON.stringify(records); try { if (isAppsScript()) { const token = accessToken(); if (!token) throw new Error('La sesión no es válida. Ingresa nuevamente.'); await callAppsScript('delete', token, id) } records = records.filter(record => record.id !== id); if (!isAppsScript()) localStorage.setItem(KEY, JSON.stringify(records)); updateCatalogControls(); renderAll() } catch (error) { records = JSON.parse(beforeSave); renderAll(); alert(error.message) } }
+    function openActions(id) { actionProcessId = id; document.getElementById('actionForm').reset(); document.getElementById('actionDate').value = new Date().toISOString().slice(0, 10); renderActionDialog(); document.getElementById('actionsDialog').classList.add('open') }
     function closeActions() { document.getElementById('actionsDialog').classList.remove('open'); actionProcessId = null }
-    function renderActionDialog() { const record = records.find(r => r.id === actionProcessId); if (!record) return; document.getElementById('actionsTitle').textContent = 'Actuaciones · ' + (record.shortNo || 'Proceso'); document.getElementById('actionsProcess').textContent = `Radicado ${record.radicado || ''} · Estado actual: ${record.state || 'Sin estado'}`; const list = [...(record.actions || [])].sort((a, b) => b.date.localeCompare(a.date)); document.getElementById('actionList').innerHTML = list.length ? list.map(action => `<article class="action-item"><strong>${escapeHtml(fmtDate(action.date))}</strong><div>${escapeHtml(action.description)}</div></article>`).join('') : '<div class="empty">Este proceso aún no tiene actuaciones registradas.</div>' }
-    async function saveAction(event) { event.preventDefault(); const record = records.find(r => r.id === actionProcessId); if (!record) return; record.actions = record.actions || []; record.actions.push({ date: document.getElementById('actionDate').value, description: document.getElementById('actionDescription').value.trim(), createdAt: new Date().toISOString() }); const selectedState = document.getElementById('actionState').value; if (selectedState) record.state = selectedState; record.updatedAt = new Date().toISOString(); try { await persist(); closeActions() } catch (error) { alert(error.message) } }
+    function renderActionDialog() { const record = records.find(r => r.id === actionProcessId); if (!record) return; document.getElementById('actionsTitle').textContent = 'Actuaciones · ' + (record.shortNo || 'Proceso'); document.getElementById('actionsProcess').textContent = `Radicado ${record.radicado || ''} · Estado actual: ${record.state || 'Sin estado'}`; const list = [...(record.actions || [])].sort((a, b) => b.date.localeCompare(a.date)); document.getElementById('actionList').innerHTML = list.length ? list.map(action => `<article class="action-item"><strong>${escapeHtml(fmtDate(action.date))} · ${escapeHtml(action.type || 'Otra')}</strong><div><b>${escapeHtml(action.title || '')}</b></div><div>${escapeHtml(action.description)}</div><div class="record-sub">Estado: ${escapeHtml(action.status || '—')} · Registrado por ${escapeHtml(action.registeredBy || 'Usuario local')}</div></article>`).join('') : '<div class="empty">Este proceso aún no tiene actuaciones registradas.</div>' }
+    async function saveAction(event) {
+      event.preventDefault();
+      const record = records.find(item => item.id === actionProcessId);
+      if (!record) return;
+      const beforeSave = JSON.stringify(records);
+      const now = new Date().toISOString();
+      record.actions = record.actions || [];
+      record.actions.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        processId: record.id,
+        date: document.getElementById('actionDate').value,
+        type: document.getElementById('actionType').value,
+        title: document.getElementById('actionTitle').value.trim(),
+        description: document.getElementById('actionDescription').value.trim(),
+        status: document.getElementById('actionState').value,
+        registeredBy: currentActor(),
+        createdAt: now
+      });
+      record.updatedAt = now;
+      record.updatedBy = currentActor();
+      try {
+        await persist();
+        document.getElementById('actionForm').reset();
+        closeActions();
+      } catch (error) {
+        records = JSON.parse(beforeSave);
+        renderAll();
+        renderActionDialog();
+        alert(error.message);
+      }
+    }
     function xmlEscape(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[char])) }
     function excelCell(value, type = 'String') { return `<Cell><Data ss:Type="${type}">${xmlEscape(value)}</Data></Cell>` }
     function excelRow(values, style = '') { return `<Row${style ? ` ss:StyleID="${style}"` : ''}>${values.map(value => value && typeof value === 'object' ? excelCell(value.value, value.type) : excelCell(value)).join('')}</Row>` }
     function exportExcel() {
-      const processHeaders = [...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Actuaciones'];
-      const processRows = records.map(record => [
+      const exportRecords = applyFilters();
+      const processHeaders = ['ID proceso', ...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Modificado por', 'Cantidad de audiencias', 'Cantidad de actuaciones'];
+      const processRows = exportRecords.map(record => [
+        record.id,
         ...fields.map(field => record[field] || ''),
         record.createdAt || '',
         record.updatedAt || '',
+        record.updatedBy || '',
+        { value: (record.hearings || []).length, type: 'Number' },
         { value: (record.actions || []).length, type: 'Number' }
       ]);
-      const actionEntries = records.flatMap(record => (record.actions || []).map(action => [
-        record.shortNo || '', record.radicado || '', action.date || '', action.description || '', action.createdAt || ''
+      const actionEntries = exportRecords.flatMap(record => (record.actions || []).map(action => [
+        action.id || '', record.id, record.shortNo || '', record.radicado || '', action.date || '', action.type || '', action.title || '', action.description || '', action.status || '', action.registeredBy || '', action.createdAt || ''
       ]));
-      const actionHeaders = ['No. corto', 'Radicado', 'Fecha', 'Descripción', 'Registrada'];
-      const workbook = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#344554" ss:Pattern="Solid"/></Style></Styles><Worksheet ss:Name="Procesos"><Table>${excelRow(processHeaders, 'Header')}${processRows.map(row => excelRow(row)).join('')}</Table></Worksheet><Worksheet ss:Name="Actuaciones"><Table>${excelRow(actionHeaders, 'Header')}${actionEntries.map(row => excelRow(row)).join('')}</Table></Worksheet></Workbook>`;
+      const actionHeaders = ['ID actuación', 'ID proceso', 'No. corto', 'Radicado', 'Fecha', 'Tipo', 'Título', 'Descripción', 'Estado', 'Registrado por', 'Fecha de registro'];
+      const hearingEntries = exportRecords.flatMap(record => (record.hearings || []).map(hearing => [hearing.id || '', record.id, record.shortNo || '', record.radicado || '', hearing.type || '', hearing.number || '', hearing.date || '', hearing.observation || '']));
+      const hearingHeaders = ['ID audiencia', 'ID proceso', 'No. corto', 'Radicado', 'Tipo de audiencia', 'Sesión', 'Fecha', 'Observación'];
+      const auditEntries = exportRecords.flatMap(record => (record.audit || []).map(audit => [record.id, record.shortNo || '', audit.changedAt || '', audit.changedBy || '', (audit.changedFields || []).join(', ')]));
+      const auditHeaders = ['ID proceso', 'No. corto', 'Fecha de cambio', 'Modificado por', 'Campos modificados'];
+      const worksheet = (name, headers, data) => `<Worksheet ss:Name="${name}"><Table>${excelRow(headers, 'Header')}${data.map(row => excelRow(row)).join('')}</Table></Worksheet>`;
+      const workbook = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#344554" ss:Pattern="Solid"/></Style></Styles>${worksheet('Procesos', processHeaders, processRows)}${worksheet('Audiencias', hearingHeaders, hearingEntries)}${worksheet('Actuaciones', actionHeaders, actionEntries)}${worksheet('Auditoria', auditHeaders, auditEntries)}</Workbook>`;
       const blob = new Blob(['\uFEFF', workbook], { type: 'application/vnd.ms-excel;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -1561,7 +1786,8 @@
       window.print();
     }
     async function clearData() { if (!confirm('Esta acción elimina todos los registros guardados en este navegador. ¿Continuar?')) return; records = []; try { await persist() } catch (error) { alert(error.message) } }
-    const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
+    load();
+const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
     function showAuthFailure(message) {
       document.getElementById('authTitle').textContent = 'Acceso no disponible';
       document.getElementById('authMessage').textContent = message;
@@ -1571,6 +1797,7 @@
       document.getElementById('authRetry').classList.remove('hidden');
     }
     function showLogin(message) {
+      window.currentAuthenticatedUser = null;
       document.getElementById('authTitle').textContent = 'Ingresa tu correo';
       document.getElementById('authMessage').textContent = message || 'Te enviaremos un código para verificar tu dirección y autorizar el acceso.';
       document.getElementById('authRetry').classList.add('hidden');
@@ -1584,8 +1811,10 @@
       document.getElementById('logoutButton').disabled = false;
     }
     function enterApp(user) {
+      window.currentAuthenticatedUser = user;
       document.getElementById('userName').textContent = user.nombre || user.correo;
       document.getElementById('userRole').textContent = user.rol === 'ADMINISTRADOR' ? 'Administrador' : 'Colaborador';
+      document.querySelectorAll('[data-admin-only]').forEach(element => element.classList.toggle('hidden', user.rol !== 'ADMINISTRADOR'));
       document.getElementById('userIdentity').classList.remove('hidden');
       document.getElementById('logoutButton').classList.remove('hidden');
       document.body.classList.remove('auth-pending');
@@ -1729,6 +1958,11 @@
         .verificarSesionAcceso(token);
     }
     startApp();
+
+
+
+
+
 </script>
 </body>
 

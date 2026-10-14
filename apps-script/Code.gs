@@ -284,3 +284,377 @@ function findAuthorizedUser_(spreadsheet, sheetName, correo, role) {
 
   return null;
 }
+
+const DATA_SHEETS = {
+  processes: { name: 'PROCESOS', headers: ['ID_PROCESO', 'RADICADO', 'DATA_JSON', 'FECHA_CREACION', 'FECHA_ACTUALIZACION', 'MODIFICADO_POR'] },
+  hearings: { name: 'AUDIENCIAS', headers: ['ID_AUDIENCIA', 'ID_PROCESO', 'TIPO_AUDIENCIA', 'NUMERO_SESION', 'FECHA', 'OBSERVACION'] },
+  actions: { name: 'ACTUACIONES', headers: ['ID_ACTUACION', 'ID_PROCESO', 'FECHA_ACTUACION', 'TIPO_ACTUACION', 'TITULO', 'DESCRIPCION', 'ESTADO', 'REGISTRADO_POR', 'FECHA_REGISTRO'] },
+  audits: { name: 'AUDITORIA_PROCESOS', headers: ['ID_AUDITORIA', 'ID_PROCESO', 'FECHA_CAMBIO', 'MODIFICADO_POR', 'CAMPOS_CAMBIADOS'] },
+  catalogs: { name: 'CATALOGOS', headers: ['CATEGORIA', 'VALOR', 'ACTIVO', 'ACTUALIZADO_POR', 'FECHA_ACTUALIZACION'] }
+};
+
+const ALLOWED_CATALOGS = ['lawyer', 'lawyerLinkType', 'type', 'cause', 'hearingType', 'terminationForm'];
+
+function loadCatalogs(sessionToken) {
+  requireApplicationUser_(sessionToken);
+  const spreadsheet = getDataSpreadsheet_();
+  ensureDataSheet_(spreadsheet, DATA_SHEETS.catalogs);
+  return readDataRows_(spreadsheet, DATA_SHEETS.catalogs)
+    .filter(row => String(row[2]).toUpperCase() === 'SI')
+    .reduce((catalogs, row) => {
+      const category = String(row[0]);
+      catalogs[category] = catalogs[category] || [];
+      catalogs[category].push(String(row[1]));
+      return catalogs;
+    }, {});
+}
+
+function saveCatalogs(sessionToken, category, values) {
+  const user = requireApplicationUser_(sessionToken);
+  if (user.rol !== 'ADMINISTRADOR') throw new Error('Solo los administradores pueden gestionar catálogos.');
+  if (ALLOWED_CATALOGS.indexOf(category) < 0 || !Array.isArray(values) || values.length > 500) {
+    throw new Error('La categoría o la lista de valores del catálogo no es válida.');
+  }
+  const cleaned = [...new Set(values.map(value => String(value || '').trim()).filter(Boolean))];
+  if (cleaned.some(value => value.length > 150)) throw new Error('Cada valor de catálogo debe tener 150 caracteres o menos.');
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const spreadsheet = getDataSpreadsheet_();
+    const sheet = ensureDataSheet_(spreadsheet, DATA_SHEETS.catalogs);
+    const rows = readDataRows_(spreadsheet, DATA_SHEETS.catalogs);
+    rows.forEach((row, index) => {
+      if (String(row[0]) === category && String(row[2]).toUpperCase() === 'SI') {
+        sheet.getRange(index + 2, 3, 1, 3).setValues([['NO', user.correo, new Date().toISOString()]]);
+      }
+    });
+    const activeValues = new Set(rows.filter(row => String(row[0]) === category).map(row => String(row[1])));
+    cleaned.forEach(value => {
+      const matchingRow = rows.findIndex(row => String(row[0]) === category && String(row[1]) === value);
+      if (matchingRow >= 0) {
+        sheet.getRange(matchingRow + 2, 3, 1, 3).setValues([['SI', user.correo, new Date().toISOString()]]);
+      } else if (!activeValues.has(value)) {
+        sheet.appendRow([category, safeSheetText_(value), 'SI', user.correo, new Date().toISOString()]);
+      }
+    });
+    return loadCatalogs(sessionToken);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+const COLLABORATOR_PROCESS_FIELDS = [
+  'stage', 'notificationDate', 'cautelar', 'measureResponseDate',
+  'maxDemandResponseDate', 'demandResponseDate', 'anticipatedJudgment',
+  'closingArgumentsDate', 'firstInstanceDecisionDate',
+  'firstInstanceDecisionSense', 'appealStatus', 'appealDate',
+  'appealGrantedOrderDate', 'appealAdmittedOrderDate',
+  'secondInstanceDecisionDate', 'secondInstanceDecisionSense',
+  'secondInstanceDecision', 'secondCourt', 'notes'
+];
+const ISO_DATE_FIELDS = [
+  'endDate', 'notificationDate', 'measureResponseDate', 'maxDemandResponseDate',
+  'demandResponseDate', 'closingArgumentsDate', 'firstInstanceDecisionDate',
+  'appealDate', 'appealGrantedOrderDate', 'appealAdmittedOrderDate',
+  'secondInstanceDecisionDate'
+];
+
+function loadApplicationData(sessionToken) {
+  const user = requireApplicationUser_(sessionToken);
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const spreadsheet = getDataSpreadsheet_();
+    const processes = readDataRows_(spreadsheet, DATA_SHEETS.processes).map(row => {
+    let process;
+    try {
+      process = JSON.parse(row[2]);
+    } catch (error) {
+      throw new Error('El proceso ' + row[0] + ' contiene JSON inválido en PROCESOS.');
+    }
+    process.notificationYear = String(process.notificationDate || '').slice(0, 4);
+    return process;
+    });
+    const permittedProcesses = user.rol === 'ADMINISTRADOR'
+      ? processes
+      : processes.filter(process => normalizeEmail_(process.assignedEmail) === user.correo);
+    const permittedIds = new Set(permittedProcesses.map(process => String(process.id)));
+    const hearings = readDataRows_(spreadsheet, DATA_SHEETS.hearings)
+      .filter(row => permittedIds.has(String(row[1])))
+      .map(row => ({ id: row[0], processId: row[1], type: row[2], number: Number(row[3]), date: row[4], observation: row[5] }));
+    const actions = readDataRows_(spreadsheet, DATA_SHEETS.actions)
+      .filter(row => permittedIds.has(String(row[1])))
+      .map(row => ({ id: row[0], processId: row[1], date: row[2], type: row[3], title: row[4], description: row[5], status: row[6], registeredBy: row[7], createdAt: row[8] }));
+    const audits = readDataRows_(spreadsheet, DATA_SHEETS.audits)
+      .filter(row => permittedIds.has(String(row[1])))
+      .map(row => ({ id: row[0], processId: row[1], changedAt: row[2], changedBy: row[3], changedFields: String(row[4] || '').split('|').filter(Boolean) }));
+
+    return permittedProcesses.map(process => ({
+      ...process,
+      hearings: hearings.filter(item => item.processId === process.id),
+      actions: actions.filter(item => item.processId === process.id),
+      audit: audits.filter(item => item.processId === process.id)
+    }));
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function saveApplicationData(sessionToken, submittedRecords) {
+  const user = requireApplicationUser_(sessionToken);
+  if (!Array.isArray(submittedRecords) || submittedRecords.length > 5000) {
+    throw new Error('La lista de procesos tiene un formato inválido o excede el máximo permitido.');
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const spreadsheet = getDataSpreadsheet_();
+    const sheets = {};
+    Object.keys(DATA_SHEETS).forEach(key => sheets[key] = ensureDataSheet_(spreadsheet, DATA_SHEETS[key]));
+    const existingRows = readDataRows_(spreadsheet, DATA_SHEETS.processes);
+    const existing = new Map(existingRows.map(row => [String(row[0]), JSON.parse(row[2])]));
+    readDataRows_(spreadsheet, DATA_SHEETS.hearings).forEach(row => {
+      const process = existing.get(String(row[1]));
+      if (process) {
+        process.hearings = process.hearings || [];
+        process.hearings.push({ id: row[0], processId: row[1], type: row[2], number: Number(row[3]), date: row[4], observation: row[5] });
+      }
+    });
+    readDataRows_(spreadsheet, DATA_SHEETS.actions).forEach(row => {
+      const process = existing.get(String(row[1]));
+      if (process) {
+        process.actions = process.actions || [];
+        process.actions.push({ id: row[0], processId: row[1], date: row[2], type: row[3], title: row[4], description: row[5], status: row[6], registeredBy: row[7], createdAt: row[8] });
+      }
+    });
+    const submittedIds = new Set();
+    const allRadicados = new Map();
+    const existingRadicados = new Map();
+    existing.forEach((process, id) => {
+      const radicado = String(process.radicado || '');
+      if (radicado) existingRadicados.set(radicado, id);
+    });
+
+    submittedRecords.forEach(process => {
+      if (!process || !process.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(process.id)) || submittedIds.has(String(process.id))) {
+        throw new Error('Cada proceso debe tener un identificador único.');
+      }
+      submittedIds.add(String(process.id));
+      ISO_DATE_FIELDS.forEach(field => {
+        if (process[field] && !isValidIsoDate_(process[field])) {
+          throw new Error('La fecha del campo ' + field + ' no tiene formato válido.');
+        }
+      });
+      const radicado = String(process.radicado || '').trim();
+      if (radicado && !/^\d{23}$/.test(radicado)) {
+        throw new Error('El radicado del proceso ' + process.id + ' debe contener exactamente 23 dígitos.');
+      }
+      if (radicado && allRadicados.has(radicado)) {
+        throw new Error('El radicado ' + radicado + ' está repetido.');
+      }
+      const existingOwner = existingRadicados.get(radicado);
+      if (radicado && existingOwner && existingOwner !== String(process.id)) {
+        throw new Error('El radicado ' + radicado + ' ya está asignado a otro proceso.');
+      }
+      if (radicado) allRadicados.set(radicado, String(process.id));
+
+      const previous = existing.get(String(process.id));
+      if (user.rol !== 'ADMINISTRADOR') {
+        if (!previous || normalizeEmail_(previous.assignedEmail) !== user.correo) {
+          throw new Error('Solo puedes modificar procesos asignados a tu correo.');
+        }
+        const changedFields = Object.keys(process).filter(key =>
+          !['actions', 'hearings', 'audit', 'createdAt', 'updatedAt', 'updatedBy', 'notificationYear'].includes(key) &&
+          JSON.stringify(process[key]) !== JSON.stringify(previous[key])
+        );
+        const forbidden = changedFields.filter(key => COLLABORATOR_PROCESS_FIELDS.indexOf(key) < 0);
+        if (forbidden.length) {
+          throw new Error('No tienes permiso para modificar estos campos: ' + forbidden.join(', '));
+        }
+        assertAppendOnly_(previous.actions || [], process.actions || [], 'actuaciones');
+        assertAppendOnly_(previous.hearings || [], process.hearings || [], 'audiencias');
+      }
+    });
+
+    if (user.rol !== 'ADMINISTRADOR') {
+      existing.forEach((process, id) => {
+        if (normalizeEmail_(process.assignedEmail) === user.correo && !submittedIds.has(id)) {
+          throw new Error('No se permite eliminar procesos desde el perfil colaborador.');
+        }
+      });
+    }
+
+    submittedRecords.forEach(process => {
+      const previous = existing.get(String(process.id));
+      const now = new Date().toISOString();
+      const changedFields = previous
+        ? Object.keys(process).filter(key =>
+          !['actions', 'hearings', 'audit', 'createdAt', 'updatedAt', 'updatedBy', 'notificationYear'].includes(key) &&
+          JSON.stringify(process[key]) !== JSON.stringify(previous[key]))
+        : [];
+      if (previous && (process.hearings || []).length > (previous.hearings || []).length) changedFields.push('hearings');
+      if (previous && (process.actions || []).length > (previous.actions || []).length) changedFields.push('actions');
+      const saved = {
+        ...process,
+        createdAt: (previous && previous.createdAt) || now,
+        updatedAt: now,
+        updatedBy: user.correo
+      };
+      const processData = { ...saved };
+      delete processData.actions;
+      delete processData.hearings;
+      delete processData.audit;
+      delete processData.notificationYear;
+      const processRow = upsertSheetRow_(sheets.processes, DATA_SHEETS.processes.headers, process.id, [
+        String(process.id), String(process.radicado || ''), JSON.stringify(processData),
+        saved.createdAt, saved.updatedAt, user.correo
+      ]);
+      sheets.processes.getRange(processRow, 2).setNumberFormat('@');
+      sheets.processes.getRange(processRow, 2).setValue(String(process.radicado || ''));
+
+      (process.hearings || []).forEach(hearing => {
+        if (!hearing.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(hearing.id)) || !isValidIsoDate_(hearing.date)) throw new Error('Cada audiencia requiere un identificador válido y una fecha válida.');
+        upsertSheetRow_(sheets.hearings, DATA_SHEETS.hearings.headers, hearing.id, [
+          String(hearing.id), String(process.id), safeSheetText_(hearing.type || ''),
+          Number(hearing.number) || 1, String(hearing.date), safeSheetText_(hearing.observation || '')
+        ]);
+      });
+      (process.actions || []).forEach(action => {
+        if (!action.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(action.id)) || !isValidIsoDate_(action.date) || !action.title || !action.description) {
+          throw new Error('Cada actuación requiere identificador, fecha, título y descripción.');
+        }
+        upsertSheetRow_(sheets.actions, DATA_SHEETS.actions.headers, action.id, [
+          String(action.id), String(process.id), String(action.date), safeSheetText_(action.type || ''),
+          safeSheetText_(action.title), safeSheetText_(action.description), safeSheetText_(action.status || ''),
+          user.correo, String(action.createdAt || now)
+        ]);
+      });
+      if (changedFields.length) {
+        const auditId = Utilities.getUuid();
+        upsertSheetRow_(sheets.audits, DATA_SHEETS.audits.headers, auditId, [
+          auditId, String(process.id), now, user.correo, changedFields.join('|')
+        ]);
+      }
+    });
+
+    return { saved: true, count: submittedRecords.length };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function deleteApplicationProcess(sessionToken, processId) {
+  const user = requireApplicationUser_(sessionToken);
+  if (user.rol !== 'ADMINISTRADOR') throw new Error('Solo los administradores pueden eliminar procesos.');
+  const id = String(processId || '');
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(id)) throw new Error('El identificador del proceso no es válido.');
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const spreadsheet = getDataSpreadsheet_();
+    const processSheet = ensureDataSheet_(spreadsheet, DATA_SHEETS.processes);
+    const processRows = readDataRows_(spreadsheet, DATA_SHEETS.processes);
+    const processIndex = processRows.findIndex(row => String(row[0]) === id);
+    if (processIndex < 0) throw new Error('No se encontró el proceso que intentas eliminar.');
+    processSheet.deleteRow(processIndex + 2);
+
+    ['hearings', 'actions', 'audits'].forEach(key => {
+      const sheet = ensureDataSheet_(spreadsheet, DATA_SHEETS[key]);
+      const rows = readDataRows_(spreadsheet, DATA_SHEETS[key]);
+      for (let index = rows.length - 1; index >= 0; index--) {
+        if (String(rows[index][1]) === id) sheet.deleteRow(index + 2);
+      }
+    });
+    return { deleted: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function requireApplicationUser_(sessionToken) {
+  const token = String(sessionToken || '');
+  if (!/^[A-Fa-f0-9]{64}$/.test(token)) throw new Error('Se requiere una sesión válida para esta operación.');
+  const correo = CacheService.getScriptCache().get(getCacheKey_('AUTH_SESSION_', token));
+  if (!correo) throw new Error('La sesión venció. Ingresa nuevamente.');
+  const user = findAuthorizedUserByEmail_(correo);
+  if (!user || ['ADMINISTRADOR', 'COLABORADOR'].indexOf(user.rol) < 0) {
+    throw new Error('No tienes autorización para esta operación.');
+  }
+  return { correo: normalizeEmail_(correo), rol: user.rol };
+}
+
+function getDataSpreadsheet_() {
+  const spreadsheetId = PropertiesService.getScriptProperties().getProperty(AUTH_CONFIG.spreadsheetIdProperty);
+  if (!spreadsheetId) throw new Error('Falta configurar AUTH_SPREADSHEET_ID.');
+  return SpreadsheetApp.openById(spreadsheetId);
+}
+
+function ensureDataSheet_(spreadsheet, config) {
+  let sheet = spreadsheet.getSheetByName(config.name);
+  if (!sheet) sheet = spreadsheet.insertSheet(config.name);
+  const headerRange = sheet.getRange(1, 1, 1, config.headers.length);
+  const current = headerRange.getDisplayValues()[0];
+  if (current.every(value => !value)) {
+    headerRange.setValues([config.headers]);
+  } else if (config.headers.some((header, index) => current[index] !== header)) {
+    throw new Error('Los encabezados de la hoja "' + config.name + '" no coinciden con el modelo requerido.');
+  }
+  return sheet;
+}
+
+function readDataRows_(spreadsheet, config) {
+  const sheet = ensureDataSheet_(spreadsheet, config);
+  const lastRow = sheet.getLastRow();
+  return lastRow < 2 ? [] : sheet.getRange(2, 1, lastRow - 1, config.headers.length).getDisplayValues();
+}
+
+function upsertSheetRow_(sheet, headers, id, values) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow >= 2) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getDisplayValues();
+    const index = ids.findIndex(row => String(row[0]) === String(id));
+    if (index >= 0) {
+      const oldValues = sheet.getRange(index + 2, 1, 1, headers.length).getDisplayValues()[0];
+      if (sheet.getName() === DATA_SHEETS.hearings.name || sheet.getName() === DATA_SHEETS.actions.name) {
+        if (JSON.stringify(oldValues.map(sheetComparisonValue_)) !== JSON.stringify(values.map(sheetComparisonValue_))) throw new Error('No se permite reemplazar un registro de historial existente.');
+      } else {
+        sheet.getRange(index + 2, 1, 1, headers.length).setValues([values]);
+      }
+      return index + 2;
+    }
+  }
+  sheet.appendRow(values);
+  return sheet.getLastRow();
+}
+
+function assertAppendOnly_(oldEntries, newEntries, label) {
+  const canonical = entry => {
+    const copy = { ...entry };
+    delete copy.processId;
+    return JSON.stringify(copy);
+  };
+  const nextById = new Map(newEntries.map(entry => [String(entry.id), canonical(entry)]));
+  oldEntries.forEach(entry => {
+    if (!nextById.has(String(entry.id)) || nextById.get(String(entry.id)) !== canonical(entry)) {
+      throw new Error('El historial de ' + label + ' no se puede borrar ni reemplazar.');
+    }
+
+    function isValidIsoDate_(value) {
+      const text = String(value || '');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return false;
+      const date = new Date(text + 'T00:00:00Z');
+      return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === text;
+    }
+
+    function safeSheetText_(value) {
+      const text = String(value || '');
+      return /^[\s]*[=+\-@]/.test(text) ? "'" + text : text;
+    }
+
+    function sheetComparisonValue_(value) {
+      return String(value).replace(/^'(?=[\s]*[=+\-@])/, '');
+    }
+  });
+}

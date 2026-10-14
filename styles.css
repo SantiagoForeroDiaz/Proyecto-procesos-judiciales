@@ -24,6 +24,82 @@
       font: 14px/1.5 Inter, Segoe UI, Arial, sans-serif
     }
 
+    body.auth-pending {
+      overflow: hidden
+    }
+
+    body.auth-pending .app {
+      display: none
+    }
+
+    .auth-screen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--bg)
+    }
+
+    .auth-card {
+      width: min(100%, 430px);
+      padding: 38px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 24px 70px rgba(26, 39, 51, .12);
+      text-align: center
+    }
+
+    .auth-mark {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 18px;
+      place-items: center;
+      border-radius: 15px;
+      background: var(--soft);
+      color: var(--accent2);
+      font-weight: 800
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+      text-align: left
+    }
+
+    .auth-form button {
+      width: 100%
+    }
+
+    .auth-spinner {
+      width: 25px;
+      height: 25px;
+      margin: 22px auto 0;
+      border: 3px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: auth-spin .8s linear infinite
+    }
+
+    @keyframes auth-spin {
+      to { transform: rotate(360deg) }
+    }
+
+    .user-identity {
+      display: grid;
+      gap: 2px;
+      color: var(--muted);
+      font-size: 11px
+    }
+
+    .user-identity strong {
+      color: var(--text);
+      font-size: 12px
+    }
+
     button,
     input,
     select,
@@ -148,7 +224,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 20px
     }
@@ -395,8 +471,32 @@
       flex-wrap: wrap
     }
 
+    .filters select {
+      min-width: 145px
+    }
+
     .toolbar input {
       min-width: 210px
+    }
+
+    .dashboard-filter-panel #dashboardSearch {
+      width: min(100%, 320px);
+      min-width: 0
+    }
+
+    .dashboard-filter-panel .filters select {
+      flex: 1 1 175px;
+      max-width: 220px
+    }
+
+    #processes #search {
+      width: min(100%, 320px);
+      min-width: 0
+    }
+
+    #processes .filters select {
+      flex: 1 1 175px;
+      max-width: 220px
     }
 
     .field-grid {
@@ -606,6 +706,13 @@
       color: #855b2f;
       font-size: 12px;
       margin-bottom: 14px
+    }
+
+    .deadline-alert {
+      margin-top: 5px;
+      color: #9a3e25;
+      font-size: 11px;
+      font-weight: 650
     }
 
     .actions-list {
@@ -847,7 +954,7 @@
 
     .action-form {
       display: grid;
-      grid-template-columns: 150px minmax(170px, 1fr) 170px auto;
+      grid-template-columns: 150px 180px minmax(170px, 1fr) minmax(170px, 1fr);
       gap: 8px;
       align-items: end
     }
