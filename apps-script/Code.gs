@@ -288,12 +288,12 @@ function findAuthorizedUser_(spreadsheet, sheetName, correo, role) {
 const DATA_SHEETS = {
   processes: { name: 'PROCESOS', headers: ['ID_PROCESO', 'RADICADO', 'DATA_JSON', 'FECHA_CREACION', 'FECHA_ACTUALIZACION', 'MODIFICADO_POR'] },
   hearings: { name: 'AUDIENCIAS', headers: ['ID_AUDIENCIA', 'ID_PROCESO', 'TIPO_AUDIENCIA', 'NUMERO_SESION', 'FECHA', 'OBSERVACION'] },
-  actions: { name: 'ACTUACIONES', headers: ['ID_ACTUACION', 'ID_PROCESO', 'FECHA_ACTUACION', 'TIPO_ACTUACION', 'TITULO', 'DESCRIPCION', 'ESTADO', 'REGISTRADO_POR', 'FECHA_REGISTRO'] },
+  actions: { name: 'ACTUACIONES', headers: ['ID_ACTUACION', 'ID_PROCESO', 'FECHA_ACTUACION', 'TIPO_ACTUACION', 'TITULO', 'DESCRIPCION', 'ESTADO', 'REGISTRADO_POR', 'FECHA_REGISTRO', 'FECHA_VENCIMIENTO'] },
   audits: { name: 'AUDITORIA_PROCESOS', headers: ['ID_AUDITORIA', 'ID_PROCESO', 'FECHA_CAMBIO', 'MODIFICADO_POR', 'CAMPOS_CAMBIADOS'] },
   catalogs: { name: 'CATALOGOS', headers: ['CATEGORIA', 'VALOR', 'ACTIVO', 'ACTUALIZADO_POR', 'FECHA_ACTUALIZACION'] }
 };
 
-const ALLOWED_CATALOGS = ['lawyer', 'lawyerLinkType', 'type', 'cause', 'hearingType', 'terminationForm'];
+const ALLOWED_CATALOGS = ['lawyer', 'lawyerLinkType', 'type', 'cause', 'stage', 'state', 'area', 'hearingType', 'terminationForm'];
 
 function loadCatalogs(sessionToken) {
   requireApplicationUser_(sessionToken);
@@ -344,21 +344,38 @@ function saveCatalogs(sessionToken, category, values) {
   }
 }
 
-const COLLABORATOR_PROCESS_FIELDS = [
-  'stage', 'notificationDate', 'cautelar', 'measureResponseDate',
-  'maxDemandResponseDate', 'demandResponseDate', 'anticipatedJudgment',
-  'closingArgumentsDate', 'firstInstanceDecisionDate',
-  'firstInstanceDecisionSense', 'appealStatus', 'appealDate',
-  'appealGrantedOrderDate', 'appealAdmittedOrderDate',
-  'secondInstanceDecisionDate', 'secondInstanceDecisionSense',
-  'secondInstanceDecision', 'secondCourt', 'notes'
-];
 const ISO_DATE_FIELDS = [
   'endDate', 'notificationDate', 'measureResponseDate', 'maxDemandResponseDate',
   'demandResponseDate', 'closingArgumentsDate', 'firstInstanceDecisionDate',
   'appealDate', 'appealGrantedOrderDate', 'appealAdmittedOrderDate',
-  'secondInstanceDecisionDate'
+  'secondInstanceDecisionDate', 'maxMeasureResponseDate',
+  'maxClosingArgumentsDate', 'maxAppealDate', 'maxAppealAnnouncementDate',
+  'committeePronouncementDate'
 ];
+const ADMIN_REQUIRED_PROCESS_FIELDS = [
+  'shortNo', 'radicado', 'currentRadicado', 'ids', 'claimant', 'defendant',
+  'lawyer', 'quality', 'represents', 'type', 'instance', 'court',
+  'cautelar', 'notificationDate'
+];
+const COLLABORATOR_REQUIRED_PROCESS_FIELDS = [
+  'shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids',
+  'claimantId', 'claimant', 'defendant', 'area', 'lawyer', 'quality',
+  'lawyerLinkType', 'represents', 'instance', 'type', 'court', 'cause',
+  'stage', 'state', 'endDate', 'terminationForm', 'terminationInstance',
+  'terminationNotes', 'claim', 'amount', 'appealAmount', 'cautelar',
+  'notificationDate', 'maxMeasureResponseDate', 'measureResponseDate',
+  'maxDemandResponseDate', 'demandResponseDate', 'committeePronouncementDate',
+  'committeeSessionNumber', 'committeeNotes', 'anticipatedJudgment', 'evidence',
+  'maxClosingArgumentsDate', 'closingArgumentsDate', 'firstInstanceDecisionDate',
+  'firstInstanceDecisionSense', 'appealStatus', 'maxAppealDate', 'appealDate',
+  'maxAppealAnnouncementDate', 'notes'
+];
+const COLLABORATOR_EDITABLE_PROCESS_FIELDS = new Set([
+  ...COLLABORATOR_REQUIRED_PROCESS_FIELDS,
+  'secondCourt', 'appealGrantedOrderDate', 'appealAdmittedOrderDate',
+  'secondInstanceDecisionDate', 'secondInstanceDecisionSense',
+  'secondInstanceDecision'
+]);
 
 function loadApplicationData(sessionToken) {
   const user = requireApplicationUser_(sessionToken);
@@ -376,16 +393,14 @@ function loadApplicationData(sessionToken) {
     process.notificationYear = String(process.notificationDate || '').slice(0, 4);
     return process;
     });
-    const permittedProcesses = user.rol === 'ADMINISTRADOR'
-      ? processes
-      : processes.filter(process => normalizeEmail_(process.assignedEmail) === user.correo);
+    const permittedProcesses = processes;
     const permittedIds = new Set(permittedProcesses.map(process => String(process.id)));
     const hearings = readDataRows_(spreadsheet, DATA_SHEETS.hearings)
       .filter(row => permittedIds.has(String(row[1])))
       .map(row => ({ id: row[0], processId: row[1], type: row[2], number: Number(row[3]), date: row[4], observation: row[5] }));
     const actions = readDataRows_(spreadsheet, DATA_SHEETS.actions)
       .filter(row => permittedIds.has(String(row[1])))
-      .map(row => ({ id: row[0], processId: row[1], date: row[2], type: row[3], title: row[4], description: row[5], status: row[6], registeredBy: row[7], createdAt: row[8] }));
+      .map(row => ({ id: row[0], processId: row[1], date: row[2], type: row[3], title: row[4], description: row[5], status: row[6], registeredBy: row[7], createdAt: row[8], dueDate: row[9] }));
     const audits = readDataRows_(spreadsheet, DATA_SHEETS.audits)
       .filter(row => permittedIds.has(String(row[1])))
       .map(row => ({ id: row[0], processId: row[1], changedAt: row[2], changedBy: row[3], changedFields: String(row[4] || '').split('|').filter(Boolean) }));
@@ -426,9 +441,12 @@ function saveApplicationData(sessionToken, submittedRecords) {
       const process = existing.get(String(row[1]));
       if (process) {
         process.actions = process.actions || [];
-        process.actions.push({ id: row[0], processId: row[1], date: row[2], type: row[3], title: row[4], description: row[5], status: row[6], registeredBy: row[7], createdAt: row[8] });
+        process.actions.push({ id: row[0], processId: row[1], date: row[2], type: row[3], title: row[4], description: row[5], status: row[6], registeredBy: row[7], createdAt: row[8], dueDate: row[9] });
       }
     });
+    const existingActionIds = new Set([...existing.values()].flatMap(process =>
+      (process.actions || []).map(action => String(action.id))
+    ));
     const submittedIds = new Set();
     const allRadicados = new Map();
     const existingRadicados = new Map();
@@ -447,6 +465,21 @@ function saveApplicationData(sessionToken, submittedRecords) {
           throw new Error('La fecha del campo ' + field + ' no tiene formato válido.');
         }
       });
+      if (process.appealAmount && process.amount && Number(process.appealAmount) < Number(process.amount)) {
+        throw new Error('La pretensión del recurso no puede ser menor que la pretensión de primera instancia.');
+      }
+      const processMilestoneDates = [
+        process.notificationDate, process.measureResponseDate, process.demandResponseDate,
+        process.committeePronouncementDate, process.closingArgumentsDate,
+        process.firstInstanceDecisionDate, process.appealDate,
+        process.appealGrantedOrderDate, process.appealAdmittedOrderDate,
+        process.secondInstanceDecisionDate,
+        ...(process.hearings || []).map(hearing => hearing.date),
+        ...(process.actions || []).map(action => action.date)
+      ].filter(Boolean);
+      if (process.endDate && processMilestoneDates.some(date => process.endDate < date)) {
+        throw new Error('La fecha de terminación no puede ser anterior a las fechas registradas del proceso.');
+      }
       const radicado = String(process.radicado || '').trim();
       if (radicado && !/^\d{23}$/.test(radicado)) {
         throw new Error('El radicado del proceso ' + process.id + ' debe contener exactamente 23 dígitos.');
@@ -461,26 +494,40 @@ function saveApplicationData(sessionToken, submittedRecords) {
       if (radicado) allRadicados.set(radicado, String(process.id));
 
       const previous = existing.get(String(process.id));
-      if (user.rol !== 'ADMINISTRADOR') {
-        if (!previous || normalizeEmail_(previous.assignedEmail) !== user.correo) {
-          throw new Error('Solo puedes modificar procesos asignados a tu correo.');
+      const changedProcessFields = Object.keys(process).filter(key =>
+        !['actions', 'hearings', 'audit', 'createdAt', 'updatedAt', 'updatedBy', 'notificationYear'].includes(key) &&
+        JSON.stringify(process[key] ?? '') !== JSON.stringify(previous?.[key] ?? '')
+      );
+      if (!previous || changedProcessFields.length) {
+        let requiredFields = user.rol === 'ADMINISTRADOR'
+          ? ADMIN_REQUIRED_PROCESS_FIELDS
+          : COLLABORATOR_REQUIRED_PROCESS_FIELDS;
+        if (user.rol !== 'ADMINISTRADOR') {
+          if (process.state !== 'Terminado') requiredFields = requiredFields.filter(field => field !== 'endDate');
+          if (process.cautelar === 'No') requiredFields = requiredFields.filter(field => !['maxMeasureResponseDate', 'measureResponseDate'].includes(field));
+          if (process.anticipatedJudgment === 'Sí') requiredFields = requiredFields.filter(field => !['evidence', 'maxClosingArgumentsDate', 'closingArgumentsDate'].includes(field));
+          if (process.appealStatus === 'No presentado') requiredFields = requiredFields.filter(field => !['appealAmount', 'maxAppealDate', 'appealDate'].includes(field));
         }
-        const changedFields = Object.keys(process).filter(key =>
-          !['actions', 'hearings', 'audit', 'createdAt', 'updatedAt', 'updatedBy', 'notificationYear'].includes(key) &&
-          JSON.stringify(process[key]) !== JSON.stringify(previous[key])
-        );
-        const forbidden = changedFields.filter(key => COLLABORATOR_PROCESS_FIELDS.indexOf(key) < 0);
-        if (forbidden.length) {
-          throw new Error('No tienes permiso para modificar estos campos: ' + forbidden.join(', '));
+        const missingField = requiredFields.find(field => !String(process[field] ?? '').trim());
+        if (missingField) throw new Error('El campo obligatorio "' + missingField + '" está vacío en el proceso ' + process.id + '.');
+      }
+      if (user.rol !== 'ADMINISTRADOR') {
+        if (!previous) throw new Error('Los colaboradores solo pueden modificar procesos existentes.');
+        if (normalizeEmail_(process.assignedEmail) !== normalizeEmail_(previous.assignedEmail)) {
+          throw new Error('Los colaboradores no pueden cambiar la asignación administrativa de un proceso.');
+        }
+        const forbiddenFields = changedProcessFields.filter(field => !COLLABORATOR_EDITABLE_PROCESS_FIELDS.has(field));
+        if (forbiddenFields.length) {
+          throw new Error('No tienes permiso para modificar estos campos: ' + forbiddenFields.join(', '));
         }
         assertAppendOnly_(previous.actions || [], process.actions || [], 'actuaciones');
-        assertAppendOnly_(previous.hearings || [], process.hearings || [], 'audiencias');
+        assertAppendOnly_(previous.hearings || [], process.hearings || [], 'diligencias');
       }
     });
 
     if (user.rol !== 'ADMINISTRADOR') {
       existing.forEach((process, id) => {
-        if (normalizeEmail_(process.assignedEmail) === user.correo && !submittedIds.has(id)) {
+        if (!submittedIds.has(id)) {
           throw new Error('No se permite eliminar procesos desde el perfil colaborador.');
         }
       });
@@ -492,7 +539,7 @@ function saveApplicationData(sessionToken, submittedRecords) {
       const changedFields = previous
         ? Object.keys(process).filter(key =>
           !['actions', 'hearings', 'audit', 'createdAt', 'updatedAt', 'updatedBy', 'notificationYear'].includes(key) &&
-          JSON.stringify(process[key]) !== JSON.stringify(previous[key]))
+          JSON.stringify(process[key] ?? '') !== JSON.stringify(previous[key] ?? ''))
         : [];
       if (previous && (process.hearings || []).length > (previous.hearings || []).length) changedFields.push('hearings');
       if (previous && (process.actions || []).length > (previous.actions || []).length) changedFields.push('actions');
@@ -515,20 +562,20 @@ function saveApplicationData(sessionToken, submittedRecords) {
       sheets.processes.getRange(processRow, 2).setValue(String(process.radicado || ''));
 
       (process.hearings || []).forEach(hearing => {
-        if (!hearing.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(hearing.id)) || !isValidIsoDate_(hearing.date)) throw new Error('Cada audiencia requiere un identificador válido y una fecha válida.');
+        if (!hearing.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(hearing.id)) || !isValidIsoDate_(hearing.date)) throw new Error('Cada diligencia requiere un identificador válido y una fecha válida.');
         upsertSheetRow_(sheets.hearings, DATA_SHEETS.hearings.headers, hearing.id, [
           String(hearing.id), String(process.id), safeSheetText_(hearing.type || ''),
           Number(hearing.number) || 1, String(hearing.date), safeSheetText_(hearing.observation || '')
         ]);
       });
       (process.actions || []).forEach(action => {
-        if (!action.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(action.id)) || !isValidIsoDate_(action.date) || !action.title || !action.description) {
-          throw new Error('Cada actuación requiere identificador, fecha, título y descripción.');
+        if (!action.id || !/^[A-Za-z0-9_-]{1,128}$/.test(String(action.id)) || !isValidIsoDate_(action.date) || (!existingActionIds.has(String(action.id)) && !isValidIsoDate_(action.dueDate)) || (action.dueDate && !isValidIsoDate_(action.dueDate)) || !action.title || !action.description) {
+          throw new Error('Cada actuación requiere identificador, fecha, fecha de vencimiento, título y descripción.');
         }
         upsertSheetRow_(sheets.actions, DATA_SHEETS.actions.headers, action.id, [
           String(action.id), String(process.id), String(action.date), safeSheetText_(action.type || ''),
           safeSheetText_(action.title), safeSheetText_(action.description), safeSheetText_(action.status || ''),
-          user.correo, String(action.createdAt || now)
+          user.correo, String(action.createdAt || now), String(action.dueDate)
         ]);
       });
       if (changedFields.length) {
@@ -582,7 +629,7 @@ function requireApplicationUser_(sessionToken) {
   if (!user || ['ADMINISTRADOR', 'COLABORADOR'].indexOf(user.rol) < 0) {
     throw new Error('No tienes autorización para esta operación.');
   }
-  return { correo: normalizeEmail_(correo), rol: user.rol };
+  return { correo: normalizeEmail_(correo), nombre: user.nombre, rol: user.rol };
 }
 
 function getDataSpreadsheet_() {
@@ -598,8 +645,16 @@ function ensureDataSheet_(spreadsheet, config) {
   const current = headerRange.getDisplayValues()[0];
   if (current.every(value => !value)) {
     headerRange.setValues([config.headers]);
-  } else if (config.headers.some((header, index) => current[index] !== header)) {
-    throw new Error('Los encabezados de la hoja "' + config.name + '" no coinciden con el modelo requerido.');
+  } else {
+    const existingHeaders = current.filter((value, index) => index < config.headers.length && value);
+    const isCompatibleExtension = existingHeaders.length < config.headers.length &&
+      existingHeaders.every((header, index) => header === config.headers[index]);
+    if (isCompatibleExtension) {
+      sheet.getRange(1, existingHeaders.length + 1, 1, config.headers.length - existingHeaders.length)
+        .setValues([config.headers.slice(existingHeaders.length)]);
+    } else if (config.headers.some((header, index) => current[index] !== header)) {
+      throw new Error('Los encabezados de la hoja "' + config.name + '" no coinciden con el modelo requerido.');
+    }
   }
   return sheet;
 }

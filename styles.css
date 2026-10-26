@@ -224,7 +224,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-bottom: 20px
     }
@@ -585,6 +585,10 @@
 
     .table-wrap {
       overflow: auto
+    }
+
+    .table-wrap input[type="checkbox"] {
+      width: auto
     }
 
     .table-summary {
@@ -964,6 +968,98 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 12px
+    }
+
+    .enhancement-box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin: 12px 0;
+      background: var(--panel)
+    }
+
+    .enhancement-box h3 {
+      margin: 0 0 10px;
+      font-size: 15px
+    }
+
+    .selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+      padding: 8px 0
+    }
+
+    .selector-grid label {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 12px
+    }
+
+    .selector-grid input {
+      width: auto;
+      margin-top: 3px
+    }
+
+    .export-groups {
+      display: grid;
+      gap: 8px
+    }
+
+    .export-group {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px
+    }
+
+    .export-group summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer
+    }
+
+    .export-group summary label {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .export-group summary input {
+      width: auto
+    }
+
+    .export-group .selector-grid {
+      max-height: none
+    }
+
+    .required-indicator {
+      color: var(--danger);
+      font-weight: 700
+    }
+
+    .section-heading {
+      grid-column: 1 / -1;
+      margin: 12px 0 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+      color: var(--blue);
+      font-size: 14px
+    }
+
+    .process-identity {
+      grid-column: 1 / -1;
+      padding: 11px 13px;
+      border-radius: 8px;
+      background: #f3f6f8
+    }
+
+    .process-identity strong {
+      display: block
     }
 
     @media(max-width:560px) {

@@ -93,7 +93,9 @@
     }
 
     @keyframes auth-spin {
-      to { transform: rotate(360deg) }
+      to {
+        transform: rotate(360deg)
+      }
     }
 
     .user-identity {
@@ -232,7 +234,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-bottom: 20px
     }
@@ -487,6 +489,26 @@
       min-width: 210px
     }
 
+    .dashboard-filter-panel #dashboardSearch {
+      width: min(100%, 320px);
+      min-width: 0
+    }
+
+    .dashboard-filter-panel .filters select {
+      flex: 1 1 175px;
+      max-width: 220px
+    }
+
+    #processes #search {
+      width: min(100%, 320px);
+      min-width: 0
+    }
+
+    #processes .filters select {
+      flex: 1 1 175px;
+      max-width: 220px
+    }
+
     .field-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -495,7 +517,8 @@
 
     .field {
       display: grid;
-      gap: 5px
+      gap: 5px;
+      align-content: start
     }
 
     .field.full {
@@ -535,18 +558,21 @@
     .steps {
       display: flex;
       gap: 8px;
-      margin: 0 0 20px;
-      overflow: auto
+      margin: 0 0 20px
     }
 
     .step {
-      white-space: nowrap;
+      flex: 1 1 0;
+      min-width: 0;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.3;
       background: #edf1f4;
-      color: #657382;
+      color: var(--blue);
       border-radius: 8px;
-      padding: 9px 12px;
+      padding: 10px 8px;
       font-size: 12px;
-      font-weight: 650
+      font-weight: 800
     }
 
     .step.active {
@@ -555,9 +581,146 @@
       outline: 1px solid #edc7a5
     }
 
-    .step.done {
-      background: #e8f4ee;
+    button.step {
+      border: 0;
+      cursor: pointer
+    }
+
+    button.step:hover {
+      background: #e2e8ed;
+      color: var(--text)
+    }
+
+    button.step.active:hover {
+      background: var(--soft);
+      color: var(--accent2)
+    }
+
+    /* Vista de administrador: solo los campos de registro inicial */
+    #processForm.admin-view .form-step>.field-grid> :not(.admin-field):not(.review-keep),
+    #processForm.admin-view .form-step>.field-grid>.field.admin-field .field-grid {
+      display: none
+    }
+
+    #processForm.admin-view .collab-only {
+      display: none
+    }
+
+    .admin-legend {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #eef4fb;
+      color: var(--blue)
+    }
+
+    .admin-legend-text {
+      flex: 1
+    }
+
+    .admin-legend-actions {
+      display: flex;
+      flex: none;
+      gap: 6px
+    }
+
+    .legend-restore {
+      margin: 0 0 14px
+    }
+
+    .admin-swatch {
+      flex: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      background: #eef4fb;
+      border: 2px solid #a9c3dc
+    }
+
+    #processForm:not(.admin-view) [data-admin-required] {
+      background: #eef4fb;
+      border-color: #a9c3dc
+    }
+
+    #processForm:not(.admin-view) .field.admin-field>label::after {
+      content: 'Administración';
+      margin-left: 8px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: #dbe8f5;
+      color: var(--blue);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase
+    }
+
+    #processForm.no-admin-highlight [data-admin-required] {
+      background: white;
+      border-color: #d7dee4
+    }
+
+    #processForm.no-admin-highlight .field.admin-field>label::after {
+      display: none
+    }
+
+    .scope-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      border: 1px solid #a9c3dc;
+      border-radius: 10px;
+      background: #eef4fb;
+      color: var(--blue)
+    }
+
+    .scope-bar .scope-info {
+      display: grid
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: -1px
+    }
+
+    .field-hint.ok {
       color: var(--green)
+    }
+
+    .field-hint.warn {
+      color: var(--accent2)
+    }
+
+    .review-missing {
+      border: 1px solid #f0c9c9;
+      background: #fff6f6;
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 13px
+    }
+
+    .review-missing ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 4px
+    }
+
+    button.link-button,
+    button.link-button:hover {
+      background: none;
+      padding: 0;
+      color: var(--danger);
+      font-weight: 650;
+      text-decoration: underline;
+      border-radius: 0
     }
 
     .form-actions {
@@ -573,6 +736,10 @@
 
     .table-wrap {
       overflow: auto
+    }
+
+    .table-wrap input[type="checkbox"] {
+      width: auto
     }
 
     .table-summary {
@@ -619,7 +786,7 @@
       white-space: normal
     }
 
-    .action-group + .action-group {
+    .action-group+.action-group {
       margin-top: 24px
     }
 
@@ -725,6 +892,14 @@
     }
 
     @media(max-width:850px) {
+      .steps {
+        flex-wrap: wrap
+      }
+
+      .step {
+        flex: 1 1 30%
+      }
+
       .app {
         grid-template-columns: 1fr
       }
@@ -827,6 +1002,7 @@
 
       .sidebar,
       .top,
+      .scope-bar,
       .dashboard-footer,
       #recentTable button {
         display: none !important
@@ -954,15 +1130,167 @@
       gap: 12px
     }
 
+    .enhancement-box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin: 12px 0;
+      background: var(--panel)
+    }
+
+    .enhancement-box h3 {
+      margin: 0 0 10px;
+      font-size: 15px
+    }
+
+    .selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+      padding: 8px 0
+    }
+
+    .selector-grid label {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 12px
+    }
+
+    .selector-grid input {
+      width: auto;
+      margin-top: 3px
+    }
+
+    .export-groups {
+      display: grid;
+      gap: 8px
+    }
+
+    .export-group {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px
+    }
+
+    .export-group summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer
+    }
+
+    .export-group summary label {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .export-group summary input {
+      width: auto
+    }
+
+    .export-group .selector-grid {
+      max-height: none
+    }
+
+    th {
+      white-space: nowrap
+    }
+
+    td.nowrap {
+      white-space: nowrap
+    }
+
+    td.cell-wide {
+      min-width: 260px;
+      max-width: 440px;
+      overflow-wrap: anywhere
+    }
+
+    .actions-table {
+      min-width: 1150px
+    }
+
+    .actions-table th:first-child,
+    .actions-table td:first-child {
+      width: 56px;
+      text-align: center
+    }
+
+    .action-group h3 label,
+    .actions-report-bar {
+      color: var(--text)
+    }
+
+    .action-group h3 label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 14px
+    }
+
+    .action-group h3 input {
+      width: auto
+    }
+
+    .actions-report-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f7f9fa
+    }
+
+    .actions-report-bar button:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    .required-indicator {
+      color: var(--danger);
+      font-weight: 700
+    }
+
+    .section-heading {
+      font-weight: 800;
+      grid-column: 1 / -1;
+      margin: 12px 0 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+      color: var(--blue);
+      font-size: 14px
+    }
+
+    .process-identity {
+      grid-column: 1 / -1;
+      padding: 11px 13px;
+      border-radius: 8px;
+      background: #f3f6f8
+    }
+
+    .process-identity strong {
+      display: block
+    }
+
     @media(max-width:560px) {
       .action-form {
         grid-template-columns: 1fr
       }
     }
-</style>
+  </style>
 </head>
 
-<body class="auth-pending"><main id="authGate" class="auth-screen" aria-live="polite">
+<body class="auth-pending">
+  <main id="authGate" class="auth-screen" aria-live="polite">
     <section class="auth-card">
       <div class="auth-mark" aria-hidden="true">GJ</div>
       <p class="auth-eyebrow">GESTIÓN JUDICIAL</p>
@@ -975,7 +1303,8 @@
       </form>
       <form id="codeForm" class="auth-form hidden">
         <label for="accessCode">Código de verificación</label>
-        <input id="accessCode" type="text" inputmode="text" autocomplete="one-time-code" minlength="8" maxlength="8" pattern="[A-Fa-f0-9]{8}" required>
+        <input id="accessCode" type="text" inputmode="text" autocomplete="one-time-code" minlength="8" maxlength="8"
+          pattern="[A-Fa-f0-9]{8}" required>
         <button id="verifyCodeButton" type="submit">Verificar e ingresar</button>
         <button id="changeEmailButton" class="secondary" type="button">Usar otro correo</button>
       </form>
@@ -990,7 +1319,7 @@
         <button class="active" data-view="dashboard">Resumen</button>
         <button data-view="processes">Procesos</button>
         <button data-view="actions">Actuaciones</button>
-        <button data-view="hearings">Audiencias</button>
+        <button data-view="hearings">Diligencias</button>
         <button data-view="form" data-admin-only>Registrar proceso</button>
         <button data-view="catalogs" data-admin-only>Catálogos</button>
         <button data-view="backup">Descargar datos</button>
@@ -1003,25 +1332,51 @@
           <h1 id="pageTitle">Resumen general</h1>
           <div class="muted" id="pageSubtitle">Estado de la información registrada</div>
         </div>
-        <div class="actions"><div id="userIdentity" class="user-identity hidden"><strong id="userName"></strong><span id="userRole"></span></div><button id="logoutButton" class="secondary small hidden" type="button">Cerrar sesión</button><button class="secondary" onclick="showView('processOverview')">Ver procesos</button><button
-            data-admin-only onclick="newProcess()">+ Nuevo proceso</button></div>
+        <div class="actions">
+          <div id="userIdentity" class="user-identity hidden"><strong id="userName"></strong><span id="userRole"></span>
+          </div><button id="logoutButton" class="secondary small hidden" type="button">Cerrar sesión</button><button
+            class="secondary" onclick="showView('processOverview')">Ver procesos</button><button data-admin-only
+            onclick="newProcess()">+ Nuevo proceso</button>
+        </div>
       </header>
       <section id="dashboard" class="view">
+        <div class="scope-bar hidden" data-scope-bar></div>
         <div class="print-report-title">
           <h1>Reporte general de procesos judiciales</h1>
           <p id="reportDate"></p>
         </div>
         <div class="panel dashboard-filter-panel">
-          <div class="panel-head"><h2>Filtros del tablero y consultas</h2></div>
+          <div class="panel-head">
+            <h2>Filtros del tablero y consultas</h2>
+          </div>
           <div class="toolbar filters">
-            <input id="dashboardSearch" placeholder="Radicado, número, ID o expediente ORFEO..." oninput="syncFilter('query', this.value)">
-            <select id="dashboardFilterState" onchange="syncFilter('state', this.value)"><option value="">Todos los estados</option><option>Activo</option><option>Terminado</option></select>
-            <select id="dashboardFilterInstance" onchange="syncFilter('instance', this.value)"><option value="">Todas las instancias</option></select>
-            <select id="dashboardFilterType" onchange="syncFilter('type', this.value)"><option value="">Todos los tipos</option></select>
-            <select id="dashboardFilterCause" onchange="syncFilter('cause', this.value)"><option value="">Todas las causas</option></select>
-            <select id="dashboardFilterLawyer" onchange="syncFilter('lawyer', this.value)"><option value="">Todos los abogados</option></select>
-            <select id="dashboardFilterYear" onchange="syncFilter('year', this.value)"><option value="">Todos los años</option></select>
-            <select id="dashboardFilterQuality" onchange="syncFilter('quality', this.value)"><option value="">Activa y pasiva</option><option>Activa</option><option>Pasiva</option></select>
+            <input id="dashboardSearch" placeholder="Radicado, número, ID o expediente ORFEO..."
+              oninput="syncFilter('query', this.value)">
+            <select id="dashboardFilterState" onchange="syncFilter('state', this.value)">
+              <option value="">Todos los estados</option>
+              <option>Activo</option>
+              <option>Terminado</option>
+            </select>
+            <select id="dashboardFilterInstance" onchange="syncFilter('instance', this.value)">
+              <option value="">Todas las instancias</option>
+            </select>
+            <select id="dashboardFilterType" onchange="syncFilter('type', this.value)">
+              <option value="">Todos los tipos</option>
+            </select>
+            <select id="dashboardFilterCause" onchange="syncFilter('cause', this.value)">
+              <option value="">Todas las causas</option>
+            </select>
+            <select id="dashboardFilterLawyer" onchange="syncFilter('lawyer', this.value)">
+              <option value="">Todos los abogados</option>
+            </select>
+            <select id="dashboardFilterYear" onchange="syncFilter('year', this.value)">
+              <option value="">Todos los años</option>
+            </select>
+            <select id="dashboardFilterQuality" onchange="syncFilter('quality', this.value)">
+              <option value="">Activa y pasiva</option>
+              <option>Activa</option>
+              <option>Pasiva</option>
+            </select>
           </div>
         </div>
         <div class="stats">
@@ -1030,6 +1385,7 @@
           <div class="stat"><small>Terminados</small><strong id="statClosed">0</strong></div>
           <div class="stat"><small>Actuaciones</small><strong id="statActions">0</strong></div>
           <div class="stat"><small>Con datos por revisar</small><strong id="statIssues">0</strong></div>
+          <div class="stat"><small>Total de pretensiones (COP)</small><strong id="statClaims">$0</strong></div>
         </div>
         <div class="dashboard-charts">
           <section class="panel chart-panel" aria-labelledby="stateChartTitle">
@@ -1059,10 +1415,30 @@
             </div>
             <div id="typeChart"></div>
           </section>
-          <section class="panel chart-panel" aria-labelledby="yearChartTitle"><div class="panel-head"><h2 id="yearChartTitle">Procesos por año</h2></div><div id="yearChart"></div></section>
-          <section class="panel chart-panel" aria-labelledby="qualityChartTitle"><div class="panel-head"><h2 id="qualityChartTitle">Activa y pasiva</h2></div><div id="qualityChart"></div></section>
-          <section class="panel chart-panel" aria-labelledby="lawyerChartTitle"><div class="panel-head"><h2 id="lawyerChartTitle">Procesos por abogado</h2></div><div id="lawyerChart"></div></section>
-          <section class="panel chart-panel" aria-labelledby="causeChartTitle"><div class="panel-head"><h2 id="causeChartTitle">Procesos por causa</h2></div><div id="causeChart"></div></section>
+          <section class="panel chart-panel" aria-labelledby="yearChartTitle">
+            <div class="panel-head">
+              <h2 id="yearChartTitle">Procesos por año</h2>
+            </div>
+            <div id="yearChart"></div>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="qualityChartTitle">
+            <div class="panel-head">
+              <h2 id="qualityChartTitle">Activa y pasiva</h2>
+            </div>
+            <div id="qualityChart"></div>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="lawyerChartTitle">
+            <div class="panel-head">
+              <h2 id="lawyerChartTitle">Procesos por abogado</h2>
+            </div>
+            <div id="lawyerChart"></div>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="causeChartTitle">
+            <div class="panel-head">
+              <h2 id="causeChartTitle">Procesos por causa</h2>
+            </div>
+            <div id="causeChart"></div>
+          </section>
         </div>
         <div class="panel">
           <div class="panel-head">
@@ -1074,30 +1450,50 @@
         <div class="dashboard-footer"><button type="button" onclick="downloadReport()">Descargar reporte</button></div>
       </section>
       <section id="processes" class="view hidden">
+        <div class="scope-bar hidden" data-scope-bar></div>
         <div class="panel">
           <div class="panel-head">
-            <h2>Listado de procesos</h2>
-            <div class="toolbar filters"><input id="search" placeholder="Buscar radicado, número, ID o expediente ORFEO..."
-                oninput="syncFilter('query', this.value)"><select id="filterState" onchange="syncFilter('state', this.value)">
+            <h2 id="processesListTitle">Procesos generales</h2>
+            <div class="toolbar filters"><input id="search"
+                placeholder="Buscar radicado, número, ID o expediente ORFEO..."
+                oninput="syncFilter('query', this.value)"><select id="filterState"
+                onchange="syncFilter('state', this.value)">
                 <option value="">Todos los estados</option>
                 <option>Activo</option>
                 <option>Terminado</option>
-              </select><select id="filterInstance" onchange="syncFilter('instance', this.value)"><option value="">Todas las instancias</option></select>
-              <select id="filterType" onchange="syncFilter('type', this.value)"><option value="">Todos los tipos</option></select>
-              <select id="filterCause" onchange="syncFilter('cause', this.value)"><option value="">Todas las causas</option></select>
-              <select id="filterLawyer" onchange="syncFilter('lawyer', this.value)"><option value="">Todos los abogados</option></select>
-              <select id="filterYear" onchange="syncFilter('year', this.value)"><option value="">Todos los años</option></select>
-              <select id="filterQuality" onchange="syncFilter('quality', this.value)"><option value="">Activa y pasiva</option><option>Activa</option><option>Pasiva</option></select></div>
+              </select><select id="filterInstance" onchange="syncFilter('instance', this.value)">
+                <option value="">Todas las instancias</option>
+              </select>
+              <select id="filterType" onchange="syncFilter('type', this.value)">
+                <option value="">Todos los tipos</option>
+              </select>
+              <select id="filterCause" onchange="syncFilter('cause', this.value)">
+                <option value="">Todas las causas</option>
+              </select>
+              <select id="filterLawyer" onchange="syncFilter('lawyer', this.value)">
+                <option value="">Todos los abogados</option>
+              </select>
+              <select id="filterYear" onchange="syncFilter('year', this.value)">
+                <option value="">Todos los años</option>
+              </select>
+              <select id="filterQuality" onchange="syncFilter('quality', this.value)">
+                <option value="">Activa y pasiva</option>
+                <option>Activa</option>
+                <option>Pasiva</option>
+              </select>
+            </div>
           </div>
           <div id="processTable"></div>
         </div>
       </section>
       <section id="processOverview" class="view hidden">
+        <div class="scope-bar hidden" data-scope-bar></div>
         <div class="panel">
           <div class="panel-head">
             <div>
               <h2>Vista completa de procesos</h2>
-              <div class="muted">Todos los datos registrados; desplácese horizontalmente para consultar las columnas.</div>
+              <div class="muted">Todos los datos registrados; desplácese horizontalmente para consultar las columnas.
+              </div>
             </div>
             <button type="button" class="secondary" onclick="showView('processes')">Volver a procesos</button>
           </div>
@@ -1105,25 +1501,69 @@
         </div>
       </section>
       <section id="actions" class="view hidden">
+        <div class="scope-bar hidden" data-scope-bar></div>
         <div class="panel">
           <div class="panel-head">
             <h2>Actuaciones por proceso</h2>
             <div class="toolbar"><input id="actionsSearch" placeholder="Buscar actuación, proceso o radicado..."
                 oninput="renderActions()"></div>
           </div>
+          <div class="actions-report-bar">
+            <div>
+              <strong id="actionsSelectionSummary"></strong>
+              <div class="muted">Marca las actuaciones que quieras incluir. Si no marcas ninguna, el PDF incluye todas las que se ven en la lista.</div>
+            </div>
+            <div class="actions">
+              <button type="button" class="secondary small" onclick="selectVisibleActions(true)">Marcar todas las visibles</button>
+              <button type="button" class="secondary small" onclick="selectVisibleActions(false)">Limpiar selección</button>
+              <button type="button" id="actionsReportButton" onclick="downloadActionsReport()">Descargar PDF</button>
+            </div>
+          </div>
           <div id="allActionsTable"></div>
         </div>
       </section>
       <section id="hearings" class="view hidden">
-        <div class="panel"><div class="panel-head"><h2>Audiencias por sesión</h2></div><div id="allHearingsTable"></div></div>
+        <div class="scope-bar hidden" data-scope-bar></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Diligencias por sesión</h2>
+          </div>
+          <div class="toolbar filters">
+            <input id="hearingsSearch" type="search" placeholder="Buscar proceso, radicado, tipo o comentario..."
+              oninput="renderHearingsTable()">
+            <select id="hearingTypeFilter" onchange="renderHearingsTable()">
+              <option value="">Todos los tipos</option>
+            </select>
+            <label>Desde <input id="hearingFromFilter" type="date" onchange="renderHearingsTable()"></label>
+            <label>Hasta <input id="hearingToFilter" type="date" onchange="renderHearingsTable()"></label>
+          </div>
+          <div id="allHearingsTable"></div>
+        </div>
       </section>
       <section id="catalogs" class="view hidden">
         <div class="panel">
-          <div class="panel-head"><div><h2>Catálogos autorizados</h2><div class="muted">Solo los administradores pueden actualizar estas listas.</div></div></div>
+          <div class="panel-head">
+            <div>
+              <h2>Catálogos autorizados</h2>
+              <div class="muted">Solo los administradores pueden actualizar estas listas. Por ahora los catálogos se
+                guardan localmente en este navegador.</div>
+            </div>
+          </div>
           <form id="catalogForm" onsubmit="saveCatalog(event)">
             <div class="field-grid">
-              <div class="field"><label for="catalogCategory">Catálogo</label><select id="catalogCategory"><option value="lawyer">Abogados</option><option value="lawyerLinkType">Tipo de vinculación</option><option value="type">Tipo de proceso</option><option value="cause">Causa</option><option value="hearingType">Tipo de audiencia</option><option value="terminationForm">Forma de terminación</option></select></div>
-              <div class="field full"><label for="catalogValues">Valores (uno por línea)</label><textarea id="catalogValues" required></textarea></div>
+              <div class="field"><label for="catalogCategory">Catálogo</label><select id="catalogCategory">
+                  <option value="lawyer">Abogados</option>
+                  <option value="lawyerLinkType">Tipo de vinculación</option>
+                  <option value="type">Tipo de proceso</option>
+                  <option value="cause">Causa</option>
+                  <option value="stage">Etapa del proceso</option>
+                  <option value="state">Estado del proceso</option>
+                  <option value="area">Área generadora del daño</option>
+                  <option value="hearingType">Tipo de diligencia</option>
+                  <option value="terminationForm">Forma de terminación</option>
+                </select></div>
+              <div class="field full"><label for="catalogValues">Valores (uno por línea)</label><textarea
+                  id="catalogValues" required></textarea></div>
             </div>
             <div class="form-actions"><span></span><button type="submit">Guardar catálogo</button></div>
           </form>
@@ -1135,51 +1575,83 @@
           <div class="panel-head">
             <div>
               <h2 id="formTitle">Registrar proceso</h2>
-              <div class="muted">Complete la información por etapas. La lista definitiva de campos obligatorios está pendiente de validación jurídica.</div>
-            </div><span class="pill" id="editBadge">Nuevo</span>
+              <div class="muted">Puede moverse libremente entre secciones. Los campos obligatorios se verifican en
+                Revisión, antes de guardar.</div>
+            </div>
+            <div class="actions"><button type="button" class="secondary small" onclick="downloadProcessPdf()">Descargar
+                vista general PDF</button></div>
           </div>
-          <div class="steps" id="steps">
-            <div class="step active">1. Identificación</div>
-            <div class="step">2. Partes y representación</div>
-            <div class="step">3. Clasificación judicial</div>
-            <div class="step">4. Etapas y seguimiento</div>
-            <div class="step">5. Revisión</div>
-          </div>
+          <div class="steps" id="steps" role="tablist" aria-label="Secciones del formulario"></div>
           <form id="processForm" onsubmit="return false">
+            <div class="collab-only admin-legend-wrap">
+              <div id="adminLegend" class="notice admin-legend">
+                <span class="admin-swatch" aria-hidden="true"></span>
+                <span class="admin-legend-text">Los campos con fondo azul y la etiqueta <strong>Administración</strong> fueron diligenciados por el administrador; revísalos y modifícalos solo si es necesario.</span>
+                <span class="admin-legend-actions">
+                  <button type="button" id="highlightToggle" class="secondary small" onclick="toggleAdminHighlight()">Quitar resaltado</button>
+                  <button type="button" class="secondary small" onclick="hideAdminLegend()" aria-label="Cerrar mensaje">✕</button>
+                </span>
+              </div>
+              <button type="button" id="showLegendButton" class="secondary small hidden legend-restore" onclick="showAdminLegend()">Mostrar guía de colores</button>
+            </div>
             <div class="form-step" data-step="0">
               <div class="field-grid">
-                <div class="field"><label>No. corto</label><input name="shortNo" placeholder="AAAA-NNNNN">
+                <div class="section-heading">Datos de identificación del proceso</div>
+                <div class="field"><label>No. corto</label><input name="shortNo" placeholder="AAAA-NNNNN"
+                    data-admin-required>
                 </div>
-                <div class="field"><label>Radicado judicial (23 dígitos)</label><input name="radicado" inputmode="numeric"
-                    maxlength="23" pattern="[0-9]{23}" placeholder="Solo números"></div>
-                <div class="field"><label>Radicado actual</label><input name="currentRadicado"></div>
+                <div class="field"><label>Radicado judicial (23 dígitos)</label><input name="radicado"
+                    inputmode="numeric" maxlength="23" pattern="[0-9]{23}" placeholder="Solo números"
+                    data-admin-required aria-describedby="radicadoDigitCount"><small id="radicadoDigitCount"
+                    class="field-hint" aria-live="polite">0 / 23 dígitos</small></div>
+                <div class="field"><label>Radicado actual</label><input name="currentRadicado" data-admin-required
+                    aria-describedby="currentRadicadoDigitCount"><small id="currentRadicadoDigitCount"
+                    class="field-hint" aria-live="polite">0 / 23 dígitos</small></div>
                 <div class="field"><label>ID SIPROJ</label><input name="siproJ"></div>
                 <div class="field"><label>Expediente ORFEO</label><input name="orfeo"></div>
-                <div class="field"><label>Cédulas / identificadores</label><input name="ids"></div>
+                <div class="field"><label>Cédulas / identificadores</label><input name="ids" data-admin-required></div>
+                <div class="field"><label>Demandante</label><input name="claimant" data-admin-required></div>
               </div>
             </div>
             <div class="form-step hidden" data-step="1">
               <div class="field-grid">
-                <div class="field"><label>Demandante</label><input name="claimant"></div>
-                <div class="field"><label>Demandados / entidades (uno por línea)</label><textarea name="defendant"></textarea></div>
-                <div class="field"><label>Área generadora del daño</label><input name="area"></div>
-                <div class="field"><label>Abogado a cargo</label><select name="lawyer" id="lawyerSelect"><option value="">Seleccione</option></select></div>
-                <div class="field"><label>Activa / pasiva</label><select name="quality"><option value="">Seleccione</option><option>Activa</option><option>Pasiva</option></select></div>
-                <div class="field"><label>Tipo de vinculación del abogado</label><select name="lawyerLinkType" id="lawyerLinkTypeSelect"><option value="">Seleccione</option></select></div>
-                <div class="field"><label>Correo de persona asignada (control de acceso)</label><input name="assignedEmail" type="email"></div>
-                <div class="field"><label>Representa</label><select name="represents">
+                <div class="section-heading">Partes del proceso</div>
+                <div class="process-identity" id="claimantIdentity"><strong>Demandante</strong><span>Ingrese el nombre
+                    del demandante en la sección de identificación.</span></div>
+                <div class="field"><label>Demandados / entidades (uno por línea)</label><textarea name="defendant"
+                    data-admin-required></textarea></div>
+                <div class="field"><label>Área generadora del daño</label><select name="area">
                     <option value="">Seleccione</option>
-                    <option>Demandante</option>
-                    <option>Demandado</option>
+                  </select></div>
+                <div class="section-heading">Abogado a cargo y representación</div>
+                <div class="field"><label>Abogado a cargo</label><select name="lawyer" id="lawyerSelect"
+                    data-admin-required>
+                    <option value="">Seleccione</option>
+                  </select></div>
+                <div class="field"><label>Parte procesal (activa / pasiva)</label><select name="quality" data-admin-required>
+                    <option value="">Seleccione</option>
+                    <option>Activa</option>
+                    <option>Pasiva</option>
+                  </select></div>
+                <div class="field"><label>Tipo de vinculación del abogado</label><select name="lawyerLinkType"
+                    id="lawyerLinkTypeSelect">
+                    <option value="">Seleccione</option>
+                  </select></div>
+                <div class="field"><label>Calidad de representación</label><select name="represents" data-admin-required>
+                    <option value="">Seleccione</option>
                     <option>Representa</option>
-                    <option>Ambas partes</option>
-                    <option>No informado</option>
+                    <option>Representado</option>
                   </select></div>
               </div>
             </div>
             <div class="form-step hidden" data-step="2">
               <div class="field-grid">
-                <div class="field"><label>Instancia del proceso</label><select name="instance">
+                <div class="section-heading">Clasificación del proceso</div>
+                <div class="field"><label>Tipo de proceso</label><select name="type" id="processTypeSelect"
+                    data-admin-required>
+                    <option value="">Seleccione</option>
+                  </select></div>
+                <div class="field"><label>Instancia del proceso</label><select name="instance" data-admin-required>
                     <option value="">Seleccione</option>
                     <option>Primera</option>
                     <option>Segunda</option>
@@ -1187,84 +1659,156 @@
                     <option>Casación</option>
                     <option>Otra</option>
                   </select></div>
-                <div class="field"><label>Tipo de proceso</label><input name="type" list="typeOptions"
-                    placeholder="Ej. Reparación directa"><datalist id="typeOptions"></datalist></div>
-                <div class="field"><label>Despacho judicial inicial</label><input name="court"></div>
-                <div class="field"><label>Despacho de segunda instancia</label><input name="secondCourt"></div>
-                <div class="field"><label>Causa</label><input name="cause" list="causeOptions"><datalist id="causeOptions"></datalist></div>
-                <div class="field"><label>Etapa del proceso</label><input name="stage"
-                    placeholder="Etapa procesal actual"></div>
+                <div class="field"><label>Despacho judicial inicial</label><input name="court" data-admin-required>
+                </div>
+                <div class="field"><label>Fecha de notificación de la demanda</label><input name="notificationDate"
+                    type="date" data-admin-required></div>
+                <div class="field"><label>Despacho de segunda instancia</label><input name="secondCourt"
+                    data-second-instance></div>
+                <div class="field"><label>Causa</label><input name="cause" list="causeOptions"><datalist
+                    id="causeOptions"></datalist></div>
+                <div class="field"><label>Etapa del proceso</label><select name="stage">
+                    <option value="">Seleccione</option>
+                  </select></div>
+                <div class="field"><label>¿Presenta medida cautelar?</label><select name="cautelar" data-admin-required>
+                    <option value="">Seleccione</option>
+                    <option>Sí</option>
+                    <option>No</option>
+                  </select></div>
                 <div class="field"><label>Estado del proceso</label><select name="state">
                     <option value="">Seleccione</option>
                     <option>Activo</option>
                     <option>Terminado</option>
                   </select></div>
+                <div class="section-heading">Terminación del proceso</div>
                 <div class="field"><label>Fecha de terminación</label><input name="endDate" type="date"></div>
-                <div class="field"><label>Forma de terminación</label><input name="terminationForm" list="terminationFormOptions"><datalist id="terminationFormOptions"><option>Sentencia</option><option>Conciliación</option><option>Transacción</option><option>Desvinculación</option><option>Otra</option></datalist></div>
-                <div class="field"><label>Instancia de terminación</label><select name="terminationInstance"><option value="">Seleccione</option><option>Primera</option><option>Segunda</option><option>Única</option><option>Casación</option><option>Otra</option></select></div>
-                <div class="field full"><label>Observaciones de terminación</label><textarea name="terminationNotes"></textarea></div>
+                <div class="field"><label>Forma de terminación</label><select name="terminationForm">
+                    <option value="">Seleccione</option>
+                  </select></div>
+                <div class="field"><label>Instancia de terminación</label><select name="terminationInstance">
+                    <option value="">Seleccione</option>
+                    <option>Primera</option>
+                    <option>Segunda</option>
+                    <option>Única</option>
+                    <option>Casación</option>
+                    <option>Otra</option>
+                  </select></div>
+                <div class="field full"><label>Observaciones de terminación</label><textarea
+                    name="terminationNotes"></textarea></div>
               </div>
             </div>
             <div class="form-step hidden" data-step="3">
               <div class="field-grid">
+                <div class="section-heading">Pretensión y valor reclamado</div>
                 <div class="field full"><label>Pretensión / asunto</label><textarea name="claim"></textarea></div>
-                <div class="field"><label>Valor de las pretensiones (COP)</label><input name="amount" type="number"
-                    min="0" step="1" placeholder="Ej. 150000000"></div>
-                <div class="field"><label>¿Presenta medida cautelar?</label><select name="cautelar">
-                    <option>No informado</option>
-                    <option>Sí</option>
-                    <option>No</option>
-                  </select></div>
-                <div class="field"><label>Fecha de notificación de la demanda</label><input name="notificationDate"
-                    type="date"></div>
-                <div class="field full"><div id="deadlineNotice" class="notice">La fecha máxima debe registrarse manualmente; el cálculo del término requiere validación jurídica.</div></div>
+                <div class="field"><label>Valor de las pretensiones de primera instancia (COP, sin
+                    separadores)</label><input name="amount" type="number" min="0" step="1" placeholder="Ej. 150000000">
+                </div>
+                <div class="field full">
+                  <div id="deadlineNotice" class="notice">La fecha máxima debe registrarse manualmente; el cálculo del
+                    término requiere validación jurídica.</div>
+                </div>
+                <div class="section-heading">Medida cautelar y contestación de la demanda</div>
+                <div class="field"><label>Fecha máxima de contestación de medida cautelar</label><input
+                    name="maxMeasureResponseDate" type="date" data-measure-field></div>
                 <div class="field"><label>Fecha de contestación de medida cautelar</label><input
-                    name="measureResponseDate" type="date"></div>
+                    name="measureResponseDate" type="date" data-measure-field></div>
                 <div class="field"><label>Fecha máxima de contestación de demanda</label><input
                     name="maxDemandResponseDate" type="date"></div>
                 <div class="field"><label>Fecha de contestación de demanda</label><input name="demandResponseDate"
                     type="date"></div>
+                <div class="section-heading">Diligencias (audiencias y sesiones)</div>
                 <div class="field full">
-                  <label>Audiencias (cada sesión se conserva por separado)</label>
+                  <label>Diligencias (cada sesión se conserva por separado)</label>
                   <div class="field-grid">
-                    <div class="field"><input id="hearingType" list="hearingTypeOptions" value="Inicial" aria-label="Tipo de audiencia"><datalist id="hearingTypeOptions"><option>Inicial</option><option>Pruebas</option><option>Otra</option></datalist></div>
-                    <div class="field"><input id="hearingDate" type="date" aria-label="Fecha de audiencia"></div>
-                    <div class="field"><input id="hearingObservation" placeholder="Observación o resultado" aria-label="Observación de audiencia"></div>
-                    <div class="field"><button type="button" class="secondary" onclick="addHearing()">Agregar fecha de audiencia</button></div>
+                    <div class="field"><label for="hearingType">Tipo de diligencia</label><select id="hearingType">
+                        <option value="">Seleccione</option>
+                      </select></div>
+                    <div class="field"><label for="hearingDate">Fecha de diligencia</label><input id="hearingDate"
+                        type="date"></div>
+                    <div class="field"><label for="hearingObservation">Observación o resultado</label><input
+                        id="hearingObservation"></div>
+                    <div class="field"><label for="hearingSessionNumber">Número de sesión</label><input
+                        id="hearingSessionNumber" type="number" min="1" step="1"></div>
+                    <div class="field"><button type="button" class="secondary" onclick="addHearing()">Agregar
+                        diligencia</button></div>
                   </div>
                   <div id="hearingList" class="action-list"></div>
                 </div>
-                <div class="field"><label>¿Sentencia anticipada?</label><select name="anticipatedJudgment"><option value="">Seleccione</option><option>No</option><option>Sí</option></select></div>
-                <div class="field full"><div id="judicialFlowNotice" class="notice">Las etapas no aplicables pueden ocultarse temporalmente; los datos registrados se conservan.</div></div>
+                <div class="section-heading">Comité de conciliación</div>
+                <div class="field"><label>Fecha de pronunciamiento del comité de conciliación</label><input
+                    name="committeePronouncementDate" type="date"></div>
+                <div class="field"><label>Número de sesión del comité</label><input name="committeeSessionNumber"
+                    type="text"></div>
+                <div class="field full"><label>Comentario del comité de conciliación</label><textarea
+                    name="committeeNotes"
+                    placeholder="Indique si existe pronunciamiento y agregue comentarios"></textarea></div>
+              </div>
+            </div>
+            <div class="form-step hidden" data-step="4">
+              <div class="field-grid">
+                <div class="section-heading">Primera instancia: pruebas, alegatos y fallo</div>
+                <div class="field"><label>¿Sentencia anticipada?</label><select name="anticipatedJudgment">
+                    <option value="">Seleccione</option>
+                    <option>No</option>
+                    <option>Sí</option>
+                  </select></div>
+                <div class="field full">
+                  <div id="judicialFlowNotice" class="notice">Las etapas no aplicables pueden ocultarse temporalmente;
+                    los datos registrados se conservan.</div>
+                </div>
                 <div class="field full"><label>Pruebas</label><textarea name="evidence"
                     placeholder="Información relacionada con las pruebas"></textarea></div>
                 <div class="field"><label>Fecha de alegatos de conclusión</label><input name="closingArgumentsDate"
                     type="date"></div>
+                <div class="field"><label>Fecha máxima de alegatos de conclusión</label><input
+                    name="maxClosingArgumentsDate" type="date"></div>
                 <div class="field"><label>Fecha de fallo de primera instancia</label><input
                     name="firstInstanceDecisionDate" type="date"></div>
                 <div class="field"><label>Sentido del fallo de primera instancia</label><input
                     name="firstInstanceDecisionSense" placeholder="Ej. Favorable, desfavorable o mixto"></div>
+                <div class="section-heading">Recurso de apelación</div>
+                <div class="field"><label>Estado del recurso de apelación</label><select name="appealStatus">
+                    <option value="">Seleccione</option>
+                    <option>No presentado</option>
+                    <option>Presentado en término</option>
+                    <option>Presentado fuera de término</option>
+                  </select></div>
+                <div class="field"><label>Pretensión del recurso (COP, sin separadores)</label><input
+                    name="appealAmount" type="number" min="0" step="1"></div>
                 <div class="field"><label>Fecha de presentación del recurso</label><input name="appealDate" type="date">
                 </div>
-                <div class="field"><label>Estado del recurso de apelación</label><select name="appealStatus"><option value="">Seleccione</option><option>No presentado</option><option>Presentado en término</option><option>Presentado fuera de término</option></select></div>
-                <div class="field"><label>Fecha del auto que concede la apelación</label><input name="appealGrantedOrderDate" type="date"></div>
-                <div class="field"><label>Fecha del auto que admite la apelación</label><input name="appealAdmittedOrderDate" type="date"></div>
+                <div class="field"><label>Fecha máxima para presentar el recurso</label><input name="maxAppealDate"
+                    type="date"></div>
+                <div class="field"><label>Fecha del auto que concede la apelación</label><input
+                    name="appealGrantedOrderDate" type="date" data-second-instance></div>
+                <div class="field"><label>Fecha del auto que admite la apelación</label><input
+                    name="appealAdmittedOrderDate" type="date" data-second-instance></div>
+                <div class="field"><label>Fecha máxima del anuncio del recurso</label><input
+                    name="maxAppealAnnouncementDate" type="date"></div>
+                <div class="section-heading">Segunda instancia: fallo</div>
                 <div class="field"><label>Fecha del fallo de segunda instancia</label><input
-                    name="secondInstanceDecisionDate" type="date"></div>
-                <div class="field"><label>Sentido del fallo de segunda instancia</label><input name="secondInstanceDecisionSense"></div>
-                <div class="field full"><label>Fallo de segunda instancia</label><textarea
-                    name="secondInstanceDecision"></textarea></div>
+                    name="secondInstanceDecisionDate" type="date" data-second-instance></div>
+                <div class="field"><label>Sentido del fallo de segunda instancia</label><input
+                    name="secondInstanceDecisionSense" data-second-instance></div>
+                <div class="field full"><label>Fallo de segunda instancia</label><textarea name="secondInstanceDecision"
+                    data-second-instance></textarea></div>
+                <div class="section-heading">Observaciones generales</div>
                 <div class="field full"><label>Observaciones</label><textarea name="notes"></textarea></div>
               </div>
             </div>
-            <div class="form-step hidden" data-step="4">
-              <div id="reviewBox" class="notice">Revise la información antes de guardar.</div>
-              <div class="field"><label><input type="checkbox" id="confirmData" style="width:auto"> Confirmo que revisé
+            <div class="form-step hidden" data-step="5">
+              <div class="field-grid">
+                <div class="section-heading review-keep">Revisión final antes de guardar</div>
+                <div class="field full review-keep"><div id="reviewMissing" class="review-missing hidden" aria-live="polite"></div></div>
+                <div class="field full review-keep"><div id="reviewBox" class="notice">Revise la información antes de guardar.</div></div>
+                <div class="field full review-keep"><label><input type="checkbox" id="confirmData" style="width:auto"> Confirmo que revisé
                   los datos ingresados.</label></div>
+              </div>
             </div>
             <div class="form-actions"><button type="button" class="secondary" id="prevBtn"
                 onclick="moveStep(-1)">Anterior</button>
-              <div><button type="button" class="secondary" onclick="showView('processes')">Cancelar</button> <button
+              <div><button type="button" class="secondary" onclick="cancelProcess()">Cancelar</button> <button
                   type="button" id="nextBtn" onclick="moveStep(1)">Siguiente</button><button type="button" id="saveBtn"
                   class="hidden" onclick="saveProcess()">Guardar proceso</button></div>
             </div>
@@ -1272,9 +1816,35 @@
         </div>
       </section>
       <section id="backup" class="view hidden">
+        <div class="scope-bar hidden" data-scope-bar></div>
         <div class="panel">
           <h2>Descargar datos</h2>
-          <div class="actions"><button type="button" onclick="exportExcel()">Descargar Excel</button></div>
+          <div class="muted">Descarga la base de procesos en Excel. Elige las columnas y, si lo necesitas, los procesos que quieres incluir; si no marcas ninguno se exportan los que coinciden con los filtros.</div>
+          <section class="panel enhancement-box">
+            <h3>Columnas del reporte</h3>
+            <div class="toolbar filters">
+              <input id="exportColumnSearch" type="search" placeholder="Buscar columna" oninput="filterExportColumns()">
+              <button type="button" class="secondary" onclick="applyExportPreset('all')">Todas</button>
+              <button type="button" class="secondary" onclick="applyExportPreset('none')">Ninguna</button>
+            </div>
+            <p id="exportColumnSummary" class="muted" aria-live="polite"></p>
+            <div id="exportColumnChoices" class="export-groups"></div>
+          </section>
+          <section class="panel enhancement-box">
+            <h3>Buscar y seleccionar procesos</h3>
+            <div class="toolbar filters">
+              <input id="exportRecordSearch" type="search"
+                placeholder="Buscar por No. corto, radicado, demandante, demandado, abogado o ID"
+                oninput="refreshExportRecordChoices()">
+              <button type="button" class="secondary" onclick="selectVisibleExportRecords(true)">Seleccionar
+                resultados</button>
+              <button type="button" class="secondary" onclick="selectVisibleExportRecords(false)">Desmarcar
+                resultados</button>
+            </div>
+            <p id="exportRecordSummary" class="muted" aria-live="polite"></p>
+            <div id="exportRecordChoices" class="selector-grid"></div>
+          </section>
+          <div class="actions"><button type="button" onclick="exportExcel()">Descargar reporte Excel</button></div>
         </div>
       </section>
     </main>
@@ -1289,30 +1859,49 @@
         </div>
         <div id="actionList" class="action-list"></div>
         <form id="actionForm" class="action-form" onsubmit="saveAction(event)">
-          <div class="field"><label for="actionDate">Fecha de actuación</label><input id="actionDate" type="date" required></div>
-          <div class="field"><label for="actionType">Tipo</label><select id="actionType"><option>Contestación de demanda</option><option>Contestación de medida cautelar</option><option>Fijación de audiencia</option><option>Traslado para alegatos</option><option>Fallo</option><option>Recurso</option><option>Otra</option></select></div>
-          <div class="field"><label for="actionTitle">Título</label><input id="actionTitle" maxlength="160" placeholder="Resumen corto" required></div>
-          <div class="field"><label for="actionDescription">Descripción</label><textarea id="actionDescription" required maxlength="1000"></textarea></div>
-          <div class="field"><label for="actionState">Estado de la actuación (opcional)</label><select id="actionState"><option value="">Sin estado</option><option>Pendiente</option><option>En trámite</option><option>Completada</option></select></div>
+          <div class="field"><label for="actionDate">Fecha de actuación</label><input id="actionDate" type="date"
+              required></div>
+          <div class="field"><label for="actionType">Tipo</label><select id="actionType">
+              <option>Contestación de demanda</option>
+              <option>Contestación de medida cautelar</option>
+              <option>Programación de diligencia</option>
+              <option>Traslado para alegatos</option>
+              <option>Fallo</option>
+              <option>Recurso</option>
+              <option>Otra</option>
+            </select></div>
+          <div class="field"><label for="actionTitle">Título</label><input id="actionTitle" maxlength="160"
+              placeholder="Resumen corto" required></div>
+          <div class="field"><label for="actionDescription">Descripción</label><textarea id="actionDescription" required
+              maxlength="1000"></textarea></div>
+          <div class="field"><label for="actionDueDate">Fecha de vencimiento</label><input id="actionDueDate"
+              type="date" required></div>
+          <div class="field"><label for="actionState">Estado de la actuación</label><select id="actionState">
+              <option value="">Sin estado</option>
+              <option>Pendiente</option>
+              <option>En trámite</option>
+              <option>Completada</option>
+              <option>Terminada</option>
+            </select></div>
           <button type="submit">Agregar</button>
         </form>
       </section>
     </div>
   </div>
   <script>
-    const KEY = 'demo_procesos_judiciales_v1'; const CATALOG_KEY = 'demo_procesos_judiciales_catalogs_v1'; let records = []; let catalogs = {}; let step = 0; let editingId = null; let actionProcessId = null; let hearingEntries = [];
+
+    const LAST_STEP = 5; const KEY = 'demo_procesos_judiciales_v1'; const CATALOG_KEY = 'demo_procesos_judiciales_catalogs_v1'; let records = []; let catalogs = {}; let step = 0; let editingId = null; let actionProcessId = null; let hearingEntries = [];
+    const exportSelectedIds = new Set();
+    const selectedActionIds = new Set();
     const activeFilters = { query: '', state: '', instance: '', type: '', cause: '', lawyer: '', year: '', quality: '' };
-    const fields = ['shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids', 'claimant', 'defendant', 'area', 'lawyer', 'assignedEmail', 'quality', 'lawyerLinkType', 'represents', 'instance', 'type', 'court', 'secondCourt', 'cause', 'stage', 'state', 'endDate', 'terminationForm', 'terminationInstance', 'terminationNotes', 'claim', 'amount', 'cautelar', 'notificationDate', 'measureResponseDate', 'maxDemandResponseDate', 'demandResponseDate', 'anticipatedJudgment', 'evidence', 'closingArgumentsDate', 'firstInstanceDecisionDate', 'firstInstanceDecisionSense', 'appealStatus', 'appealDate', 'appealGrantedOrderDate', 'appealAdmittedOrderDate', 'secondInstanceDecisionDate', 'secondInstanceDecisionSense', 'secondInstanceDecision', 'notes'];
-    const labels = { shortNo: 'No. corto', radicado: 'Radicado', currentRadicado: 'Radicado actual', siproJ: 'ID SIPROJ', orfeo: 'Expediente ORFEO', ids: 'Cédulas / identificadores', claimant: 'Demandante', defendant: 'Demandados / entidades', area: 'Área generadora del daño', lawyer: 'Abogado a cargo', assignedEmail: 'Correo asignado', quality: 'Activa / pasiva', lawyerLinkType: 'Tipo de vinculación del abogado', represents: 'Representa', instance: 'Instancia del proceso', type: 'Tipo de proceso', court: 'Despacho judicial inicial', secondCourt: 'Despacho de segunda instancia', cause: 'Causa', stage: 'Etapa del proceso', state: 'Estado del proceso', endDate: 'Fecha de terminación', terminationForm: 'Forma de terminación', terminationInstance: 'Instancia de terminación', terminationNotes: 'Observaciones de terminación', claim: 'Pretensión / asunto', amount: 'Valor de las pretensiones', cautelar: 'Presenta medida cautelar', notificationDate: 'Fecha de notificación / inicio', measureResponseDate: 'Fecha de contestación de medida cautelar', maxDemandResponseDate: 'Fecha máxima de contestación de demanda', demandResponseDate: 'Fecha de contestación de demanda', anticipatedJudgment: 'Sentencia anticipada', evidence: 'Pruebas', closingArgumentsDate: 'Fecha de alegatos de conclusión', firstInstanceDecisionDate: 'Fecha de fallo de primera instancia', firstInstanceDecisionSense: 'Sentido del fallo de primera instancia', appealStatus: 'Estado del recurso de apelación', appealDate: 'Fecha de presentación del recurso', appealGrantedOrderDate: 'Auto que concede la apelación', appealAdmittedOrderDate: 'Auto que admite la apelación', secondInstanceDecisionDate: 'Fecha de fallo de segunda instancia', secondInstanceDecisionSense: 'Sentido del fallo de segunda instancia', secondInstanceDecision: 'Fallo de segunda instancia', notes: 'Observaciones' };
+    const fields = ['shortNo', 'radicado', 'currentRadicado', 'siproJ', 'orfeo', 'ids', 'claimant', 'defendant', 'area', 'lawyer', 'quality', 'lawyerLinkType', 'represents', 'type', 'instance', 'court', 'notificationDate', 'secondCourt', 'cause', 'stage', 'state', 'endDate', 'terminationForm', 'terminationInstance', 'terminationNotes', 'claim', 'amount', 'appealAmount', 'cautelar', 'maxMeasureResponseDate', 'measureResponseDate', 'maxDemandResponseDate', 'demandResponseDate', 'committeePronouncementDate', 'committeeSessionNumber', 'committeeNotes', 'anticipatedJudgment', 'evidence', 'maxClosingArgumentsDate', 'closingArgumentsDate', 'firstInstanceDecisionDate', 'firstInstanceDecisionSense', 'appealStatus', 'maxAppealDate', 'appealDate', 'appealGrantedOrderDate', 'appealAdmittedOrderDate', 'maxAppealAnnouncementDate', 'secondInstanceDecisionDate', 'secondInstanceDecisionSense', 'secondInstanceDecision', 'notes'];
+    const labels = { shortNo: 'No. corto', radicado: 'Radicado judicial', currentRadicado: 'Radicado actual', siproJ: 'ID SIPROJ', orfeo: 'Expediente ORFEO', ids: 'Cédulas / identificadores', claimant: 'Demandante', defendant: 'Demandados / entidades', area: 'Área generadora del daño', lawyer: 'Abogado a cargo', quality: 'Parte procesal (activa / pasiva)', lawyerLinkType: 'Tipo de vinculación del abogado', represents: 'Calidad de representación', instance: 'Instancia del proceso', type: 'Tipo de proceso', court: 'Despacho judicial inicial', secondCourt: 'Despacho de segunda instancia', cause: 'Causa', stage: 'Etapa del proceso', state: 'Estado del proceso', endDate: 'Fecha de terminación', terminationForm: 'Forma de terminación', terminationInstance: 'Instancia de terminación', terminationNotes: 'Observaciones de terminación', claim: 'Pretensión / asunto', amount: 'Pretensiones de primera instancia (COP)', appealAmount: 'Pretensión del recurso (COP)', cautelar: 'Presenta medida cautelar', notificationDate: 'Fecha de notificación de la demanda', maxMeasureResponseDate: 'Fecha máxima de contestación de medida cautelar', measureResponseDate: 'Fecha de contestación de medida cautelar', maxDemandResponseDate: 'Fecha máxima de contestación de demanda', demandResponseDate: 'Fecha de contestación de demanda', committeePronouncementDate: 'Fecha de pronunciamiento del comité', committeeSessionNumber: 'Número de sesión del comité', committeeNotes: 'Comentario del comité de conciliación', anticipatedJudgment: 'Sentencia anticipada', evidence: 'Pruebas', maxClosingArgumentsDate: 'Fecha máxima de alegatos de conclusión', closingArgumentsDate: 'Fecha de alegatos de conclusión', firstInstanceDecisionDate: 'Fecha de fallo de primera instancia', firstInstanceDecisionSense: 'Sentido del fallo de primera instancia', appealStatus: 'Estado del recurso de apelación', maxAppealDate: 'Fecha máxima para presentar el recurso', appealDate: 'Fecha de presentación del recurso', appealGrantedOrderDate: 'Auto que concede la apelación', appealAdmittedOrderDate: 'Auto que admite la apelación', maxAppealAnnouncementDate: 'Fecha máxima del anuncio del recurso', secondInstanceDecisionDate: 'Fecha de fallo de segunda instancia', secondInstanceDecisionSense: 'Sentido del fallo de segunda instancia', secondInstanceDecision: 'Fallo de segunda instancia', notes: 'Observaciones' };
+    const secondInstanceFields = new Set(['secondCourt', 'appealGrantedOrderDate', 'appealAdmittedOrderDate', 'secondInstanceDecisionDate', 'secondInstanceDecisionSense', 'secondInstanceDecision']);
+    const processDateFields = ['notificationDate', 'measureResponseDate', 'demandResponseDate', 'committeePronouncementDate', 'closingArgumentsDate', 'firstInstanceDecisionDate', 'appealDate', 'appealGrantedOrderDate', 'appealAdmittedOrderDate', 'secondInstanceDecisionDate'];
     function isAppsScript() { return typeof google !== 'undefined' && google.script && google.script.run }
     function accessToken() { try { return localStorage.getItem('judicial_access_session_v1') || '' } catch (error) { console.error('No se pudo leer la sesión de acceso.', error); return '' } }
     function load() {
-      if (isAppsScript()) {
-        records = [];
-        renderAll();
-        if (window.currentAuthenticatedUser && accessToken()) loadRemoteApplicationData();
-        return;
-      }
+      // Temporal: los procesos se guardan localmente en este navegador (también dentro de Apps Script).
       try {
         const saved = localStorage.getItem(KEY);
         records = saved ? JSON.parse(saved) : [];
@@ -1336,43 +1925,225 @@
         console.error('No se pudieron cargar los procesos guardados.', error);
         alert('No se pudieron cargar los procesos guardados en este navegador. No se sobrescribieron los datos. Detalle: ' + error.message);
       }
-      try {
-        const savedCatalogs = JSON.parse(localStorage.getItem(CATALOG_KEY) || '{}');
-        catalogs = savedCatalogs && typeof savedCatalogs === 'object' && !Array.isArray(savedCatalogs)
-          ? Object.fromEntries(Object.entries(savedCatalogs).filter(([, values]) => Array.isArray(values)))
-          : {};
-      } catch (error) {
-        catalogs = {};
-        console.error('No se pudieron cargar los catálogos locales.', error);
-        alert('No se pudieron cargar los catálogos guardados en este navegador. Detalle: ' + error.message);
-      }
+      catalogs = loadLocalCatalogs();
       updateCatalogControls();
       renderAll();
     }
+    const DEFAULT_CATALOGS = {
+      lawyer: ['Laura Gómez Ruiz', 'Andrés Muñoz Paz', 'Carolina Rivera Díaz', 'Julián Ortega Mora'],
+      lawyerLinkType: ['Planta', 'Contratista', 'Otro', 'No informado'],
+      type: ['Reparación directa', 'Nulidad y restablecimiento del derecho', 'Controversias contractuales', 'Nulidad simple', 'Acción de tutela', 'Acción popular', 'Acción de grupo', 'Ejecutivo', 'Ordinario laboral', 'Repetición'],
+      cause: ['Falla en el servicio', 'Accidente de tránsito', 'Responsabilidad médica', 'Incumplimiento contractual', 'Contrato realidad', 'Reliquidación pensional', 'Sanción disciplinaria', 'Ocupación de inmueble'],
+      stage: ['Admisión de la demanda', 'Notificación', 'Contestación de la demanda', 'Audiencia inicial', 'Pruebas', 'Alegatos de conclusión', 'Fallo de primera instancia', 'Recurso de apelación', 'Fallo de segunda instancia', 'Cumplimiento / ejecución', 'Archivo'],
+      state: ['Activo', 'Terminado'],
+      area: ['Secretaría de Educación', 'Secretaría de Salud', 'Secretaría de Infraestructura', 'Secretaría de Hacienda', 'Secretaría de Gobierno', 'Secretaría Jurídica', 'Talento Humano'],
+      hearingType: ['Inicial', 'Pruebas', 'Alegatos y juzgamiento', 'Conciliación', 'Otra'],
+      terminationForm: ['Sentencia', 'Conciliación', 'Transacción', 'Desistimiento', 'Desvinculación', 'Otra']
+    };
+    function loadLocalCatalogs() {
+      let saved = {};
+      try {
+        const parsed = JSON.parse(localStorage.getItem(CATALOG_KEY) || '{}');
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) saved = Object.fromEntries(Object.entries(parsed).filter(([, values]) => Array.isArray(values)));
+      } catch (error) {
+        console.error('No se pudieron cargar los catálogos locales.', error);
+      }
+      let seeded = false;
+      Object.entries(DEFAULT_CATALOGS).forEach(([category, values]) => { if (!(category in saved)) { saved[category] = [...values]; seeded = true } });
+      if (seeded) saveLocalCatalogs(saved);
+      return saved;
+    }
+    function saveLocalCatalogs(value = catalogs) {
+      try { localStorage.setItem(CATALOG_KEY, JSON.stringify(value)) } catch (error) { console.error('No se pudieron guardar los catálogos locales.', error); throw new Error('El navegador no permitió guardar el catálogo localmente.') }
+    }
     function newId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}` }
     function callAppsScript(method, token, payload, category) { return new Promise((resolve, reject) => { let runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(error => reject(new Error(error.message || String(error)))); if (method === 'load') runner.loadApplicationData(token); else if (method === 'save') runner.saveApplicationData(token, payload); else if (method === 'delete') runner.deleteApplicationProcess(token, payload); else if (method === 'catalogs') runner.loadCatalogs(token); else runner.saveCatalogs(token, category, payload) }) }
-    async function loadRemoteApplicationData() { if (!isAppsScript() || !accessToken()) return; try { const token = accessToken(); [records, catalogs] = await Promise.all([callAppsScript('load', token), callAppsScript('catalogs', token)]); updateCatalogControls(); renderAll() } catch (error) { console.error('No se pudieron cargar los procesos y catálogos desde Google Sheets.', error); alert('No se pudieron cargar los procesos o catálogos desde Google Sheets. ' + error.message) } }
+    // Se conserva el nombre porque la autenticación lo invoca tras iniciar sesión; ahora recarga los datos locales.
+    async function loadRemoteApplicationData() { load() }
     window.loadRemoteApplicationData = loadRemoteApplicationData;
-    async function persist() { if (isAppsScript()) { const token = accessToken(); if (!token) throw new Error('La sesión no es válida. Ingresa nuevamente.'); await callAppsScript('save', token, records) } else { localStorage.setItem(KEY, JSON.stringify(records)) } updateCatalogControls(); renderAll() }
-    function showView(id) { document.querySelectorAll('.view').forEach(x => x.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id)); const titles = { dashboard: ['Resumen general', 'Estado de la información registrada'], processes: ['Procesos', 'Consulta y edición de registros'], processOverview: ['Vista completa de procesos', 'Todos los campos de cada registro'], actions: ['Actuaciones', 'Historial de actuaciones registradas'], hearings: ['Audiencias', 'Sesiones conservadas cronológicamente'], catalogs: ['Catálogos', 'Listas autorizadas para estandarizar registros'], form: ['Registro de proceso', 'Formulario por etapas'], backup: ['Descargar datos', 'Descarga de información en formato Excel'] }; document.getElementById('pageTitle').textContent = titles[id][0]; document.getElementById('pageSubtitle').textContent = titles[id][1]; if (id === 'processes') renderProcesses(); if (id === 'processOverview') renderFullProcesses(); if (id === 'actions') renderActions(); if (id === 'hearings') renderHearingsTable(); if (id === 'catalogs') { renderCatalogSummary(); renderCatalogEditor() } }
+    async function persist() { try { localStorage.setItem(KEY, JSON.stringify(records)) } catch (error) { console.error('No se pudieron guardar los procesos localmente.', error); throw new Error('El navegador no permitió guardar los procesos localmente. Verifique el espacio o los permisos de almacenamiento.') } updateCatalogControls(); renderAll() }
+    function showView(id) { document.querySelectorAll('.view').forEach(x => x.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id)); const titles = { dashboard: ['Resumen general', 'Estado de la información registrada'], processes: ['Procesos', 'Consulta y edición de registros'], processOverview: ['Vista completa de procesos', 'Todos los campos de cada registro'], actions: ['Actuaciones', 'Historial de actuaciones registradas'], hearings: ['Diligencias', 'Diligencias conservadas cronológicamente'], catalogs: ['Catálogos', 'Listas autorizadas para estandarizar registros'], form: ['Registro de proceso', 'Formulario por etapas'], backup: ['Descargar datos', 'Descarga de información en formato Excel'] }; document.getElementById('pageTitle').textContent = titles[id][0]; document.getElementById('pageSubtitle').textContent = titles[id][1]; if (id === 'processes') renderProcesses(); if (id === 'processOverview') renderFullProcesses(); if (id === 'actions') renderActions(); if (id === 'hearings') renderHearingsTable(); if (id === 'catalogs') { renderCatalogSummary(); renderCatalogEditor() } if (id === 'backup') initializeExportSelectors() }
     document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
-    function newProcess() { editingId = null; hearingEntries = []; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('editBadge').textContent = 'Nuevo'; document.getElementById('confirmData').checked = false; renderHearings(); step = 0; setStep(); showView('form') }
-    function editProcess(id) { const r = records.find(x => x.id === id); if (!r) return; editingId = id; hearingEntries = [...(r.hearings || [])]; const f = document.getElementById('processForm'); f.reset(); fields.forEach(k => { if (f.elements[k]) f.elements[k].value = r[k] ?? '' }); if (f.elements.notificationDate && !f.elements.notificationDate.value) f.elements.notificationDate.value = r.startDate || ''; document.getElementById('formTitle').textContent = 'Editar proceso'; document.getElementById('editBadge').textContent = 'Edición'; document.getElementById('confirmData').checked = false; renderHearings(); step = 0; setStep(); showView('form') }
-    function setStep() { document.querySelectorAll('.form-step').forEach((el, i) => el.classList.toggle('hidden', i !== step)); document.querySelectorAll('.step').forEach((el, i) => { el.classList.toggle('active', i === step); el.classList.toggle('done', i < step) }); document.getElementById('prevBtn').disabled = step === 0; document.getElementById('nextBtn').classList.toggle('hidden', step === 4); document.getElementById('saveBtn').classList.toggle('hidden', step !== 4); updateConditionalFields(); if (step === 4) makeReview() }
-    function moveStep(delta) { if (delta > 0 && !validateStep()) return; step = Math.max(0, Math.min(4, step + delta)); setStep() }
-    function validateStep() {
-      const box = document.querySelector(`.form-step[data-step="${step}"]`); for (const el of box.querySelectorAll('[required]')) { if (!el.value.trim()) { el.focus(); alert('Complete el campo obligatorio: ' + (el.closest('.field').querySelector('label')?.textContent || el.name)); return false } }
-      if (step === 0) { let rad = document.querySelector('[name=radicado]').value.trim(); if (rad && !/^\d{23}$/.test(rad)) { alert('Si registra un radicado, debe contener exactamente 23 dígitos numéricos. Se conserva como texto para evitar pérdida de ceros.'); return false } }
-      return true
+    function newProcess() { editingId = null; hearingEntries = []; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('confirmData').checked = false; document.getElementById('hearingType').value = ''; renderHearings(); updateClaimantIdentity(); updateRadicadoCounter(); step = 0; setStep(); showView('form') }
+    function cancelProcess() { editingId = null; hearingEntries = []; document.getElementById('processForm').reset(); document.getElementById('formTitle').textContent = 'Registrar proceso'; document.getElementById('confirmData').checked = false; renderHearings(); updateClaimantIdentity(); updateRadicadoCounter(); step = 0; setStep(); showView('processes') }
+    function editProcess(id) { const r = records.find(x => x.id === id); if (!r) return; editingId = id; hearingEntries = [...(r.hearings || [])]; const f = document.getElementById('processForm'); f.reset(); updateCatalogControls(); fields.forEach(k => { const input = f.elements[k]; if (!input) return; const value = r[k] ?? ''; if (input instanceof HTMLSelectElement && value && ![...input.options].some(option => option.value === value)) { const legacyOption = new Option(value, value, false, true); legacyOption.hidden = true; input.add(legacyOption); } input.value = value }); if (f.elements.notificationDate && !f.elements.notificationDate.value) f.elements.notificationDate.value = r.startDate || ''; document.getElementById('formTitle').textContent = 'Editar proceso'; document.getElementById('confirmData').checked = false; renderHearings(); updateClaimantIdentity(); updateRadicadoCounter(); step = 0; setStep(); showView('form') }
+    function setStep() { document.querySelectorAll('.form-step').forEach((el, i) => el.classList.toggle('hidden', i !== step)); renderStepButtons(); document.getElementById('prevBtn').disabled = step === 0; document.getElementById('nextBtn').classList.toggle('hidden', step === LAST_STEP); document.getElementById('saveBtn').classList.toggle('hidden', step !== LAST_STEP); updateConditionalFields(); if (step === LAST_STEP) makeReview() }
+    function updateDigitHint(inputName, hintId) {
+      const input = document.querySelector(`#processForm [name="${inputName}"]`);
+      const hint = document.getElementById(hintId);
+      if (!input || !hint) return;
+      const digits = input.value.replace(/\D/g, '').length;
+      hint.textContent = `${digits} / 23 dígitos`;
+      hint.classList.toggle('ok', digits === 23);
+      hint.classList.toggle('warn', digits > 0 && digits !== 23);
     }
-    function makeReview() { let f = document.getElementById('processForm'); let data = Object.fromEntries(fields.map(k => [k, f.elements[k]?.value || ''])); const storage = isAppsScript() ? 'Google Sheets' : 'el almacenamiento local de este navegador'; document.getElementById('reviewBox').innerHTML = '<b>Resumen de revisión</b><br>' + ['shortNo', 'radicado', 'claimant', 'defendant', 'notificationDate', 'maxDemandResponseDate', 'type', 'stage', 'state', 'lawyer', 'quality', 'endDate', 'appealStatus'].map(k => `<div>${labels[k]}: ${escapeHtml(data[k] || 'Sin diligenciar')}</div>`).join('') + `<div>Sesiones de audiencia: ${hearingEntries.length}</div><br>Los campos obligatorios definitivos y los términos deben ser validados por el equipo jurídico. El registro se guardará en ${storage}.` }
+    function updateRadicadoCounter() {
+      updateDigitHint('radicado', 'radicadoDigitCount');
+      updateDigitHint('currentRadicado', 'currentRadicadoDigitCount');
+    }
+    function updateClaimantIdentity() {
+      const name = document.querySelector('#processForm [name="claimant"]').value.trim() || 'Sin nombre';
+      const ids = document.querySelector('#processForm [name="ids"]').value.trim() || 'Sin registrar';
+      document.getElementById('claimantIdentity').innerHTML = `<strong>${escapeHtml(name)}</strong><span>Cédulas / identificadores: ${escapeHtml(ids)}</span>`;
+    }
+    document.querySelectorAll('#processForm [name="radicado"], #processForm [name="currentRadicado"]').forEach(input => input.addEventListener('input', updateRadicadoCounter));
+    document.querySelectorAll('#processForm [name="claimant"], #processForm [name="ids"]').forEach(input => input.addEventListener('input', updateClaimantIdentity));
+    function configureAdminRequiredFields(user) {
+      const isAdmin = !user || user.rol === 'ADMINISTRADOR';
+      const isCollaborator = user?.rol === 'COLABORADOR';
+      const processForm = document.getElementById('processForm');
+      processForm.querySelectorAll('[data-admin-required]').forEach(input => input.closest('.field')?.classList.add('admin-field'));
+      processForm.classList.toggle('admin-view', isAdmin);
+      placeCautelarField(isAdmin);
+      if (!stepSequence().includes(step)) step = 0;
+      renderStepButtons();
+      fields.forEach(name => {
+        const input = document.getElementById('processForm').elements[name];
+        if (!input) return;
+        const form = document.getElementById('processForm');
+        let required = isAdmin ? input.hasAttribute('data-admin-required') : isCollaborator && !secondInstanceFields.has(name);
+        if (isCollaborator && form.elements.state.value !== 'Terminado' && name === 'endDate') required = false;
+        if (isCollaborator && form.elements.cautelar.value === 'No' && ['maxMeasureResponseDate', 'measureResponseDate'].includes(name)) required = false;
+        if (isCollaborator && form.elements.anticipatedJudgment.value === 'Sí' && ['evidence', 'maxClosingArgumentsDate', 'closingArgumentsDate'].includes(name)) required = false;
+        if (isCollaborator && form.elements.appealStatus.value === 'No presentado' && ['appealAmount', 'maxAppealDate', 'appealDate'].includes(name)) required = false;
+        input.required = required;
+      });
+      document.querySelectorAll('#processForm .field label .required-indicator').forEach(indicator => indicator.remove());
+      document.querySelectorAll('#processForm [required]').forEach(input => {
+        const label = input.closest('.field')?.querySelector('label');
+        if (!label || label.querySelector('.required-indicator')) return;
+        const mark = document.createElement('span');
+        mark.className = 'required-indicator';
+        mark.textContent = ' *';
+        mark.setAttribute('aria-hidden', 'true');
+        label.append(mark);
+      });
+    }
+    function validateRequiredFields(container = document.getElementById('processForm')) {
+      const missing = [...container.querySelectorAll('[required]')].find(input =>
+        !input.closest('.field')?.classList.contains('hidden') && !String(input.value || '').trim()
+      );
+      if (!missing) return true;
+      const formStep = missing.closest('.form-step');
+      if (formStep) {
+        step = Number(formStep.dataset.step);
+        setStep();
+      }
+      missing.focus();
+      alert('Complete el campo obligatorio: ' + (missing.closest('.field')?.querySelector('label')?.textContent || missing.name));
+      return false;
+    }
+    function moveStep(delta) { const sequence = stepSequence(); const position = Math.max(0, sequence.indexOf(step)); step = sequence[Math.max(0, Math.min(sequence.length - 1, position + delta))]; setStep() }
+    function goToStep(index) { const target = Number(index) || 0; step = stepSequence().includes(target) ? target : 0; setStep() }
+    const STEP_TITLES = ['Identificación del proceso', 'Partes y abogado', 'Clasificación judicial', 'Pretensiones y trámite inicial', 'Primera y segunda instancia', 'Revisión y confirmación'];
+    const stepNames = STEP_TITLES;
+    function placeCautelarField(adminView) {
+      const form = document.getElementById('processForm');
+      const field = form.elements.cautelar?.closest('.field');
+      const anchor = (adminView ? form.elements.state : form.elements.maxMeasureResponseDate)?.closest('.field');
+      if (field && anchor && field.nextElementSibling !== anchor) anchor.parentNode.insertBefore(field, anchor);
+    }
+    function readPreference(key) { try { return localStorage.getItem(key) === '1' } catch (error) { return false } }
+    function writePreference(key, value) { try { localStorage.setItem(key, value ? '1' : '0') } catch (error) { console.error('No se pudo guardar la preferencia.', error) } }
+    const LEGEND_HIDDEN_KEY = 'judicial_admin_legend_hidden_v1';
+    const HIGHLIGHT_OFF_KEY = 'judicial_admin_highlight_off_v1';
+    function applyLegendPreferences() {
+      const highlightOff = readPreference(HIGHLIGHT_OFF_KEY);
+      const legendHidden = readPreference(LEGEND_HIDDEN_KEY);
+      document.getElementById('processForm').classList.toggle('no-admin-highlight', highlightOff);
+      document.getElementById('adminLegend').classList.toggle('hidden', legendHidden);
+      document.getElementById('showLegendButton').classList.toggle('hidden', !legendHidden);
+      document.getElementById('highlightToggle').textContent = highlightOff ? 'Volver a resaltar' : 'Quitar resaltado';
+    }
+    function toggleAdminHighlight() { writePreference(HIGHLIGHT_OFF_KEY, !readPreference(HIGHLIGHT_OFF_KEY)); applyLegendPreferences() }
+    function hideAdminLegend() { writePreference(LEGEND_HIDDEN_KEY, true); applyLegendPreferences() }
+    function showAdminLegend() { writePreference(LEGEND_HIDDEN_KEY, false); applyLegendPreferences() }
+    function isAdminView() { return document.getElementById('processForm').classList.contains('admin-view') }
+    function stepSequence() { return isAdminView() ? [0, 1, 2, LAST_STEP] : [0, 1, 2, 3, 4, LAST_STEP] }
+    function renderStepButtons() {
+      const container = document.getElementById('steps');
+      if (!container) return;
+      const adminView = isAdminView();
+      container.innerHTML = stepSequence().map((index, position) => `<button type="button" class="step${index === step ? ' active' : ''}" role="tab" aria-selected="${index === step}" onclick="goToStep(${index})">${position + 1}. ${adminView && index === LAST_STEP ? 'Seguimiento y revisión' : STEP_TITLES[index]}</button>`).join('');
+    }
+    function missingRequiredFields() {
+      return [...document.querySelectorAll('#processForm [required]')]
+        .filter(input => !input.closest('.field')?.classList.contains('hidden') && !String(input.value || '').trim())
+        .map(input => ({
+          name: input.name,
+          step: Number(input.closest('.form-step')?.dataset.step || 0),
+          label: (input.closest('.field')?.querySelector('label')?.textContent || input.name).replace(/\s*\*\s*$/, '').trim()
+        }));
+    }
+    function focusField(name, stepIndex) { goToStep(stepIndex); document.querySelector(`#processForm [name="${name}"]`)?.focus() }
+    function validateRadicado() {
+      const radicado = document.querySelector('#processForm [name="radicado"]').value.trim();
+      if (radicado && !/^\d{23}$/.test(radicado)) {
+        alert('El radicado judicial debe contener exactamente 23 dígitos numéricos. Se conserva como texto para evitar pérdida de ceros.');
+        step = 0;
+        setStep();
+        document.querySelector('#processForm [name="radicado"]').focus();
+        return false;
+      }
+      return true;
+    }
+    function makeReview() {
+      const form = document.getElementById('processForm');
+      const data = Object.fromEntries(fields.map(key => [key, form.elements[key]?.value || '']));
+      const storage = 'el almacenamiento local de este navegador';
+      const adminView = form.classList.contains('admin-view');
+      const reviewFields = fields
+        .filter(name => !adminView || form.elements[name]?.hasAttribute('data-admin-required'))
+        .map(name => ({ name, label: labels[name] }));
+      const details = reviewFields
+        .map(({ name, label }) => `<div>${escapeHtml(label)}: ${escapeHtml(data[name] || 'Sin diligenciar')}</div>`)
+        .join('');
+      const missing = missingRequiredFields();
+      const radicadoInvalid = data.radicado && !/^\d{23}$/.test(data.radicado.trim());
+      const missingBox = document.getElementById('reviewMissing');
+      if (missingBox) {
+        const items = missing.map(item => `<li><button type="button" class="link-button" onclick="focusField('${item.name}', ${item.step})">${escapeHtml(item.label)}</button> <span class="record-sub">· ${escapeHtml(stepNames[item.step] || '')}</span></li>`);
+        if (radicadoInvalid) items.unshift(`<li><button type="button" class="link-button" onclick="focusField('radicado', 0)">Radicado judicial</button> <span class="record-sub">· debe tener exactamente 23 dígitos</span></li>`);
+        missingBox.classList.toggle('hidden', !items.length);
+        missingBox.innerHTML = items.length ? `<b>Faltan ${items.length} campo(s) obligatorio(s) antes de guardar</b><ul>${items.join('')}</ul>` : '';
+      }
+      document.getElementById('reviewBox').innerHTML = `<b>Resumen de revisión</b><br>${details}${adminView ? '' : `<div>Diligencias: ${hearingEntries.length}</div>`}<br>Los vencimientos se ingresan manualmente hasta que se configuren y validen las reglas jurídicas. El registro se guardará en ${storage}.`;
+    }
     async function saveProcess() {
+      if (step !== LAST_STEP) { goToStep(LAST_STEP); return; }
+      makeReview();
+      const missing = missingRequiredFields();
+      if (missing.length) {
+        alert(`Faltan ${missing.length} campo(s) obligatorio(s). Revise la lista en la sección Revisión antes de guardar.`);
+        document.getElementById('reviewMissing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (!validateRadicado()) return;
       if (!document.getElementById('confirmData').checked) {
         alert('Marque la confirmación de revisión antes de guardar.');
         return;
       }
       const form = document.getElementById('processForm');
-      const data = Object.fromEntries(fields.map(key => [key, form.elements[key]?.value.trim() || '']));
+      const data = Object.fromEntries(fields.map(key => [key, String(form.elements[key]?.value || '').trim()]));
+      if (data.appealAmount && data.amount && Number(data.appealAmount) < Number(data.amount)) {
+        alert('La pretensión del recurso no puede ser menor que la pretensión de primera instancia.');
+        step = 4;
+        setStep();
+        form.elements.appealAmount.focus();
+        return;
+      }
+      const actualDates = [
+        ...processDateFields.map(name => data[name]).filter(Boolean),
+        ...hearingEntries.map(item => item.date),
+        ...records.find(record => record.id === editingId)?.actions?.map(action => action.date) || []
+      ];
+      if (data.endDate && actualDates.some(date => data.endDate < date)) {
+        alert('La fecha de terminación no puede ser anterior a la notificación ni a otras fechas registradas del proceso.');
+        step = 2;
+        setStep();
+        form.elements.endDate.focus();
+        return;
+      }
       if (data.radicado && !/^\d{23}$/.test(data.radicado)) {
         alert('Si registra un radicado, debe contener exactamente 23 dígitos numéricos.');
         step = 0;
@@ -1418,8 +2189,25 @@
       }
     }
     function currentActor() { return document.getElementById('userName')?.textContent.trim() || 'Usuario local' }
-    function addHearing() { const date = document.getElementById('hearingDate').value; const type = document.getElementById('hearingType').value.trim(); if (!date || !type) { alert('Selecciona el tipo y la fecha de la sesión de audiencia.'); return } const number = hearingEntries.filter(item => item.type === type).length + 1; hearingEntries.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), type, number, date, observation: document.getElementById('hearingObservation').value.trim() }); document.getElementById('hearingDate').value = ''; document.getElementById('hearingObservation').value = ''; renderHearings() }
-    function renderHearings() { const target = document.getElementById('hearingList'); if (!target) return; const sorted = [...hearingEntries].sort((a, b) => a.date.localeCompare(b.date)); target.innerHTML = sorted.length ? sorted.map(item => `<article class="action-item"><strong>${escapeHtml(item.type)} · Sesión ${item.number} · ${escapeHtml(fmtDate(item.date))}</strong><div>${escapeHtml(item.observation || 'Sin observación')}</div></article>`).join('') : '<div class="empty">Aún no hay sesiones registradas.</div>' }
+    function addHearing() {
+      const date = document.getElementById('hearingDate').value;
+      const type = document.getElementById('hearingType').value.trim();
+      const requestedNumber = Number(document.getElementById('hearingSessionNumber').value);
+      if (!date || !type) { alert('Selecciona el tipo y la fecha de la diligencia.'); return }
+      const number = requestedNumber || hearingEntries.filter(item => item.type === type).length + 1;
+      if (!Number.isInteger(number) || number < 1) { alert('El número de sesión debe ser un entero mayor que cero.'); return }
+      hearingEntries.push({ id: newId(), type, number, date, observation: document.getElementById('hearingObservation').value.trim() });
+      document.getElementById('hearingDate').value = '';
+      document.getElementById('hearingObservation').value = '';
+      document.getElementById('hearingSessionNumber').value = '';
+      renderHearings();
+    }
+    function renderHearings() {
+      const target = document.getElementById('hearingList');
+      if (!target) return;
+      const sorted = [...hearingEntries].sort((a, b) => a.date.localeCompare(b.date));
+      target.innerHTML = sorted.length ? sorted.map(item => `<article class="action-item"><strong>${escapeHtml(item.type)} · Sesión ${item.number} · ${escapeHtml(fmtDate(item.date))}</strong><div>${escapeHtml(item.observation || 'Sin observación')}</div></article>`).join('') : '<div class="empty">Aún no hay diligencias registradas.</div>';
+    }
     function updateConditionalFields() {
       const form = document.getElementById('processForm');
       const anticipated = form.elements.anticipatedJudgment?.value === 'Sí';
@@ -1427,22 +2215,34 @@
       const hearingField = document.getElementById('hearingList')?.closest('.field');
       const flowNotice = document.getElementById('judicialFlowNotice');
       if (hearingField) hearingField.classList.toggle('hidden', anticipated);
-      ['evidence', 'closingArgumentsDate'].forEach(name => {
+      ['evidence', 'maxClosingArgumentsDate', 'closingArgumentsDate'].forEach(name => {
         const field = form.elements[name]?.closest('.field');
         if (field) field.classList.toggle('hidden', anticipated);
       });
       const appealFiled = appealStatus === 'Presentado en término';
+      ['appealAmount', 'maxAppealDate', 'appealDate'].forEach(name => {
+        const field = form.elements[name]?.closest('.field');
+        if (field) field.classList.toggle('hidden', appealStatus === 'No presentado');
+      });
       ['appealGrantedOrderDate', 'appealAdmittedOrderDate', 'secondInstanceDecisionDate', 'secondInstanceDecisionSense', 'secondInstanceDecision'].forEach(name => {
         const field = form.elements[name]?.closest('.field');
         if (field) field.classList.toggle('hidden', appealStatus !== '' && !appealFiled);
       });
       if (flowNotice) {
         flowNotice.textContent = anticipated
-          ? 'Sentencia anticipada seleccionada: se ocultan las audiencias, pruebas y alegatos. Cualquier dato ya registrado se conserva.'
+          ? 'Sentencia anticipada seleccionada: se ocultan las diligencias, pruebas y alegatos. Cualquier dato ya registrado se conserva.'
           : appealStatus === 'No presentado' || appealStatus === 'Presentado fuera de término'
             ? `Estado del recurso: ${appealStatus}. No se marcará automáticamente el proceso como terminado; confirme el estado y la terminación según el criterio jurídico.`
             : 'Las etapas no aplicables pueden ocultarse temporalmente; los datos registrados se conservan.';
       }
+      const cautelar = form.elements.cautelar?.value;
+      document.querySelectorAll('[data-measure-field]').forEach(input => {
+        input.disabled = cautelar === 'No';
+        if (cautelar === 'No') input.value = '';
+        input.closest('.field')?.classList.toggle('hidden', cautelar === 'No');
+      });
+      const notification = form.elements.notificationDate?.value;
+      const processType = form.elements.type?.value;
       const deadline = form.elements.maxDemandResponseDate?.value;
       const responded = form.elements.demandResponseDate?.value;
       const notice = document.getElementById('deadlineNotice');
@@ -1454,22 +2254,40 @@
             ? `Alerta: la fecha máxima registrada (${fmtDate(deadline)}) ya pasó y no se ha ingresado fecha real de contestación.`
             : deadline === today
               ? `Alerta: la fecha máxima registrada (${fmtDate(deadline)}) es hoy.`
-              : `Fecha máxima registrada: ${fmtDate(deadline)}. El cálculo del término no está automatizado y requiere validación jurídica.`;
+              : `Fecha máxima registrada: ${fmtDate(deadline)}. El cómputo automático por tipo de proceso queda pendiente de las reglas jurídicas aplicables.`;
+      } else if (notice && notification) {
+        notice.textContent = `Notificación registrada: ${fmtDate(notification)}${processType ? ` · Tipo de proceso: ${processType}` : ''}. La fecha máxima se debe ingresar manualmente hasta configurar el término legal aplicable.`;
       }
+      configureAdminRequiredFields(window.currentAuthenticatedUser);
     }
-    document.querySelectorAll('#processForm [name="anticipatedJudgment"], #processForm [name="appealStatus"], #processForm [name="maxDemandResponseDate"], #processForm [name="demandResponseDate"]').forEach(input => input.addEventListener('change', updateConditionalFields));
+    document.getElementById('processForm').addEventListener('change', () => { if (step === LAST_STEP) makeReview() });
+    document.querySelectorAll('#processForm [name="anticipatedJudgment"], #processForm [name="appealStatus"], #processForm [name="cautelar"], #processForm [name="state"], #processForm [name="maxDemandResponseDate"], #processForm [name="demandResponseDate"], #processForm [name="notificationDate"], #processForm [name="type"]').forEach(input => input.addEventListener('change', updateConditionalFields));
     function renderHearingsTable() {
-      const entries = applyFilters().flatMap(record => (record.hearings || []).map(hearing => ({ record, hearing })))
-        .sort((a, b) => a.hearing.date.localeCompare(b.hearing.date));
+      const query = (document.getElementById('hearingsSearch')?.value || '').trim().toLowerCase();
+      const typeFilter = document.getElementById('hearingTypeFilter');
+      const allEntries = applyFilters().flatMap(record => (record.hearings || []).map(hearing => ({ record, hearing })));
+      const types = [...new Set(allEntries.map(({ hearing }) => hearing.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+      const selectedType = typeFilter?.value || '';
+      if (typeFilter) {
+        typeFilter.innerHTML = '<option value="">Todos los tipos</option>' + types.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('');
+        if (types.includes(selectedType)) typeFilter.value = selectedType;
+      }
+      const from = document.getElementById('hearingFromFilter')?.value || '';
+      const to = document.getElementById('hearingToFilter')?.value || '';
+      const entries = allEntries.filter(({ record, hearing }) =>
+        (!selectedType || hearing.type === selectedType) &&
+        (!from || hearing.date >= from) && (!to || hearing.date <= to) &&
+        [record.shortNo, record.radicado, record.claimant, hearing.type, hearing.observation, hearing.date, hearing.number]
+          .some(value => String(value || '').toLowerCase().includes(query))
+      ).sort((a, b) => a.hearing.date.localeCompare(b.hearing.date));
       document.getElementById('allHearingsTable').innerHTML = entries.length
-        ? `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Tipo</th><th>Sesión</th><th>Fecha</th><th>Observación</th><th></th></tr></thead><tbody>${entries.map(({ record, hearing }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(hearing.type)}</td><td>${hearing.number}</td><td>${escapeHtml(fmtDate(hearing.date))}</td><td>${escapeHtml(hearing.observation || '—')}</td><td><button class="secondary small" onclick="editProcess('${record.id}')">Ver proceso</button></td></tr>`).join('')}</tbody></table></div>`
-        : '<div class="empty">No hay sesiones de audiencia registradas.</div>';
+        ? `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Tipo de diligencia</th><th>Sesión</th><th>Fecha</th><th>Observación</th><th></th></tr></thead><tbody>${entries.map(({ record, hearing }) => `<tr><td class="nowrap">${escapeHtml(record.shortNo || 'Sin número')}</td><td class="nowrap">${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(hearing.type)}</td><td>${hearing.number}</td><td class="nowrap">${escapeHtml(fmtDate(hearing.date))}</td><td>${escapeHtml(hearing.observation || '—')}</td><td><button class="secondary small" onclick="editProcess('${record.id}')">Ver proceso</button></td></tr>`).join('')}</tbody></table></div>`
+        : '<div class="empty">No hay diligencias que coincidan con los filtros.</div>';
     }
     function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
     function fmtDate(s) { return s ? new Date(s + 'T00:00:00').toLocaleDateString('es-CO') : '—' }
-    function adminOnlyClass() { return isAppsScript() && window.currentAuthenticatedUser?.rol !== 'ADMINISTRADOR' ? 'hidden' : '' }
     function deadlineStatus(record) { if (!record.maxDemandResponseDate) return ''; if (record.demandResponseDate) return record.demandResponseDate > record.maxDemandResponseDate ? `Contestación ${fmtDate(record.demandResponseDate)} posterior al vencimiento ${fmtDate(record.maxDemandResponseDate)}.` : ''; const today = new Date().toISOString().slice(0, 10); return record.maxDemandResponseDate < today ? 'Vencimiento de contestación superado; verifique la actuación.' : record.maxDemandResponseDate === today ? 'El vencimiento de contestación registrado es hoy.' : `Vencimiento registrado: ${fmtDate(record.maxDemandResponseDate)}.` }
-    function row(r) { const deadline = deadlineStatus(r); return `<tr><td><div class="record-title">${escapeHtml(r.shortNo || 'Sin número')}</div><div class="record-sub">${escapeHtml(r.radicado || 'Sin radicado')}</div>${deadline ? `<div class="deadline-alert">${escapeHtml(deadline)}</div>` : ''}</td><td>${escapeHtml(r.claimant || '—')}<div class="record-sub">Demandados: ${escapeHtml(r.defendant || '—')}</div></td><td>${escapeHtml(r.type || '—')}</td><td>${escapeHtml(r.lawyer || 'Sin asignar')}</td><td><span class="pill ${r.state === 'Activo' ? 'active' : r.state === 'Terminado' ? 'closed' : ''}">${escapeHtml(r.state || 'Sin estado')}</span></td><td><button class="secondary small" onclick="editProcess('${r.id}')">Editar</button> <button class="secondary small" onclick="openActions('${r.id}')">Actuaciones (${(r.actions || []).length})</button> <button class="danger small ${adminOnlyClass()}" onclick="deleteProcess('${r.id}')">Eliminar</button></td></tr>` }
+    function row(r) { const deadline = deadlineStatus(r); return `<tr><td><div class="record-title">${escapeHtml(r.shortNo || 'Sin número')}</div><div class="record-sub">${escapeHtml(r.radicado || 'Sin radicado')}</div>${deadline ? `<div class="deadline-alert">${escapeHtml(deadline)}</div>` : ''}</td><td>${escapeHtml(r.claimant || '—')}<div class="record-sub">Demandados: ${escapeHtml(r.defendant || '—')}</div></td><td>${escapeHtml(r.type || '—')}</td><td>${escapeHtml(r.lawyer || 'Sin asignar')}</td><td><span class="pill ${r.state === 'Activo' ? 'active' : r.state === 'Terminado' ? 'closed' : ''}">${escapeHtml(r.state || 'Sin estado')}</span></td><td><button class="secondary small" onclick="editProcess('${r.id}')">Editar</button> <button class="secondary small" onclick="openActions('${r.id}')">Actuaciones (${(r.actions || []).length})</button> <button class="secondary small" onclick="viewProcessPdf('${r.id}')">Ver PDF</button></td></tr>` }
     function table(list) { return list.length ? `<div class="table-wrap"><table><thead><tr><th>Identificación</th><th>Partes</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>` : '<div class="empty">No hay procesos registrados.</div>' }
     function fullProcessRow(record) {
       const processCells = fields.map(field => {
@@ -1477,15 +2295,60 @@
         const displayValue = value ? (/Date$/.test(field) ? fmtDate(value) : String(value)) : '—';
         return `<td>${escapeHtml(displayValue)}</td>`;
       });
-      const actionHistory = (record.actions || []).map(action => `${fmtDate(action.date)} · ${action.title || action.description}`).join('\n') || '—';
+      const actionHistory = (record.actions || []).map(action => `${fmtDate(action.date)} · ${action.title || action.description} · creada ${action.createdAt ? new Date(action.createdAt).toLocaleString('es-CO') : 'sin fecha'}`).join('\n') || '—';
       const hearingHistory = (record.hearings || []).map(item => `${item.type} ${item.number}: ${fmtDate(item.date)}${item.observation ? ` · ${item.observation}` : ''}`).join('\n') || '—';
       const audit = (record.audit || []).map(item => `${new Date(item.changedAt).toLocaleString('es-CO')} · ${item.changedBy}: ${(item.changedFields || []).join(', ')}`).join('\n') || '—';
-      return `<tr>${processCells.join('')}<td>${escapeHtml(hearingHistory)}</td><td>${escapeHtml(record.createdAt ? new Date(record.createdAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedAt ? new Date(record.updatedAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedBy || '—')}</td><td>${escapeHtml(audit)}</td><td>${escapeHtml(actionHistory)}</td><td class="full-table-actions"><button class="secondary small" onclick="editProcess('${record.id}')">Editar</button> <button class="secondary small" onclick="openActions('${record.id}')">Actuaciones (${(record.actions || []).length})</button> <button class="danger small ${adminOnlyClass()}" onclick="deleteProcess('${record.id}')">Eliminar</button></td></tr>`;
+      return `<tr>${processCells.join('')}<td>${escapeHtml(hearingHistory)}</td><td>${escapeHtml(record.createdAt ? new Date(record.createdAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedAt ? new Date(record.updatedAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(record.updatedBy || '—')}</td><td>${escapeHtml(audit)}</td><td>${escapeHtml(actionHistory)}</td><td class="full-table-actions"><button class="secondary small" onclick="editProcess('${record.id}')">Editar</button> <button class="secondary small" onclick="openActions('${record.id}')">Actuaciones (${(record.actions || []).length})</button> <button class="secondary small" onclick="viewProcessPdf('${record.id}')">Ver PDF</button></td></tr>`;
     }
     function fullProcessTable(list) {
       if (!list.length) return '<div class="empty">No hay procesos registrados.</div>';
-      const headers = [...fields.map(field => labels[field]), 'Sesiones de audiencia', 'Creado', 'Actualizado', 'Modificado por', 'Historial de cambios', 'Historial de actuaciones', 'Administrar'];
+      const headers = [...fields.map(field => labels[field]), 'Diligencias', 'Creado', 'Actualizado', 'Modificado por', 'Historial de cambios', 'Historial de actuaciones', 'Administrar'];
       return `<div class="table-wrap full-table-wrap" role="region" aria-label="Tabla general de procesos; desplácese horizontalmente para ver todas las columnas" tabindex="0"><table class="full-process-table"><thead><tr>${headers.map(header => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${list.map(fullProcessRow).join('')}</tbody></table></div>`;
+    }
+    function openPrintDocument(title, content, preview = false, landscape = false) {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('El navegador bloqueó la ventana de impresión. Permite ventanas emergentes para descargar el PDF.');
+        return;
+      }
+      if (!preview) printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
+      printWindow.document.open();
+      printWindow.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>body{font:12px/1.5 Arial,sans-serif;color:#202b36;margin:28px}h1{font-size:20px}h2{font-size:15px;margin-top:22px}table{width:100%;border-collapse:collapse;margin:10px 0}th,td{border:1px solid #d7dee4;padding:7px;text-align:left;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}th{background:#edf1f4}table.info th{width:28%}table.grid{table-layout:fixed}.metadata{color:#697785;font-size:11px}@page{size:${landscape ? 'A4 landscape' : 'A4'};margin:14mm}.toolbar{position:sticky;top:0;background:#fff;padding:0 0 12px;margin:0 0 12px;border-bottom:1px solid #d7dee4}.toolbar button{font:600 13px Arial,sans-serif;padding:8px 14px;border:0;border-radius:6px;background:#c8641e;color:#fff;cursor:pointer;margin-right:8px}.toolbar button.secondary{background:#edf1f4;color:#202b36}@media print{.toolbar{display:none}}</style></head><body>${preview ? '<div class="toolbar"><button onclick="window.print()">Descargar PDF</button><button class="secondary" onclick="window.close()">Cerrar</button></div>' : ''}<h1>${escapeHtml(title)}</h1>${content}</body></html>`);
+      printWindow.document.close();
+    }
+    function downloadProcessPdf() {
+      const savedRecord = records.find(item => item.id === editingId);
+      if (!savedRecord) {
+        alert('Abre un proceso existente para generar su vista general en PDF.');
+        return;
+      }
+      const form = document.getElementById('processForm');
+      const formValues = Object.fromEntries(fields.map(field => [field, form.elements[field]?.value ?? savedRecord[field] ?? '']));
+      openProcessPdf({ ...savedRecord, ...formValues, hearings: hearingEntries });
+    }
+    function viewProcessPdf(id) {
+      const record = records.find(item => item.id === id);
+      if (record) openProcessPdf(record);
+    }
+    function openProcessPdf(record) {
+      const details = fields.map(field => `<tr><th>${escapeHtml(labels[field])}</th><td>${escapeHtml(record[field] || '—')}</td></tr>`).join('');
+      const actions = (record.actions || []).map(action => `<tr><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(fmtDate(action.dueDate))}</td><td>${escapeHtml(action.title || action.type || 'Actuación')}</td><td>${escapeHtml(action.description || '—')}</td><td>${escapeHtml(action.status || '—')}</td></tr>`).join('') || '<tr><td colspan="5">Sin actuaciones registradas.</td></tr>';
+      const hearings = (record.hearings || []).map(hearing => `<tr><td>${escapeHtml(hearing.type)}</td><td>${escapeHtml(hearing.number)}</td><td>${escapeHtml(fmtDate(hearing.date))}</td><td>${escapeHtml(hearing.observation || '—')}</td></tr>`).join('') || '<tr><td colspan="4">Sin diligencias registradas.</td></tr>';
+      openPrintDocument(`Proceso ${record.shortNo || record.radicado || ''}`, `<p class="metadata">Generado el ${escapeHtml(new Date().toLocaleString('es-CO'))}</p><h2>Información general</h2><table class="info">${details}</table><h2>Actuaciones</h2><table class="grid"><colgroup><col style="width:11%"><col style="width:12%"><col style="width:27%"><col style="width:38%"><col style="width:12%"></colgroup><thead><tr><th>Fecha</th><th>Vencimiento</th><th>Título</th><th>Descripción</th><th>Estado</th></tr></thead><tbody>${actions}</tbody></table><h2>Diligencias</h2><table class="grid"><colgroup><col style="width:25%"><col style="width:10%"><col style="width:15%"><col style="width:50%"></colgroup><thead><tr><th>Tipo</th><th>Sesión</th><th>Fecha</th><th>Observación</th></tr></thead><tbody>${hearings}</tbody></table>`, true);
+    }
+    function downloadActionsReport() {
+      const visible = visibleActionEntries();
+      const marked = visible.filter(({ action }) => selectedActionIds.has(action.id));
+      const entries = marked.length ? marked : visible;
+      if (!entries.length) {
+        alert('No hay actuaciones para generar el reporte.');
+        return;
+      }
+      const rows = entries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(record.claimant || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(fmtDate(action.dueDate))}</td><td>${escapeHtml(action.title || action.type || 'Actuación')}</td><td>${escapeHtml(action.description || '—')}</td><td>${escapeHtml(action.status || '—')}</td><td>${escapeHtml(action.createdAt ? new Date(action.createdAt).toLocaleString('es-CO') : '—')}</td></tr>`).join('');
+      openPrintDocument('Reporte de actuaciones', `<p class="metadata">${entries.length} actuaciones${marked.length ? ' seleccionadas' : ' (todas las visibles)'}</p><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Demandante</th><th>Fecha</th><th>Vencimiento</th><th>Actuación</th><th>Descripción</th><th>Estado</th><th>Creada</th></tr></thead><tbody>${rows}</tbody></table>`, true, true);
     }
     function fillFilterOptions(id, values, label) {
       const ids = [id];
@@ -1508,6 +2371,11 @@
       const datalist = document.getElementById(id);
       if (datalist) datalist.innerHTML = values.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
     }
+    function fillSelectOptions(select, values, selectedValue = select.value) {
+      const options = [...new Set(values.map(value => String(value || '').trim()).filter(Boolean))];
+      select.innerHTML = '<option value="">Seleccione</option>' + options.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+      if (options.includes(selectedValue)) select.value = selectedValue;
+    }
     function updateCatalogControls() {
       const lawyerSelect = document.getElementById('lawyerSelect');
       const previousLawyer = lawyerSelect?.value || '';
@@ -1524,16 +2392,25 @@
         linkTypeSelect.innerHTML = '<option value="">Seleccione</option>' + linkTypes.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
         linkTypeSelect.value = previousValue;
       }
-      fillDatalist('typeOptions', catalogValues('type', records.map(record => record.type)));
+      const processTypeSelect = document.getElementById('processTypeSelect');
+      fillSelectOptions(processTypeSelect, catalogValues('type', records.map(record => record.type)));
+      const areaSelect = document.querySelector('#processForm [name="area"]');
+      fillSelectOptions(areaSelect, catalogValues('area', records.map(record => record.area)));
+      const stageSelect = document.querySelector('#processForm [name="stage"]');
+      fillSelectOptions(stageSelect, catalogValues('stage', records.map(record => record.stage)));
+      const stateSelect = document.querySelector('#processForm [name="state"]');
+      fillSelectOptions(stateSelect, catalogValues('state', [...records.map(record => record.state), 'Activo', 'Terminado']));
+      const terminationSelect = document.querySelector('#processForm [name="terminationForm"]');
+      fillSelectOptions(terminationSelect, catalogValues('terminationForm', [...records.map(record => record.terminationForm), 'Sentencia', 'Conciliación', 'Transacción', 'Desvinculación', 'Otra']));
       fillDatalist('causeOptions', catalogValues('cause', records.map(record => record.cause)));
-      fillDatalist('hearingTypeOptions', catalogValues('hearingType', ['Inicial', 'Pruebas', 'Otra']));
-      fillDatalist('terminationFormOptions', catalogValues('terminationForm', ['Sentencia', 'Conciliación', 'Transacción', 'Desvinculación', 'Otra']));
+      const hearingTypeSelect = document.getElementById('hearingType');
+      fillSelectOptions(hearingTypeSelect, catalogValues('hearingType', ['Inicial', 'Pruebas', 'Otra']));
       renderCatalogSummary();
     }
     function renderCatalogSummary() {
       const target = document.getElementById('catalogSummary');
       if (!target) return;
-      const labelsByCategory = { lawyer: 'Abogados', lawyerLinkType: 'Tipo de vinculación', type: 'Tipo de proceso', cause: 'Causas', hearingType: 'Tipo de audiencia', terminationForm: 'Forma de terminación' };
+      const labelsByCategory = { lawyer: 'Abogados', lawyerLinkType: 'Tipo de vinculación', type: 'Tipo de proceso', cause: 'Causas', stage: 'Etapa del proceso', state: 'Estado del proceso', area: 'Área generadora del daño', hearingType: 'Tipo de diligencia', terminationForm: 'Forma de terminación' };
       target.innerHTML = Object.keys(labelsByCategory).map(category => `<article class="action-item"><strong>${labelsByCategory[category]}</strong><div>${(catalogs[category] || []).map(escapeHtml).join(', ') || 'Sin valores configurados'}</div></article>`).join('');
     }
     function renderCatalogEditor() {
@@ -1545,17 +2422,12 @@
       const category = document.getElementById('catalogCategory').value;
       const values = [...new Set(document.getElementById('catalogValues').value.split(/\r?\n/).map(value => value.trim()).filter(Boolean))];
       try {
-        if (isAppsScript()) {
-          const token = accessToken();
-          if (!token) throw new Error('La sesión no es válida. Ingresa nuevamente.');
-          catalogs = await callAppsScript('saveCatalogs', token, values, category);
-        } else {
-          catalogs[category] = values;
-          localStorage.setItem(CATALOG_KEY, JSON.stringify(catalogs));
-        }
+        // Temporal: los catálogos se crean y guardan localmente en este navegador.
+        catalogs = { ...catalogs, [category]: values };
+        saveLocalCatalogs(catalogs);
         updateCatalogControls();
         renderCatalogEditor();
-        alert('Catálogo guardado.');
+        alert('Catálogo guardado localmente en este navegador.');
       } catch (error) {
         alert(error.message);
       }
@@ -1568,10 +2440,26 @@
       [processId, dashboardId].forEach(id => { const element = document.getElementById(id); if (element && element.value !== value) element.value = value; });
       renderAll();
     }
+    let viewScope = 'mine';
+    function isCollaboratorUser() { return window.currentAuthenticatedUser?.rol === 'COLABORADOR' }
+    function isOwnFirstInstance(record) { return isAssignedToCurrentUser(record) && String(record.instance || '').toLowerCase().startsWith('primera') }
+    function inCurrentScope(record) { return !isCollaboratorUser() || viewScope === 'all' || isOwnFirstInstance(record) }
+    function setViewScope(scope) { viewScope = scope === 'all' ? 'all' : 'mine'; renderAll() }
+    function renderScopeBars() {
+      const collaborator = isCollaboratorUser();
+      const mine = viewScope === 'mine';
+      const ownCount = collaborator ? records.filter(isOwnFirstInstance).length : 0;
+      document.querySelectorAll('[data-scope-bar]').forEach(bar => {
+        bar.classList.toggle('hidden', !collaborator);
+        if (!collaborator) return;
+        bar.innerHTML = `<div class="scope-info"><strong>${mine ? 'Mostrando tus procesos en primera instancia' : 'Mostrando los procesos generales'}</strong><span>${mine ? `${ownCount} proceso(s) asignados a ti` : `${records.length} proceso(s) registrados en total`}</span></div><button type="button" class="secondary small" onclick="setViewScope('${mine ? 'all' : 'mine'}')">${mine ? 'Ver procesos generales' : 'Volver a mis procesos'}</button>`;
+      });
+    }
     function applyFilters(source = records) {
       const query = activeFilters.query.trim().toLowerCase();
       return source.filter(record => {
-        const searchable = ['shortNo', 'radicado', 'currentRadicado', 'id', 'orfeo', 'siproJ', 'claimant', 'defendant', 'ids'].some(key => String(record[key] || '').toLowerCase().includes(query));
+        if (!inCurrentScope(record)) return false;
+        const searchable = ['shortNo', 'radicado', 'currentRadicado', 'id', 'orfeo', 'siproJ', 'claimant', 'claimantId', 'defendant', 'ids', 'lawyer', 'area'].some(key => String(record[key] || '').toLowerCase().includes(query));
         const recordYear = (record.notificationDate || '').slice(0, 4);
         return searchable && (!activeFilters.state || record.state === activeFilters.state) &&
           (!activeFilters.instance || record.instance === activeFilters.instance) &&
@@ -1582,36 +2470,94 @@
           (!activeFilters.quality || record.quality === activeFilters.quality);
       });
     }
+    function isAssignedToCurrentUser(record) {
+      const user = window.currentAuthenticatedUser;
+      if (!user) return false;
+      const emailMatch = String(record.assignedEmail || '').toLowerCase() === String(user.correo || '').toLowerCase();
+      const lawyerMatch = String(record.lawyer || '').trim().toLowerCase() === String(user.nombre || '').trim().toLowerCase();
+      return emailMatch || lawyerMatch;
+    }
+    function renderAssignedProcesses() {
+      const panel = document.getElementById('assignedProcessesPanel');
+      if (!panel) return;
+      const isCollaborator = window.currentAuthenticatedUser?.rol === 'COLABORADOR';
+      panel.classList.toggle('hidden', !isCollaborator);
+      if (!isCollaborator) return;
+      const assigned = records.filter(record => isAssignedToCurrentUser(record) && String(record.instance || '').toLowerCase().startsWith('primera'));
+      document.getElementById('assignedProcessesTable').innerHTML = assigned.length
+        ? table(assigned)
+        : '<div class="empty">No tienes procesos asignados en primera instancia.</div>';
+    }
     function renderProcesses() {
       fillFilterOptions('filterInstance', records.map(record => record.instance), 'Todas las instancias');
       fillFilterOptions('filterType', records.map(record => record.type), 'Todos los tipos');
       fillFilterOptions('filterCause', records.map(record => record.cause), 'Todas las causas');
       fillFilterOptions('filterLawyer', records.map(record => record.lawyer), 'Todos los abogados');
       fillFilterOptions('filterYear', records.map(record => (record.notificationDate || '').slice(0, 4)), 'Todos los años');
+      renderAssignedProcesses();
+      const listTitle = document.getElementById('processesListTitle');
+      if (listTitle) listTitle.textContent = isCollaboratorUser() && viewScope === 'mine' ? 'Mis procesos asignados (primera instancia)' : 'Procesos generales';
       document.getElementById('processTable').innerHTML = table(applyFilters());
     }
     function renderFullProcesses() { const list = applyFilters(); document.getElementById('fullProcessTable').innerHTML = `<p class="table-summary">${list.length} procesos consultados.</p>${fullProcessTable(list)}` }
-    function renderActions() {
+    function visibleActionEntries() {
       const query = (document.getElementById('actionsSearch')?.value || '').trim().toLowerCase();
-      const entries = applyFilters().flatMap(record => (record.actions || []).map(action => ({ record, action })))
+      return applyFilters().flatMap(record => (record.actions || []).map(action => ({ record, action })))
         .filter(({ record, action }) => [record.shortNo, record.radicado, record.claimant, action.date, action.type, action.title, action.description, action.status, action.registeredBy]
           .some(value => String(value || '').toLowerCase().includes(query)))
         .sort((a, b) => b.action.date.localeCompare(a.action.date) || String(b.action.createdAt || '').localeCompare(String(a.action.createdAt || '')));
+    }
+    function renderActions() {
+      const entries = visibleActionEntries();
       const groupedEntries = entries.reduce((groups, entry) => {
         const processNumber = String(entry.record.shortNo || '').trim() || 'Sin número';
         if (!groups.has(processNumber)) groups.set(processNumber, []);
         groups.get(processNumber).push(entry);
         return groups;
       }, new Map());
-      const actionTable = groupEntries => `<div class="table-wrap"><table><thead><tr><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Tipo</th><th>Título / detalle</th><th>Estado</th><th>Demandante</th><th></th></tr></thead><tbody>${groupEntries.map(({ record, action }) => `<tr><td>${escapeHtml(record.shortNo || 'Sin número')}</td><td>${escapeHtml(record.radicado || '—')}</td><td>${escapeHtml(fmtDate(action.date))}</td><td>${escapeHtml(action.type || 'Otra')}</td><td><strong>${escapeHtml(action.title || '')}</strong><div>${escapeHtml(action.description)}</div></td><td>${escapeHtml(action.status || '—')}</td><td>${escapeHtml(record.claimant || '—')}</td><td><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>`;
+      const actionTable = groupEntries => `<div class="table-wrap"><table class="actions-table"><thead><tr><th>Incluir</th><th>Proceso</th><th>Radicado</th><th>Fecha</th><th>Vencimiento</th><th>Creada</th><th>Tipo</th><th>Título / detalle</th><th>Estado</th><th>Demandante</th><th></th></tr></thead><tbody>${groupEntries.map(({ record, action }) => `<tr><td><input type="checkbox" class="action-select" value="${escapeHtml(action.id)}" aria-label="Incluir ${escapeHtml(action.title || 'actuación')} en el reporte" ${selectedActionIds.has(action.id) ? 'checked' : ''} onchange="toggleActionReport('${action.id}', this.checked)"></td><td class="nowrap">${escapeHtml(record.shortNo || 'Sin número')}</td><td class="nowrap">${escapeHtml(record.radicado || '—')}</td><td class="nowrap">${escapeHtml(fmtDate(action.date))}</td><td class="nowrap">${escapeHtml(fmtDate(action.dueDate))}</td><td class="nowrap">${escapeHtml(action.createdAt ? new Date(action.createdAt).toLocaleString('es-CO') : '—')}</td><td>${escapeHtml(action.type || 'Otra')}</td><td class="cell-wide"><strong>${escapeHtml(action.title || '')}</strong><div>${escapeHtml(action.description)}</div></td><td>${escapeHtml(action.status || '—')}</td><td>${escapeHtml(record.claimant || '—')}</td><td class="nowrap"><button class="secondary small" onclick="openActions('${record.id}')">Abrir historial</button></td></tr>`).join('')}</tbody></table></div>`;
       document.getElementById('allActionsTable').innerHTML = groupedEntries.size
         ? [...groupedEntries.entries()]
           .sort(([processA], [processB]) => processA.localeCompare(processB, 'es', { numeric: true }))
-          .map(([processNumber, groupEntries]) => `<section class="action-group"><h3>Proceso ${escapeHtml(processNumber)} <span class="record-sub">(${groupEntries.length} actuaciones)</span></h3>${actionTable(groupEntries)}</section>`)
+          .map(([processNumber, groupEntries]) => `<section class="action-group"><h3><label><input type="checkbox" class="action-group-toggle" data-ids="${escapeHtml(groupEntries.map(({ action }) => action.id).join(','))}" onchange="toggleActionGroup(this)"> Proceso ${escapeHtml(processNumber)} <span class="record-sub">(${groupEntries.length} actuaciones)</span></label></h3>${actionTable(groupEntries)}</section>`)
           .join('')
         : '<div class="empty">No hay actuaciones registradas.</div>';
+      updateActionsSelectionUi();
+    }
+    function updateActionsSelectionUi() {
+      const entries = visibleActionEntries();
+      const selected = entries.filter(({ action }) => selectedActionIds.has(action.id)).length;
+      const summary = document.getElementById('actionsSelectionSummary');
+      if (summary) summary.textContent = selected ? `${selected} de ${entries.length} actuaciones seleccionadas` : `${entries.length} actuaciones visibles, ninguna seleccionada`;
+      const button = document.getElementById('actionsReportButton');
+      if (button) {
+        button.textContent = selected ? `Descargar PDF (${selected} seleccionadas)` : `Descargar PDF (todas: ${entries.length})`;
+        button.disabled = !entries.length;
+      }
+      document.querySelectorAll('.action-group-toggle').forEach(toggle => {
+        const ids = toggle.dataset.ids.split(',');
+        const count = ids.filter(id => selectedActionIds.has(id)).length;
+        toggle.checked = count === ids.length;
+        toggle.indeterminate = count > 0 && count < ids.length;
+      });
+    }
+    function toggleActionReport(id, selected) {
+      if (selected) selectedActionIds.add(id);
+      else selectedActionIds.delete(id);
+      updateActionsSelectionUi();
+    }
+    function toggleActionGroup(toggle) {
+      toggle.dataset.ids.split(',').forEach(id => { if (toggle.checked) selectedActionIds.add(id); else selectedActionIds.delete(id); });
+      document.querySelectorAll('.action-select').forEach(input => { input.checked = selectedActionIds.has(input.value); });
+      updateActionsSelectionUi();
+    }
+    function selectVisibleActions(selected) {
+      visibleActionEntries().forEach(({ action }) => { if (selected) selectedActionIds.add(action.id); else selectedActionIds.delete(action.id); });
+      document.querySelectorAll('.action-select').forEach(input => { input.checked = selectedActionIds.has(input.value); });
+      updateActionsSelectionUi();
     }
     function renderAll() {
+      renderScopeBars();
       const list = applyFilters();
       fillFilterOptions('filterInstance', records.map(record => record.instance), 'Todas las instancias');
       fillFilterOptions('filterType', records.map(record => record.type), 'Todos los tipos');
@@ -1623,12 +2569,15 @@
       document.getElementById('statClosed').textContent = list.filter(record => record.state === 'Terminado').length;
       document.getElementById('statActions').textContent = list.reduce((sum, record) => sum + (record.actions || []).length, 0);
       document.getElementById('statIssues').textContent = list.filter(issues).length;
+      const totalClaims = list.reduce((sum, record) => sum + (Number(record.amount) || 0), 0);
+      document.getElementById('statClaims').textContent = '$' + totalClaims.toFixed(0);
       document.getElementById('recentTable').innerHTML = table(list.slice(0, 5));
       renderCharts(list);
       if (!document.getElementById('processes').classList.contains('hidden')) renderProcesses();
       if (!document.getElementById('actions').classList.contains('hidden')) renderActions();
       if (!document.getElementById('hearings').classList.contains('hidden')) renderHearingsTable();
       if (!document.getElementById('processOverview').classList.contains('hidden')) renderFullProcesses();
+      if (document.getElementById('exportRecordChoices')) refreshExportRecordChoices();
     }
     function renderCharts(chartRecords = applyFilters()) {
       const records = chartRecords;
@@ -1713,10 +2662,9 @@
       document.getElementById('causeChart').innerHTML = ranked('cause', 'No hay causas clasificadas.');
     }
     function issues(r) { return !r.currentRadicado || !r.lawyer || (r.state === 'Terminado' && !r.endDate) || !r.area }
-    async function deleteProcess(id) { if (!confirm('¿Eliminar este proceso y sus audiencias, actuaciones e historial de auditoría? Esta acción no se puede deshacer.')) return; const beforeSave = JSON.stringify(records); try { if (isAppsScript()) { const token = accessToken(); if (!token) throw new Error('La sesión no es válida. Ingresa nuevamente.'); await callAppsScript('delete', token, id) } records = records.filter(record => record.id !== id); if (!isAppsScript()) localStorage.setItem(KEY, JSON.stringify(records)); updateCatalogControls(); renderAll() } catch (error) { records = JSON.parse(beforeSave); renderAll(); alert(error.message) } }
     function openActions(id) { actionProcessId = id; document.getElementById('actionForm').reset(); document.getElementById('actionDate').value = new Date().toISOString().slice(0, 10); renderActionDialog(); document.getElementById('actionsDialog').classList.add('open') }
     function closeActions() { document.getElementById('actionsDialog').classList.remove('open'); actionProcessId = null }
-    function renderActionDialog() { const record = records.find(r => r.id === actionProcessId); if (!record) return; document.getElementById('actionsTitle').textContent = 'Actuaciones · ' + (record.shortNo || 'Proceso'); document.getElementById('actionsProcess').textContent = `Radicado ${record.radicado || ''} · Estado actual: ${record.state || 'Sin estado'}`; const list = [...(record.actions || [])].sort((a, b) => b.date.localeCompare(a.date)); document.getElementById('actionList').innerHTML = list.length ? list.map(action => `<article class="action-item"><strong>${escapeHtml(fmtDate(action.date))} · ${escapeHtml(action.type || 'Otra')}</strong><div><b>${escapeHtml(action.title || '')}</b></div><div>${escapeHtml(action.description)}</div><div class="record-sub">Estado: ${escapeHtml(action.status || '—')} · Registrado por ${escapeHtml(action.registeredBy || 'Usuario local')}</div></article>`).join('') : '<div class="empty">Este proceso aún no tiene actuaciones registradas.</div>' }
+    function renderActionDialog() { const record = records.find(r => r.id === actionProcessId); if (!record) return; document.getElementById('actionsTitle').textContent = 'Actuaciones · ' + (record.shortNo || 'Proceso'); document.getElementById('actionsProcess').textContent = `Radicado ${record.radicado || ''} · Estado actual: ${record.state || 'Sin estado'}`; const list = [...(record.actions || [])].sort((a, b) => b.date.localeCompare(a.date)); document.getElementById('actionList').innerHTML = list.length ? list.map(action => `<article class="action-item"><strong>${escapeHtml(fmtDate(action.date))} · ${escapeHtml(action.type || 'Otra')}</strong><div><b>${escapeHtml(action.title || '')}</b></div><div>${escapeHtml(action.description)}</div><div class="record-sub">Vence: ${escapeHtml(fmtDate(action.dueDate))} · Creada: ${escapeHtml(action.createdAt ? new Date(action.createdAt).toLocaleString('es-CO') : '—')} · Estado: ${escapeHtml(action.status || '—')} · Registrado por ${escapeHtml(action.registeredBy || 'Usuario local')}</div></article>`).join('') : '<div class="empty">Este proceso aún no tiene actuaciones registradas.</div>' }
     async function saveAction(event) {
       event.preventDefault();
       const record = records.find(item => item.id === actionProcessId);
@@ -1731,6 +2679,7 @@
         type: document.getElementById('actionType').value,
         title: document.getElementById('actionTitle').value.trim(),
         description: document.getElementById('actionDescription').value.trim(),
+        dueDate: document.getElementById('actionDueDate').value,
         status: document.getElementById('actionState').value,
         registeredBy: currentActor(),
         createdAt: now
@@ -1751,28 +2700,117 @@
     function xmlEscape(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[char])) }
     function excelCell(value, type = 'String') { return `<Cell><Data ss:Type="${type}">${xmlEscape(value)}</Data></Cell>` }
     function excelRow(values, style = '') { return `<Row${style ? ` ss:StyleID="${style}"` : ''}>${values.map(value => value && typeof value === 'object' ? excelCell(value.value, value.type) : excelCell(value)).join('')}</Row>` }
+    function exportFieldGroups() {
+            const groups = [];
+      const assigned = new Set();
+      document.querySelectorAll('#processForm .form-step').forEach((section, index) => {
+        let group = { name: STEP_TITLES[index] || `Paso ${index + 1}`, fields: [] };
+        groups.push(group);
+        section.querySelectorAll('.section-heading, [name]').forEach(node => {
+          if (node.classList.contains('section-heading')) {
+            group = { name: node.textContent.trim(), fields: [] };
+            groups.push(group);
+          } else if (fields.includes(node.name) && !assigned.has(node.name)) {
+            assigned.add(node.name);
+            group.fields.push(node.name);
+          }
+        });
+      });
+      const rest = fields.filter(field => !assigned.has(field));
+      if (rest.length) groups.push({ name: 'Otros', fields: rest });
+      return groups.filter(group => group.fields.length);
+    }
+    function initializeExportSelectors() {
+      const target = document.getElementById('exportColumnChoices');
+      if (!target) return;
+      if (target.dataset.initialized) { refreshExportRecordChoices(); return; }
+      target.innerHTML = exportFieldGroups().map((group, index) => `<details class="export-group" ${index === 0 ? 'open' : ''}><summary><label><input type="checkbox" class="export-group-toggle" onchange="toggleExportGroup(this)"> <strong>${escapeHtml(group.name)}</strong></label><span class="export-group-count muted"></span></summary><div class="selector-grid">${group.fields.map(field => `<label data-label="${escapeHtml((labels[field] || field).toLowerCase())}"><input type="checkbox" class="export-column" value="${escapeHtml(field)}" checked onchange="updateExportColumnSummary()"><span>${escapeHtml(labels[field] || field)}</span></label>`).join('')}</div></details>`).join('');
+      target.dataset.initialized = 'true';
+      updateExportColumnSummary();
+      refreshExportRecordChoices();
+    }
+    function toggleExportGroup(toggle) {
+      toggle.closest('.export-group').querySelectorAll('.export-column').forEach(input => { input.checked = toggle.checked; });
+      updateExportColumnSummary();
+    }
+    function updateExportColumnSummary() {
+      document.querySelectorAll('.export-group').forEach(group => {
+        const inputs = [...group.querySelectorAll('.export-column')];
+        const checked = inputs.filter(input => input.checked).length;
+        const toggle = group.querySelector('.export-group-toggle');
+        toggle.checked = checked === inputs.length;
+        toggle.indeterminate = checked > 0 && checked < inputs.length;
+        group.querySelector('.export-group-count').textContent = `${checked}/${inputs.length}`;
+      });
+      const summary = document.getElementById('exportColumnSummary');
+      if (summary) summary.textContent = `${document.querySelectorAll('.export-column:checked').length} de ${document.querySelectorAll('.export-column').length} columnas seleccionadas.`;
+    }
+    function applyExportPreset(preset) {
+      document.querySelectorAll('.export-column').forEach(input => {
+        input.checked = preset === 'all';
+      });
+      updateExportColumnSummary();
+    }
+    function filterExportColumns() {
+      const query = (document.getElementById('exportColumnSearch')?.value || '').trim().toLowerCase();
+      document.querySelectorAll('.export-group').forEach(group => {
+        let visible = 0;
+        group.querySelectorAll('.selector-grid label').forEach(label => {
+          const match = !query || label.dataset.label.includes(query);
+          label.classList.toggle('hidden', !match);
+          if (match) visible++;
+        });
+        group.classList.toggle('hidden', !visible);
+        if (query && visible) group.open = true;
+      });
+    }
+    function refreshExportRecordChoices() {
+      const target = document.getElementById('exportRecordChoices');
+      if (!target) return;
+      const query = (document.getElementById('exportRecordSearch')?.value || '').trim().toLowerCase();
+      const filtered = applyFilters();
+      const matches = filtered.filter(record => [
+        record.shortNo, record.radicado, record.currentRadicado, record.id, record.orfeo,
+        record.siproJ, record.claimant, record.defendant, record.ids, record.lawyer
+      ].some(value => String(value || '').toLowerCase().includes(query)));
+      target.innerHTML = matches.length
+        ? matches.map(record => `<label><input type="checkbox" class="export-record" value="${escapeHtml(record.id)}" ${exportSelectedIds.has(record.id) ? 'checked' : ''} onchange="toggleExportRecord(this.value, this.checked)"><span><strong>${escapeHtml(record.shortNo || 'Sin número')}</strong> · ${escapeHtml(record.radicado || 'Sin radicado')} · ${escapeHtml(record.claimant || 'Sin demandante')} · ${escapeHtml(record.defendant || 'Sin demandado')}</span></label>`).join('')
+        : '<span class="muted">No hay procesos que coincidan con la búsqueda.</span>';
+      const selectedCount = filtered.filter(record => exportSelectedIds.has(record.id)).length;
+      const summary = document.getElementById('exportRecordSummary');
+      summary.textContent = `${matches.length} registros encontrados en la búsqueda actual; ${selectedCount} seleccionados. ${selectedCount ? 'Se exportarán únicamente los seleccionados.' : 'Como no hay registros marcados, se exportarán todos los que coincidan con los filtros generales.'}`;
+      const note = document.getElementById('exportSelectionNote');
+      if (note) note.textContent = selectedCount ? `${selectedCount} proceso(s) seleccionados en Procesos.` : `Sin selección: se exportarán los ${filtered.length} proceso(s) que coinciden con los filtros.`;
+    }
+    function toggleExportRecord(id, selected) {
+      if (selected) exportSelectedIds.add(id);
+      else exportSelectedIds.delete(id);
+      refreshExportRecordChoices();
+    }
+    function selectVisibleExportRecords(selected) {
+      document.querySelectorAll('#exportRecordChoices .export-record').forEach(input => {
+        if (selected) exportSelectedIds.add(input.value);
+        else exportSelectedIds.delete(input.value);
+      });
+      refreshExportRecordChoices();
+    }
     function exportExcel() {
-      const exportRecords = applyFilters();
-      const processHeaders = ['ID proceso', ...fields.map(field => labels[field]), 'Creado', 'Actualizado', 'Modificado por', 'Cantidad de audiencias', 'Cantidad de actuaciones'];
-      const processRows = exportRecords.map(record => [
-        record.id,
-        ...fields.map(field => record[field] || ''),
-        record.createdAt || '',
-        record.updatedAt || '',
-        record.updatedBy || '',
-        { value: (record.hearings || []).length, type: 'Number' },
-        { value: (record.actions || []).length, type: 'Number' }
-      ]);
-      const actionEntries = exportRecords.flatMap(record => (record.actions || []).map(action => [
-        action.id || '', record.id, record.shortNo || '', record.radicado || '', action.date || '', action.type || '', action.title || '', action.description || '', action.status || '', action.registeredBy || '', action.createdAt || ''
-      ]));
-      const actionHeaders = ['ID actuación', 'ID proceso', 'No. corto', 'Radicado', 'Fecha', 'Tipo', 'Título', 'Descripción', 'Estado', 'Registrado por', 'Fecha de registro'];
-      const hearingEntries = exportRecords.flatMap(record => (record.hearings || []).map(hearing => [hearing.id || '', record.id, record.shortNo || '', record.radicado || '', hearing.type || '', hearing.number || '', hearing.date || '', hearing.observation || '']));
-      const hearingHeaders = ['ID audiencia', 'ID proceso', 'No. corto', 'Radicado', 'Tipo de audiencia', 'Sesión', 'Fecha', 'Observación'];
-      const auditEntries = exportRecords.flatMap(record => (record.audit || []).map(audit => [record.id, record.shortNo || '', audit.changedAt || '', audit.changedBy || '', (audit.changedFields || []).join(', ')]));
-      const auditHeaders = ['ID proceso', 'No. corto', 'Fecha de cambio', 'Modificado por', 'Campos modificados'];
+      const filteredRecords = applyFilters();
+      const selectedRecords = filteredRecords.filter(record => exportSelectedIds.has(record.id));
+      const exportRecords = selectedRecords.length ? selectedRecords : filteredRecords;
+      const selectedFields = [...document.querySelectorAll('.export-column:checked')].map(input => input.value);
+      if (!exportRecords.length) {
+        alert('No hay procesos para exportar. Ajusta la búsqueda o los filtros.');
+        return;
+      }
+      if (!selectedFields.length) {
+        alert('Selecciona al menos una columna para exportar.');
+        return;
+      }
+      const processHeaders = ['ID proceso', ...selectedFields.map(field => labels[field] || field)];
+      const processRows = exportRecords.map(record => [record.id, ...selectedFields.map(field => record[field] || '')]);
       const worksheet = (name, headers, data) => `<Worksheet ss:Name="${name}"><Table>${excelRow(headers, 'Header')}${data.map(row => excelRow(row)).join('')}</Table></Worksheet>`;
-      const workbook = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#344554" ss:Pattern="Solid"/></Style></Styles>${worksheet('Procesos', processHeaders, processRows)}${worksheet('Audiencias', hearingHeaders, hearingEntries)}${worksheet('Actuaciones', actionHeaders, actionEntries)}${worksheet('Auditoria', auditHeaders, auditEntries)}</Workbook>`;
+      const workbook = `<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#344554" ss:Pattern="Solid"/></Style></Styles>${worksheet('Procesos', processHeaders, processRows)}</Workbook>`;
       const blob = new Blob(['\uFEFF', workbook], { type: 'application/vnd.ms-excel;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -1786,8 +2824,11 @@
       window.print();
     }
     async function clearData() { if (!confirm('Esta acción elimina todos los registros guardados en este navegador. ¿Continuar?')) return; records = []; try { await persist() } catch (error) { alert(error.message) } }
+    renderStepButtons();
+    applyLegendPreferences();
     load();
-const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
+
+    const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
     function showAuthFailure(message) {
       document.getElementById('authTitle').textContent = 'Acceso no disponible';
       document.getElementById('authMessage').textContent = message;
@@ -1798,6 +2839,7 @@ const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
     }
     function showLogin(message) {
       window.currentAuthenticatedUser = null;
+      configureAdminRequiredFields(null);
       document.getElementById('authTitle').textContent = 'Ingresa tu correo';
       document.getElementById('authMessage').textContent = message || 'Te enviaremos un código para verificar tu dirección y autorizar el acceso.';
       document.getElementById('authRetry').classList.add('hidden');
@@ -1815,6 +2857,8 @@ const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
       document.getElementById('userName').textContent = user.nombre || user.correo;
       document.getElementById('userRole').textContent = user.rol === 'ADMINISTRADOR' ? 'Administrador' : 'Colaborador';
       document.querySelectorAll('[data-admin-only]').forEach(element => element.classList.toggle('hidden', user.rol !== 'ADMINISTRADOR'));
+      viewScope = 'mine';
+      configureAdminRequiredFields(user);
       document.getElementById('userIdentity').classList.remove('hidden');
       document.getElementById('logoutButton').classList.remove('hidden');
       document.body.classList.remove('auth-pending');
@@ -1963,7 +3007,20 @@ const ACCESS_SESSION_KEY = 'judicial_access_session_v1';
 
 
 
-</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
 </body>
 
 </html>
